@@ -1833,14 +1833,17 @@ func (g *Generator) generateClient(service *parser.Service) string {
 	contents += tabtab + "}\n"
 	contents += tabtab + "return null;\n"
 	contents += tab + "}\n"
-	contents += "\n"
-
+	
 	for _, method := range service.Methods {
+		contents += "\n"
 		contents += g.generateClientMethod(service, method)
 	}
 
-	contents += g.generatePrepareMessage();
-	contents += g.generateProcessReply();
+	if len(service.Methods) > 0 {
+		contents += "\n"
+		contents += g.generatePrepareMessage();
+		contents += g.generateProcessReply();
+	}
 
 	contents += "}\n\n"
 
@@ -1950,7 +1953,7 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 
 	if method.Oneway {
 		contents += indent + "await _transport.oneway(ctx, message);\n"
-		contents += tab + "}\n\n"
+		contents += tab + "}\n"
 		return contents
 	}
 
@@ -1973,7 +1976,7 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 			nameLower)
 		contents += tabtab + ");\n"
 	}
-	contents += tab + "}\n"
+	contents += tab + "}"
 
 	return contents
 }
