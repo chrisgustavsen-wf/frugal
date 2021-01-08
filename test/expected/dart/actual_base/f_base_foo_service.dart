@@ -56,20 +56,30 @@ class FBaseFooClient extends disposable.Disposable implements FBaseFoo {
   }
 
   Future _basePing(frugal.FContext ctx) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
+    final args = basePing_args();
+    final message = _prepareMessage(ctx, 'basePing', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
+
+    final result = basePing_result();
+    _processReply(ctx, result, response);
+  }
+  
+Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {
+    final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
+    final oprot = _protocolFactory.getProtocol(memoryBuffer);
     oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('basePing', thrift.TMessageType.CALL, 0));
-    basePing_args args = basePing_args();
+    oprot.writeMessageBegin(thrift.TMessage(method, kind, 0));
     args.write(oprot);
     oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
-
-    var iprot = _protocolFactory.getProtocol(response);
+    return memoryBuffer.writeBytes;
+  }
+  
+void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {
+    final iprot = _protocolFactory.getProtocol(response);
     iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
+    final msg = iprot.readMessageBegin();
     if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
+      final error = thrift.TApplicationError.read(iprot);
       iprot.readMessageEnd();
       if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
         throw thrift.TTransportError(
@@ -78,7 +88,6 @@ class FBaseFooClient extends disposable.Disposable implements FBaseFoo {
       throw error;
     }
 
-    basePing_result result = basePing_result();
     result.read(iprot);
     iprot.readMessageEnd();
   }

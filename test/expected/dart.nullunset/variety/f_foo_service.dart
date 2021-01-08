@@ -110,31 +110,12 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future _ping(frugal.FContext ctx) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('ping', thrift.TMessageType.CALL, 0));
-    Ping_args args = Ping_args();
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final args = Ping_args();
+    final message = _prepareMessage(ctx, 'ping', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    Ping_result result = Ping_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = Ping_result();
+    _processReply(ctx, result, response);
   }
   /// Blah the server.
   @override
@@ -143,34 +124,15 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<int> _blah(frugal.FContext ctx, int num, String str, t_variety.Event event) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('blah', thrift.TMessageType.CALL, 0));
-    blah_args args = blah_args();
+    final args = blah_args();
     args.num = num;
     args.str = str;
     args.event = event;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'blah', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    blah_result result = blah_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = blah_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -192,16 +154,11 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future _oneWay(frugal.FContext ctx, int id, Map<int, String> req) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('oneWay', thrift.TMessageType.ONEWAY, 0));
-    oneWay_args args = oneWay_args();
+    final args = oneWay_args();
     args.id = id;
     args.req = req;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    await _transport.oneway(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'oneWay', args, thrift.TMessageType.ONEWAY);
+    await _transport.oneway(ctx, message);
   }
 
   @override
@@ -210,33 +167,14 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<Uint8List> _bin_method(frugal.FContext ctx, Uint8List bin, String str) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('bin_method', thrift.TMessageType.CALL, 0));
-    bin_method_args args = bin_method_args();
+    final args = bin_method_args();
     args.bin = bin;
     args.str = str;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'bin_method', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    bin_method_result result = bin_method_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = bin_method_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -254,34 +192,15 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<int> _param_modifiers(frugal.FContext ctx, int opt_num, int default_num, int req_num) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('param_modifiers', thrift.TMessageType.CALL, 0));
-    param_modifiers_args args = param_modifiers_args();
+    final args = param_modifiers_args();
     args.opt_num = opt_num;
     args.default_num = default_num;
     args.req_num = req_num;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'param_modifiers', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    param_modifiers_result result = param_modifiers_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = param_modifiers_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -296,33 +215,14 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<List<int>> _underlying_types_test(frugal.FContext ctx, List<int> list_type, Set<int> set_type) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('underlying_types_test', thrift.TMessageType.CALL, 0));
-    underlying_types_test_args args = underlying_types_test_args();
+    final args = underlying_types_test_args();
     args.list_type = list_type;
     args.set_type = set_type;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'underlying_types_test', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    underlying_types_test_result result = underlying_types_test_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = underlying_types_test_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -337,31 +237,12 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<t_validStructs.Thing> _getThing(frugal.FContext ctx) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('getThing', thrift.TMessageType.CALL, 0));
-    getThing_args args = getThing_args();
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final args = getThing_args();
+    final message = _prepareMessage(ctx, 'getThing', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    getThing_result result = getThing_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = getThing_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -376,31 +257,12 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<int> _getMyInt(frugal.FContext ctx) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('getMyInt', thrift.TMessageType.CALL, 0));
-    getMyInt_args args = getMyInt_args();
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final args = getMyInt_args();
+    final message = _prepareMessage(ctx, 'getMyInt', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    getMyInt_result result = getMyInt_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = getMyInt_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -415,32 +277,13 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<t_subdir_include_ns.A> _use_subdir_struct(frugal.FContext ctx, t_subdir_include_ns.A a) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('use_subdir_struct', thrift.TMessageType.CALL, 0));
-    use_subdir_struct_args args = use_subdir_struct_args();
+    final args = use_subdir_struct_args();
     args.a = a;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'use_subdir_struct', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    use_subdir_struct_result result = use_subdir_struct_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = use_subdir_struct_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -455,32 +298,13 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<String> _sayHelloWith(frugal.FContext ctx, String newMessage) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('sayHelloWith', thrift.TMessageType.CALL, 0));
-    sayHelloWith_args args = sayHelloWith_args();
+    final args = sayHelloWith_args();
     args.newMessage = newMessage;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'sayHelloWith', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    sayHelloWith_result result = sayHelloWith_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = sayHelloWith_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -495,32 +319,13 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<String> _whatDoYouSay(frugal.FContext ctx, String messageArgs) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('whatDoYouSay', thrift.TMessageType.CALL, 0));
-    whatDoYouSay_args args = whatDoYouSay_args();
+    final args = whatDoYouSay_args();
     args.messageArgs = messageArgs;
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
+    final message = _prepareMessage(ctx, 'whatDoYouSay', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
 
-    var iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    whatDoYouSay_result result = whatDoYouSay_result();
-    result.read(iprot);
-    iprot.readMessageEnd();
+    final result = whatDoYouSay_result();
+    _processReply(ctx, result, response);
     if (result.isSetSuccess()) {
       return result.success;
     }
@@ -535,21 +340,38 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
   }
 
   Future<String> _sayAgain(frugal.FContext ctx, String messageResult) async {
-    var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    var oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage('sayAgain', thrift.TMessageType.CALL, 0));
-    sayAgain_args args = sayAgain_args();
+    final args = sayAgain_args();
     args.messageResult = messageResult;
+    final message = _prepareMessage(ctx, 'sayAgain', args, thrift.TMessageType.CALL);
+    var response = await _transport.request(ctx, message);
+
+    final result = sayAgain_result();
+    _processReply(ctx, result, response);
+    if (result.isSetSuccess()) {
+      return result.success;
+    }
+
+    throw thrift.TApplicationError(
+      frugal.FrugalTApplicationErrorType.MISSING_RESULT, 'sayAgain failed: unknown result'
+    );
+  }
+  
+Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {
+    final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
+    final oprot = _protocolFactory.getProtocol(memoryBuffer);
+    oprot.writeRequestHeader(ctx);
+    oprot.writeMessageBegin(thrift.TMessage(method, kind, 0));
     args.write(oprot);
     oprot.writeMessageEnd();
-    var response = await _transport.request(ctx, memoryBuffer.writeBytes);
-
-    var iprot = _protocolFactory.getProtocol(response);
+    return memoryBuffer.writeBytes;
+  }
+  
+void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {
+    final iprot = _protocolFactory.getProtocol(response);
     iprot.readResponseHeader(ctx);
-    thrift.TMessage msg = iprot.readMessageBegin();
+    final msg = iprot.readMessageBegin();
     if (msg.type == thrift.TMessageType.EXCEPTION) {
-      thrift.TApplicationError error = thrift.TApplicationError.read(iprot);
+      final error = thrift.TApplicationError.read(iprot);
       iprot.readMessageEnd();
       if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
         throw thrift.TTransportError(
@@ -558,16 +380,8 @@ class FFooClient extends t_actual_base_dart.FBaseFooClient with disposable.Dispo
       throw error;
     }
 
-    sayAgain_result result = sayAgain_result();
     result.read(iprot);
     iprot.readMessageEnd();
-    if (result.isSetSuccess()) {
-      return result.success;
-    }
-
-    throw thrift.TApplicationError(
-      frugal.FrugalTApplicationErrorType.MISSING_RESULT, 'sayAgain failed: unknown result'
-    );
   }
 }
 
