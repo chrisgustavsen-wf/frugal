@@ -1,5 +1,7 @@
 module github.com/Workiva/frugal/lib/go
 
+go 1.15
+
 require (
 	github.com/apache/thrift v0.13.0
 	github.com/go-stomp/stomp v2.1.0+incompatible

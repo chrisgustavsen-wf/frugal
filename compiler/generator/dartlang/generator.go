@@ -1838,7 +1838,70 @@ func (g *Generator) generateClient(service *parser.Service) string {
 	for _, method := range service.Methods {
 		contents += g.generateClientMethod(service, method)
 	}
+
+	contents += g.generatePrepareMessage();
+	contents += g.generateProcessReply();
+
 	contents += "}\n\n"
+
+	return contents
+}
+
+func (g *Generator) generatePrepareMessage() string {
+	indent := tab
+
+	contents := indent + "\nUint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {\n"
+
+	indent = tabtab
+	contents += indent + "final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);\n"
+	contents += indent + "final oprot = _protocolFactory.getProtocol(memoryBuffer);\n"
+	contents += indent + "oprot.writeRequestHeader(ctx);\n"
+	contents += indent + "oprot.writeMessageBegin(thrift.TMessage(method, kind, 0));\n"
+	contents += indent + "args.write(oprot);\n"
+	contents += indent + "oprot.writeMessageEnd();\n"
+
+	contents += indent + "return memoryBuffer.writeBytes;\n"
+
+	indent = tab
+	contents += indent + "}\n"
+
+	return contents
+}
+
+func (g *Generator) generateProcessReply() string {
+	indent := tab
+
+	contents := indent + "\nvoid _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {\n"
+
+	indent = tabtab
+	contents += indent + "final iprot = _protocolFactory.getProtocol(response);\n"
+	contents += indent + "iprot.readResponseHeader(ctx);\n"
+	contents += indent + "final msg = iprot.readMessageBegin();\n"
+	contents += indent + "if (msg.type == thrift.TMessageType.EXCEPTION) {\n"
+
+	indent = tabtabtab
+	contents += indent + "final error = thrift.TApplicationError.read(iprot);\n"
+	contents += indent + "iprot.readMessageEnd();\n"
+	contents += indent + "if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {\n"
+
+	indent = tabtabtabtab
+	contents += indent + "throw thrift.TTransportError(\n"
+
+	indent = tabtabtabtabtabtab
+	contents += indent + "frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);\n"
+
+	indent = tabtabtab
+	contents += indent + "}\n"
+	contents += indent + "throw error;\n"
+
+	indent = tabtab
+	contents += indent + "}\n\n"
+
+	contents += indent + "result.read(iprot);\n"
+	contents += indent + "iprot.readMessageEnd();\n"
+
+	indent = tab
+	contents += indent + "}\n"
 
 	return contents
 }
@@ -1872,48 +1935,31 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 
 	indent := tabtab
 
-	contents += indent + "var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);\n"
-	contents += indent + "var oprot = _protocolFactory.getProtocol(memoryBuffer);\n"
-	contents += indent + "oprot.writeRequestHeader(ctx);\n"
-	msgType := "CALL"
-	if method.Oneway {
-		msgType = "ONEWAY"
-	}
-	contents += fmt.Sprintf(indent+"oprot.writeMessageBegin(thrift.TMessage('%s', thrift.TMessageType.%s, 0));\n",
-		nameLower, msgType)
-	contents += fmt.Sprintf(indent+"%s_args args = %s_args();\n", method.Name, method.Name)
+	contents += fmt.Sprintf(indent+"final args = %s_args();\n", method.Name)
 	for _, arg := range method.Arguments {
 		argLower := parser.LowercaseFirstLetter(arg.Name)
 		contents += fmt.Sprintf(indent+"args.%s = %s;\n", argLower, argLower)
 	}
-	contents += indent + "args.write(oprot);\n"
-	contents += indent + "oprot.writeMessageEnd();\n"
+	msgType := "CALL"
+	if method.Oneway {
+		msgType = "ONEWAY"
+	}
+
+	contents += fmt.Sprintf(indent+"final message = _prepareMessage(ctx, '%s', args, thrift.TMessageType.%s);\n",
+	nameLower, msgType)
 
 	if method.Oneway {
-		contents += indent + "await _transport.oneway(ctx, memoryBuffer.writeBytes);\n"
+		contents += indent + "await _transport.oneway(ctx, message);\n"
 		contents += tab + "}\n\n"
 		return contents
 	}
 
-	contents += indent + "var response = await _transport.request(ctx, memoryBuffer.writeBytes);\n"
+	contents += indent + "var response = await _transport.request(ctx, message);\n"
 	contents += "\n"
 
-	contents += tabtab + "var iprot = _protocolFactory.getProtocol(response);\n"
-	contents += tabtab + "iprot.readResponseHeader(ctx);\n"
-	contents += tabtab + "thrift.TMessage msg = iprot.readMessageBegin();\n"
-	contents += tabtab + "if (msg.type == thrift.TMessageType.EXCEPTION) {\n"
-	contents += tabtabtab + "thrift.TApplicationError error = thrift.TApplicationError.read(iprot);\n"
-	contents += tabtabtab + "iprot.readMessageEnd();\n"
-	contents += tabtabtab + "if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {\n"
-	contents += tabtabtabtab + "throw thrift.TTransportError(\n"
-	contents += tabtabtabtabtabtab + "frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);\n"
-	contents += tabtabtab + "}\n"
-	contents += tabtabtab + "throw error;\n"
-	contents += tabtab + "}\n\n"
+	contents += fmt.Sprintf(tabtab+"final result = %s_result();\n", method.Name)
+	contents += indent + "_processReply(ctx, result, response);\n"
 
-	contents += fmt.Sprintf(tabtab+"%s_result result = %s_result();\n", method.Name, method.Name)
-	contents += tabtab + "result.read(iprot);\n"
-	contents += tabtab + "iprot.readMessageEnd();\n"
 	if method.ReturnType == nil {
 		contents += g.generateErrors(method)
 	} else {
