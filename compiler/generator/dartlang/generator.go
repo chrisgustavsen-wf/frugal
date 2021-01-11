@@ -1853,7 +1853,8 @@ func (g *Generator) generateClient(service *parser.Service) string {
 func (g *Generator) generatePrepareMessage() string {
 	indent := tab
 
-	contents := indent + "\nUint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {\n"
+	contents := "\n"
+	contents += indent + "Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {\n"
 
 	indent = tabtab
 	contents += indent + "final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);\n"
@@ -1874,7 +1875,8 @@ func (g *Generator) generatePrepareMessage() string {
 func (g *Generator) generateProcessReply() string {
 	indent := tab
 
-	contents := indent + "\nvoid _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {\n"
+	contents := "\n"
+	contents += indent + "void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {\n"
 
 	indent = tabtab
 	contents += indent + "final iprot = _protocolFactory.getProtocol(response);\n"

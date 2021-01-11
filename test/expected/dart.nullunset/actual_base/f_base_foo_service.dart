@@ -63,8 +63,8 @@ class FBaseFooClient extends disposable.Disposable implements FBaseFoo {
     final result = basePing_result();
     _processReply(ctx, result, response);
   }
-  
-Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {
+
+  Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {
     final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
     final oprot = _protocolFactory.getProtocol(memoryBuffer);
     oprot.writeRequestHeader(ctx);
@@ -73,8 +73,8 @@ Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args,
     oprot.writeMessageEnd();
     return memoryBuffer.writeBytes;
   }
-  
-void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {
+
+  void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {
     final iprot = _protocolFactory.getProtocol(response);
     iprot.readResponseHeader(ctx);
     final msg = iprot.readMessageBegin();
