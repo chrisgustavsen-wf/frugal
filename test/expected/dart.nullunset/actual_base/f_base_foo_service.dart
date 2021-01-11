@@ -57,39 +57,11 @@ class FBaseFooClient extends disposable.Disposable implements FBaseFoo {
 
   Future _basePing(frugal.FContext ctx) async {
     final args = basePing_args();
-    final message = _prepareMessage(ctx, 'basePing', args, thrift.TMessageType.CALL);
+    final message = frugal.prepareMessage(ctx, 'basePing', args, thrift.TMessageType.CALL, _protocolFactory, _transport.requestSizeLimit);
     var response = await _transport.request(ctx, message);
 
     final result = basePing_result();
-    _processReply(ctx, result, response);
-  }
-
-  Uint8List _prepareMessage(frugal.FContext ctx, String method, thrift.TBase args, int kind) {
-    final memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);
-    final oprot = _protocolFactory.getProtocol(memoryBuffer);
-    oprot.writeRequestHeader(ctx);
-    oprot.writeMessageBegin(thrift.TMessage(method, kind, 0));
-    args.write(oprot);
-    oprot.writeMessageEnd();
-    return memoryBuffer.writeBytes;
-  }
-
-  void _processReply(frugal.FContext ctx, thrift.TBase result, thrift.TTransport response) {
-    final iprot = _protocolFactory.getProtocol(response);
-    iprot.readResponseHeader(ctx);
-    final msg = iprot.readMessageBegin();
-    if (msg.type == thrift.TMessageType.EXCEPTION) {
-      final error = thrift.TApplicationError.read(iprot);
-      iprot.readMessageEnd();
-      if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {
-        throw thrift.TTransportError(
-            frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);
-      }
-      throw error;
-    }
-
-    result.read(iprot);
-    iprot.readMessageEnd();
+    frugal.processReply(ctx, result, response, _protocolFactory);
   }
 }
 
