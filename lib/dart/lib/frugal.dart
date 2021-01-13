@@ -42,3 +42,4 @@ export 'src/frugal.dart'
         TMemoryOutputBuffer,
         TMemoryTransport,
         debugMiddleware;
+export 'src/frugal/f_packers.dart' show prepareMessage, processReply;

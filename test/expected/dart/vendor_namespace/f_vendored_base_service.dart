@@ -46,6 +46,5 @@ class FVendoredBaseClient extends disposable.Disposable implements FVendoredBase
     }
     return null;
   }
-
 }
 
