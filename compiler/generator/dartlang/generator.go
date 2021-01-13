@@ -1833,11 +1833,16 @@ func (g *Generator) generateClient(service *parser.Service) string {
 	contents += tabtab + "}\n"
 	contents += tabtab + "return null;\n"
 	contents += tab + "}\n"
-	contents += "\n"
-
+	
 	for _, method := range service.Methods {
+		contents += "\n"
 		contents += g.generateClientMethod(service, method)
 	}
+
+	if len(service.Methods) > 0 {
+		contents += "\n"
+	}
+
 	contents += "}\n\n"
 
 	return contents
@@ -1872,48 +1877,31 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 
 	indent := tabtab
 
-	contents += indent + "var memoryBuffer = frugal.TMemoryOutputBuffer(_transport.requestSizeLimit);\n"
-	contents += indent + "var oprot = _protocolFactory.getProtocol(memoryBuffer);\n"
-	contents += indent + "oprot.writeRequestHeader(ctx);\n"
-	msgType := "CALL"
-	if method.Oneway {
-		msgType = "ONEWAY"
-	}
-	contents += fmt.Sprintf(indent+"oprot.writeMessageBegin(thrift.TMessage('%s', thrift.TMessageType.%s, 0));\n",
-		nameLower, msgType)
-	contents += fmt.Sprintf(indent+"%s_args args = %s_args();\n", method.Name, method.Name)
+	contents += fmt.Sprintf(indent+"final args = %s_args();\n", method.Name)
 	for _, arg := range method.Arguments {
 		argLower := parser.LowercaseFirstLetter(arg.Name)
 		contents += fmt.Sprintf(indent+"args.%s = %s;\n", argLower, argLower)
 	}
-	contents += indent + "args.write(oprot);\n"
-	contents += indent + "oprot.writeMessageEnd();\n"
+	msgType := "CALL"
+	if method.Oneway {
+		msgType = "ONEWAY"
+	}
+
+	contents += fmt.Sprintf(indent+"final message = frugal.prepareMessage(ctx, '%s', args, thrift.TMessageType.%s, _protocolFactory, _transport.requestSizeLimit);\n",
+	nameLower, msgType)
 
 	if method.Oneway {
-		contents += indent + "await _transport.oneway(ctx, memoryBuffer.writeBytes);\n"
-		contents += tab + "}\n\n"
+		contents += indent + "await _transport.oneway(ctx, message);\n"
+		contents += tab + "}\n"
 		return contents
 	}
 
-	contents += indent + "var response = await _transport.request(ctx, memoryBuffer.writeBytes);\n"
+	contents += indent + "var response = await _transport.request(ctx, message);\n"
 	contents += "\n"
 
-	contents += tabtab + "var iprot = _protocolFactory.getProtocol(response);\n"
-	contents += tabtab + "iprot.readResponseHeader(ctx);\n"
-	contents += tabtab + "thrift.TMessage msg = iprot.readMessageBegin();\n"
-	contents += tabtab + "if (msg.type == thrift.TMessageType.EXCEPTION) {\n"
-	contents += tabtabtab + "thrift.TApplicationError error = thrift.TApplicationError.read(iprot);\n"
-	contents += tabtabtab + "iprot.readMessageEnd();\n"
-	contents += tabtabtab + "if (error.type == frugal.FrugalTTransportErrorType.REQUEST_TOO_LARGE) {\n"
-	contents += tabtabtabtab + "throw thrift.TTransportError(\n"
-	contents += tabtabtabtabtabtab + "frugal.FrugalTTransportErrorType.RESPONSE_TOO_LARGE, error.message);\n"
-	contents += tabtabtab + "}\n"
-	contents += tabtabtab + "throw error;\n"
-	contents += tabtab + "}\n\n"
+	contents += fmt.Sprintf(tabtab+"final result = %s_result();\n", method.Name)
+	contents += indent + "frugal.processReply(ctx, result, response, _protocolFactory);\n"
 
-	contents += fmt.Sprintf(tabtab+"%s_result result = %s_result();\n", method.Name, method.Name)
-	contents += tabtab + "result.read(iprot);\n"
-	contents += tabtab + "iprot.readMessageEnd();\n"
 	if method.ReturnType == nil {
 		contents += g.generateErrors(method)
 	} else {
@@ -1927,7 +1915,7 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 			nameLower)
 		contents += tabtab + ");\n"
 	}
-	contents += tab + "}\n"
+	contents += tab + "}"
 
 	return contents
 }
