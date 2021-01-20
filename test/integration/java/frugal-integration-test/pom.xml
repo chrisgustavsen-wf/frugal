@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.workiva</groupId>
             <artifactId>frugal</artifactId>
-            <version>3.13.0</version>
+            <version>3.13.1</version>
         </dependency>
         <dependency>
             <groupId>io.nats</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.56.Final</version>
+            <version>4.1.58.Final</version>
         </dependency>
         <dependency>
             <groupId>org.nanohttpd</groupId>
