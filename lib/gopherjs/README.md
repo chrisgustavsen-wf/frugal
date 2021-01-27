@@ -80,8 +80,8 @@ $ ./test.sh
 ```
 
 Or tabular
-
-  | Standard Go | Slim Go | GopherJS
--- | -- | -- | --
+ 
+Standard Go | Slim Go | GopherJS
+:--- |:---:|:---:
 Normal | 8470279 (8.4 MB) | 8302420 (8.3 MB) | 1128616 (1.1 MB)
 Minified | 5492268 (5.5 MB) | 5382206 (5.3 MB) | 746860 (746 kB)
