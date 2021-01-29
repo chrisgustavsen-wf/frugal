@@ -19,10 +19,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Workiva/frugal/lib/gopherjs/thrift"
-	"github.com/nats-io/gnatsd/server"
+	"github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/Workiva/frugal/lib/gopherjs/thrift"
 )
 
 var defaultOptions = server.Options{

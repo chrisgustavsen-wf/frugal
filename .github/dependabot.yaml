@@ -1,0 +1,74 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/lib/go"
+    schedule:
+      interval: "weekly"
+    target_branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Go: "
+  - package-ecosystem: "gomod"
+      directory: "/lib/gopherjs"
+      schedule:
+        interval: "weekly"
+      target_branch: "develop"
+      reviewers:
+        - "charliekump-wf"
+        - "erikpetersen-wf"
+        - "natewoods-wf"
+        - "yuanmwang-wf"
+      commit-message:
+        prefix: "Go: "
+  - package-ecosystem: "maven"
+    directory: "/lib/java"
+    schedule:
+      interval: "weekly"
+    target_branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Java: "
+  - package-ecosystem: "maven"
+    directory: "/examples/java"
+    schedule:
+      interval: "weekly"
+    target_branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Examples: "
+  - package-ecosystem: "maven"
+    directory: "/test/integration/java/frugal-integration-test"
+    schedule:
+      interval: "weekly"
+    target_branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Tests: "
+  - package-ecosystem: "pip"
+    directory: "/lib/python"
+    schedule: 
+      interval: "weekly"
+    target_branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Python: "
