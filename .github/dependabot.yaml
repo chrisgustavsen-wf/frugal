@@ -4,7 +4,7 @@ updates:
     directory: "/lib/go"
     schedule:
       interval: "weekly"
-    target_branch: "develop"
+    target-branch: "develop"
     reviewers:
       - "charliekump-wf"
       - "erikpetersen-wf"
@@ -13,22 +13,22 @@ updates:
     commit-message:
       prefix: "Go: "
   - package-ecosystem: "gomod"
-      directory: "/lib/gopherjs"
-      schedule:
-        interval: "weekly"
-      target_branch: "develop"
-      reviewers:
-        - "charliekump-wf"
-        - "erikpetersen-wf"
-        - "natewoods-wf"
-        - "yuanmwang-wf"
-      commit-message:
-        prefix: "Go: "
+    directory: "/lib/gopherjs"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "erikpetersen-wf"
+      - "natewoods-wf"
+      - "yuanmwang-wf"
+    commit-message:
+      prefix: "Go: "
   - package-ecosystem: "maven"
     directory: "/lib/java"
     schedule:
       interval: "weekly"
-    target_branch: "develop"
+    target-branch: "develop"
     reviewers:
       - "charliekump-wf"
       - "erikpetersen-wf"
@@ -40,7 +40,7 @@ updates:
     directory: "/examples/java"
     schedule:
       interval: "weekly"
-    target_branch: "develop"
+    target-branch: "develop"
     reviewers:
       - "charliekump-wf"
       - "erikpetersen-wf"
@@ -52,7 +52,7 @@ updates:
     directory: "/test/integration/java/frugal-integration-test"
     schedule:
       interval: "weekly"
-    target_branch: "develop"
+    target-branch: "develop"
     reviewers:
       - "charliekump-wf"
       - "erikpetersen-wf"
@@ -62,9 +62,9 @@ updates:
       prefix: "Tests: "
   - package-ecosystem: "pip"
     directory: "/lib/python"
-    schedule: 
+    schedule:
       interval: "weekly"
-    target_branch: "develop"
+    target-branch: "develop"
     reviewers:
       - "charliekump-wf"
       - "erikpetersen-wf"
