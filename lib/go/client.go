@@ -83,33 +83,35 @@ func (client *FStandardClient) Publish(ctx FContext, op, topic string, message t
 	return client.publisher.Publish(topic, payload)
 }
 
-func (client FStandardClient) prepareMessage(ctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
+func (client FStandardClient) prepareMessage(fctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
 	buffer := NewTMemoryOutputBuffer(client.limit)
 	oprot := client.protocolFactory.GetProtocol(buffer)
-	if err := oprot.WriteRequestHeader(ctx); err != nil {
+	if err := oprot.WriteRequestHeader(fctx); err != nil {
 		return nil, err
 	}
-	if err := oprot.WriteMessageBegin(method, kind, 0); err != nil {
+	ctx := toCTX(fctx)
+	if err := oprot.WriteMessageBegin(ctx, method, kind, 0); err != nil {
 		return nil, err
 	}
-	if err := args.Write(oprot); err != nil {
+	if err := args.Write(ctx, oprot); err != nil {
 		return nil, err
 	}
-	if err := oprot.WriteMessageEnd(); err != nil {
+	if err := oprot.WriteMessageEnd(ctx); err != nil {
 		return nil, err
 	}
-	if err := oprot.Flush(toCTX(ctx)); err != nil {
+	if err := oprot.Flush(ctx); err != nil {
 		return nil, err
 	}
 	return buffer.Bytes(), nil
 }
 
-func (client FStandardClient) processReply(ctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
+func (client FStandardClient) processReply(fctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
 	iprot := client.protocolFactory.GetProtocol(resultTransport)
-	if err := iprot.ReadResponseHeader(ctx); err != nil {
+	if err := iprot.ReadResponseHeader(fctx); err != nil {
 		return err
 	}
-	oMethod, mTypeID, _, err := iprot.ReadMessageBegin()
+	ctx := toCTX(fctx)
+	oMethod, mTypeID, _, err := iprot.ReadMessageBegin(ctx)
 	if err != nil {
 		return err
 	}
@@ -118,11 +120,11 @@ func (client FStandardClient) processReply(ctx FContext, method string, result t
 	}
 	if mTypeID == thrift.EXCEPTION {
 		error0 := thrift.NewTApplicationException(APPLICATION_EXCEPTION_UNKNOWN, "Unknown Exception")
-		err = error0.Read(iprot)
+		err = error0.Read(ctx, iprot)
 		if err != nil {
 			return err
 		}
-		if err = iprot.ReadMessageEnd(); err != nil {
+		if err = iprot.ReadMessageEnd(ctx); err != nil {
 			return err
 		}
 		if error0.TypeId() == APPLICATION_EXCEPTION_RESPONSE_TOO_LARGE {
@@ -133,8 +135,8 @@ func (client FStandardClient) processReply(ctx FContext, method string, result t
 	if mTypeID != thrift.REPLY {
 		return thrift.NewTApplicationException(APPLICATION_EXCEPTION_INVALID_MESSAGE_TYPE, method+" failed: invalid message type")
 	}
-	if err = result.Read(iprot); err != nil {
+	if err = result.Read(ctx, iprot); err != nil {
 		return err
 	}
-	return iprot.ReadMessageEnd()
+	return iprot.ReadMessageEnd(ctx)
 }

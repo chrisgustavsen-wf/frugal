@@ -1,6 +1,7 @@
 package frugal
 
 import (
+	"context"
 	"testing"
 
 	"github.com/apache/thrift/lib/go/thrift"
@@ -29,8 +30,12 @@ type mockTStruct struct {
 	mock.Mock
 }
 
-func (m *mockTStruct) Read(iprot thrift.TProtocol) error  { return m.Called(iprot).Error(0) }
-func (m *mockTStruct) Write(oprot thrift.TProtocol) error { return m.Called(oprot).Error(0) }
+func (m *mockTStruct) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	return m.Called(iprot).Error(0)
+}
+func (m *mockTStruct) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	return m.Called(oprot).Error(0)
+}
 
 func TestFStandardClient(t *testing.T) {
 	transport := new(mockFTransport)
