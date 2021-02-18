@@ -4,6 +4,7 @@
 package subdir_include
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/gopherjs/thrift"
@@ -19,40 +20,40 @@ func NewA() *A {
 	return &A{}
 }
 
-func (p *A) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *A) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *A) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("A"); err != nil {
+func (p *A) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "A"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil

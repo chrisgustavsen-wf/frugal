@@ -5,6 +5,7 @@ package include_vendor
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/go"
@@ -87,8 +88,8 @@ type myserviceFGetItem struct {
 
 func (p *myserviceFGetItem) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
 	args := MyServiceGetItemArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getItem", err.Error())
 	}
@@ -125,40 +126,40 @@ func NewMyServiceGetItemArgs() *MyServiceGetItemArgs {
 	return &MyServiceGetItemArgs{}
 }
 
-func (p *MyServiceGetItemArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *MyServiceGetItemArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getItem_args"); err != nil {
+func (p *MyServiceGetItemArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getItem_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -206,13 +207,13 @@ func (p *MyServiceGetItemResult) GetD() *excepts.InvalidData {
 	return p.D
 }
 
-func (p *MyServiceGetItemResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *MyServiceGetItemResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -221,87 +222,87 @@ func (p *MyServiceGetItemResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if err := p.ReadField0(iprot); err != nil {
+			if err := p.ReadField0(ctx, iprot); err != nil {
 				return err
 			}
 		case 1:
-			if err := p.ReadField1(iprot); err != nil {
+			if err := p.ReadField1(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemResult) ReadField0(iprot thrift.TProtocol) error {
+func (p *MyServiceGetItemResult) ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
 	p.Success = vendor_namespace.NewItem()
-	if err := p.Success.Read(iprot); err != nil {
+	if err := p.Success.Read(ctx, iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemResult) ReadField1(iprot thrift.TProtocol) error {
+func (p *MyServiceGetItemResult) ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
 	p.D = excepts.NewInvalidData()
-	if err := p.D.Read(iprot); err != nil {
+	if err := p.D.Read(ctx, iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.D), err)
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getItem_result"); err != nil {
+func (p *MyServiceGetItemResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getItem_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField0(oprot); err != nil {
+	if err := p.writeField0(ctx, oprot); err != nil {
 		return err
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemResult) writeField0(oprot thrift.TProtocol) error {
+func (p *MyServiceGetItemResult) writeField0(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetSuccess() {
-		if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err)
 		}
-		if err := p.Success.Write(oprot); err != nil {
+		if err := p.Success.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err)
 		}
 	}
 	return nil
 }
 
-func (p *MyServiceGetItemResult) writeField1(oprot thrift.TProtocol) error {
+func (p *MyServiceGetItemResult) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetD() {
-		if err := oprot.WriteFieldBegin("d", thrift.STRUCT, 1); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "d", thrift.STRUCT, 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:d: ", p), err)
 		}
-		if err := p.D.Write(oprot); err != nil {
+		if err := p.D.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.D), err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 1:d: ", p), err)
 		}
 	}

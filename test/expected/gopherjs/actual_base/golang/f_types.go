@@ -4,6 +4,7 @@
 package golang
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/gopherjs/frugal"
@@ -69,13 +70,13 @@ func (p *Thing) GetAString() string {
 	return p.AString
 }
 
-func (p *Thing) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *Thing) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -84,46 +85,46 @@ func (p *Thing) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.AnID = v
 			}
 		case 2:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 2: ", err)
 			} else {
 				p.AString = v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *Thing) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("thing"); err != nil {
+func (p *Thing) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "thing"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(oprot, p.AnID, "an_id", 1); err != nil {
+	if err := frugal.WriteI32(ctx, oprot, p.AnID, "an_id", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::an_id:1 ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.AString, "a_string", 2); err != nil {
+	if err := frugal.WriteString(ctx, oprot, p.AString, "a_string", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::a_string:2 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -148,13 +149,13 @@ func (p *NestedThing) GetThings() []*Thing {
 	return p.Things
 }
 
-func (p *NestedThing) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *NestedThing) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -163,68 +164,68 @@ func (p *NestedThing) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			_, size, err := iprot.ReadListBegin()
+			_, size, err := iprot.ReadListBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading list begin: ", err)
 			}
 			p.Things = make([]*Thing, 0, size)
 			for i := 0; i < size; i++ {
 				elem28 := NewThing()
-				if err := elem28.Read(iprot); err != nil {
+				if err := elem28.Read(ctx, iprot); err != nil {
 					return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", elem28), err)
 				}
 				p.Things = append(p.Things, elem28)
 			}
-			if err := iprot.ReadListEnd(); err != nil {
+			if err := iprot.ReadListEnd(ctx); err != nil {
 				return thrift.PrependError("error reading list end: ", err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *NestedThing) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("nested_thing"); err != nil {
+func (p *NestedThing) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "nested_thing"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *NestedThing) writeField1(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("things", thrift.LIST, 1); err != nil {
+func (p *NestedThing) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "things", thrift.LIST, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:things: ", p), err)
 	}
-	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Things)); err != nil {
+	if err := oprot.WriteListBegin(ctx, thrift.STRUCT, len(p.Things)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p.Things {
-		if err := v.Write(oprot); err != nil {
+		if err := v.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", v), err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:things: ", p), err)
 	}
 	return nil
@@ -244,40 +245,40 @@ func NewAPIException() *APIException {
 	return &APIException{}
 }
 
-func (p *APIException) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *APIException) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *APIException) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("api_exception"); err != nil {
+func (p *APIException) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "api_exception"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil

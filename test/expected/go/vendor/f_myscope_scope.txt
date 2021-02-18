@@ -103,21 +103,21 @@ func (l *myScopeSubscriber) recvnewItem(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		req := vendor_namespace.NewItem()
-		if err := req.Read(iprot); err != nil {
+		if err := req.Read(ctx, iprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", req), err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}

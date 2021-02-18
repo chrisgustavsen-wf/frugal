@@ -605,8 +605,8 @@ func (g *Generator) generateCountSetFields(s *parser.Struct, sName string) strin
 func (g *Generator) generateRead(s *parser.Struct, sName string) string {
 	contents := ""
 
-	contents += fmt.Sprintf("func (p *%s) Read(iprot thrift.TProtocol) error {\n", sName)
-	contents += "\tif _, err := iprot.ReadStructBegin(); err != nil {\n"
+	contents += fmt.Sprintf("func (p *%s) Read(ctx context.Context, iprot thrift.TProtocol) error {\n", sName)
+	contents += "\tif _, err := iprot.ReadStructBegin(ctx); err != nil {\n"
 	contents += "\t\treturn thrift.PrependError(fmt.Sprintf(\"%T read error: \", p), err)\n"
 	contents += "\t}\n\n"
 	for _, field := range s.Fields {
@@ -617,7 +617,7 @@ func (g *Generator) generateRead(s *parser.Struct, sName string) string {
 	}
 	contents += "\n"
 	contents += "\tfor {\n"
-	contents += "\t\t_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()\n"
+	contents += "\t\t_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)\n"
 	contents += "\t\tif err != nil {\n"
 	contents += "\t\t\treturn thrift.PrependError(fmt.Sprintf(\"%T field %d read error: \", p, fieldId), err)\n"
 	contents += "\t\t}\n"
@@ -631,7 +631,7 @@ func (g *Generator) generateRead(s *parser.Struct, sName string) string {
 			if g.generateSlim() {
 				contents += g.generateReadFieldRec(field, true)
 			} else {
-				contents += fmt.Sprintf("\t\t\tif err := p.ReadField%d(iprot); err != nil {\n", field.ID)
+				contents += fmt.Sprintf("\t\t\tif err := p.ReadField%d(ctx, iprot); err != nil {\n", field.ID)
 				contents += "\t\t\t\treturn err\n"
 				contents += "\t\t\t}\n"
 			}
@@ -641,17 +641,17 @@ func (g *Generator) generateRead(s *parser.Struct, sName string) string {
 		}
 		contents += "\t\tdefault:\n"
 	}
-	contents += "\t\t\tif err := iprot.Skip(fieldTypeId); err != nil {\n"
+	contents += "\t\t\tif err := iprot.Skip(ctx, fieldTypeId); err != nil {\n"
 	contents += "\t\t\t\treturn err\n"
 	contents += "\t\t\t}\n"
 	if len(s.Fields) > 0 {
 		contents += "\t\t}\n"
 	}
-	contents += "\t\tif err := iprot.ReadFieldEnd(); err != nil {\n"
+	contents += "\t\tif err := iprot.ReadFieldEnd(ctx); err != nil {\n"
 	contents += "\t\t\treturn err\n"
 	contents += "\t\t}\n"
 	contents += "\t}\n"
-	contents += "\tif err := iprot.ReadStructEnd(); err != nil {\n"
+	contents += "\tif err := iprot.ReadStructEnd(ctx); err != nil {\n"
 	contents += "\t\treturn thrift.PrependError(fmt.Sprintf(\"%T read struct end error: \", p), err)\n"
 	contents += "\t}\n"
 	for _, field := range s.Fields {
@@ -683,17 +683,17 @@ func (g *Generator) generateRead(s *parser.Struct, sName string) string {
 }
 
 func (g *Generator) generateWrite(s *parser.Struct, sName string) string {
-	contents := fmt.Sprintf("func (p *%s) Write(oprot thrift.TProtocol) error {\n", sName)
+	contents := fmt.Sprintf("func (p *%s) Write(ctx context.Context, oprot thrift.TProtocol) error {\n", sName)
 
 	// Only one field can be set for a union, make sure that's the case
 	if s.Type == parser.StructTypeUnion {
-		contents += fmt.Sprintf("\tif c := p.CountSetFields%s(); c != 1 {\n", sName)
+		contents += fmt.Sprintf("\tif c := p.CountSetFields%s(ctx); c != 1 {\n", sName)
 		contents += "\t\treturn thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf(\"%T write union: exactly one field must be set (%d set).\", p, c))\n"
 		contents += "\t}\n"
 	}
 
 	// Use actual struct name so it's consistent between languages
-	contents += fmt.Sprintf("\tif err := oprot.WriteStructBegin(\"%s\"); err != nil {\n", s.Name)
+	contents += fmt.Sprintf("\tif err := oprot.WriteStructBegin(ctx, \"%s\"); err != nil {\n", s.Name)
 	contents += "\t\treturn thrift.PrependError(fmt.Sprintf(\"%T write struct begin error: \", p), err)\n"
 	contents += "\t}\n"
 
@@ -701,10 +701,10 @@ func (g *Generator) generateWrite(s *parser.Struct, sName string) string {
 		contents += g.generateWriteFieldInline(field)
 	}
 
-	contents += "\tif err := oprot.WriteFieldStop(); err != nil{\n"
+	contents += "\tif err := oprot.WriteFieldStop(ctx); err != nil{\n"
 	contents += "\t\treturn thrift.PrependError(\"write field stop error: \", err)\n"
 	contents += "\t}\n"
-	contents += "\tif err := oprot.WriteStructEnd(); err != nil {\n"
+	contents += "\tif err := oprot.WriteStructEnd(ctx); err != nil {\n"
 	contents += "\t\treturn thrift.PrependError(\"write struct stop error: \", err)\n"
 	contents += "\t}\n"
 	contents += "\treturn nil\n"
@@ -730,7 +730,7 @@ func (g *Generator) generateToString(s *parser.Struct, sName string) string {
 }
 
 func (g *Generator) generateReadField(structName string, field *parser.Field) string {
-	contents := fmt.Sprintf("func (p *%s) ReadField%d(iprot thrift.TProtocol) error {\n", structName, field.ID)
+	contents := fmt.Sprintf("func (p *%s) ReadField%d(ctx context.Context, iprot thrift.TProtocol) error {\n", structName, field.ID)
 
 	contents += g.generateReadFieldRec(field, true)
 
@@ -801,7 +801,7 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 			maybeAddress = "&"
 		}
 
-		contents += fmt.Sprintf("\tif v, err := iprot.Read%s(); err != nil {\n", thriftType)
+		contents += fmt.Sprintf("\tif v, err := iprot.Read%s(ctx); err != nil {\n", thriftType)
 		contents += fmt.Sprintf("\t\treturn thrift.PrependError(\"error reading field %d: \", err)\n", field.ID)
 		contents += "\t} else {\n"
 		if cast == "" {
@@ -823,7 +823,7 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 		initializer := fmt.Sprintf("%sNew%s()", goUnderlyingType[1:lastInd+1], goUnderlyingType[lastInd+1:])
 
 		contents += fmt.Sprintf("\t%s%s %s %s\n", prefix, fName, eq, initializer)
-		contents += fmt.Sprintf("\tif err := %s%s.Read(iprot); err != nil {\n", prefix, fName)
+		contents += fmt.Sprintf("\tif err := %s%s.Read(ctx, iprot); err != nil {\n", prefix, fName)
 		contents += fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T error reading struct: \", %s%s), err)\n", prefix, fName)
 		contents += "\t}\n"
 	} else if underlyingType.IsContainer() {
@@ -838,7 +838,7 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 		//valContents := g.generateReadFieldRec(valField, false)
 		switch underlyingType.Name {
 		case "list":
-			contents += "\t_, size, err := iprot.ReadListBegin()\n"
+			contents += "\t_, size, err := iprot.ReadListBegin(ctx)\n"
 			contents += "\tif err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading list begin: \", err)\n"
 			contents += "\t}\n"
@@ -855,11 +855,11 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 			contents += valContents
 			contents += fmt.Sprintf("\t\t%s%s%s = append(%s%s%s, %s)\n", maybePointer, prefix, fName, maybePointer, prefix, fName, valElem)
 			contents += "\t}\n"
-			contents += "\tif err := iprot.ReadListEnd(); err != nil {\n"
+			contents += "\tif err := iprot.ReadListEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading list end: \", err)\n"
 			contents += "\t}\n"
 		case "set":
-			contents += "\t_, size, err := iprot.ReadSetBegin()\n"
+			contents += "\t_, size, err := iprot.ReadSetBegin(ctx)\n"
 			contents += "\tif err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading set begin: \", err)\n"
 			contents += "\t}\n"
@@ -876,11 +876,11 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 			contents += valContents
 			contents += fmt.Sprintf("\t\t(%s%s%s)[%s] = true\n", maybePointer, prefix, fName, valElem)
 			contents += "\t}\n"
-			contents += "\tif err := iprot.ReadSetEnd(); err != nil {\n"
+			contents += "\tif err := iprot.ReadSetEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading set end: \", err)\n"
 			contents += "\t}\n"
 		case "map":
-			contents += "\t_, _, size, err := iprot.ReadMapBegin()\n"
+			contents += "\t_, _, size, err := iprot.ReadMapBegin(ctx)\n"
 			contents += "\tif err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading map begin: \", err)\n"
 			contents += "\t}\n"
@@ -901,7 +901,7 @@ func (g *Generator) generateReadFieldRec(field *parser.Field, first bool) string
 			contents += valContents
 			contents += fmt.Sprintf("\t\t(%s%s%s)[%s] = %s\n", maybePointer, prefix, fName, keyElem, valElem)
 			contents += "\t}\n"
-			contents += "\tif err := iprot.ReadMapEnd(); err != nil {\n"
+			contents += "\tif err := iprot.ReadMapEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error reading map end: \", err)\n"
 			contents += "\t}\n"
 		default:
@@ -924,7 +924,7 @@ func (g *Generator) skipStandaloneFieldHandler(field *parser.Field) bool {
 
 func (g *Generator) generateWriteFieldInline(field *parser.Field) (contents string) {
 	if !g.skipStandaloneFieldHandler(field) {
-		return fmt.Sprintf("\tif err := p.writeField%d(oprot); err != nil {\n\t\treturn err\n\t}\n", field.ID)
+		return fmt.Sprintf("\tif err := p.writeField%d(ctx, oprot); err != nil {\n\t\treturn err\n\t}\n", field.ID)
 	}
 
 	// Check if this field is optional and add nil checks if we need them.
@@ -964,7 +964,7 @@ func (g *Generator) generateWriteFieldInline(field *parser.Field) (contents stri
 	}
 
 	// Actually generate the write block
-	contents += indent + fmt.Sprintf("\tif err := frugal.Write%s(oprot, %s, \"%s\", %d); err != nil {\n", writeMethod, structField, field.Name, field.ID)
+	contents += indent + fmt.Sprintf("\tif err := frugal.Write%s(ctx, oprot, %s, \"%s\", %d); err != nil {\n", writeMethod, structField, field.Name, field.ID)
 	contents += indent + fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T::%s:%d \", p), err)", field.Name, field.ID)
 	return contents + tail + "\t}\n"
 }
@@ -976,17 +976,17 @@ func (g *Generator) generateWriteField(structName string, field *parser.Field) s
 	contents := ""
 	fName := title(field.Name)
 
-	contents += fmt.Sprintf("func (p *%s) writeField%d(oprot thrift.TProtocol) error {\n", structName, field.ID)
+	contents += fmt.Sprintf("func (p *%s) writeField%d(ctx context.Context, oprot thrift.TProtocol) error {\n", structName, field.ID)
 	// If an optional field isn't set, it isn't written
 	if field.Modifier == parser.Optional {
 		contents += fmt.Sprintf("\tif p.IsSet%s() {\n", fName)
 	}
 	// Use actual field so it's consistent between languages
-	contents += fmt.Sprintf("\tif err := oprot.WriteFieldBegin(\"%s\", %s, %d); err != nil {\n", field.Name, g.getEnumFromThriftType(field.Type), field.ID)
+	contents += fmt.Sprintf("\tif err := oprot.WriteFieldBegin(ctx, \"%s\", %s, %d); err != nil {\n", field.Name, g.getEnumFromThriftType(field.Type), field.ID)
 	contents += fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T write field begin error %d:%s: \", p), err)\n", field.ID, field.Name)
 	contents += "\t}\n"
 	contents += g.generateWriteFieldRec(field, "p.")
-	contents += "\tif err := oprot.WriteFieldEnd(); err != nil {\n"
+	contents += "\tif err := oprot.WriteFieldEnd(ctx); err != nil {\n"
 	contents += fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T write field end error %d:%s: \", p), err)\n", field.ID, field.Name)
 	contents += "\t}\n"
 	if field.Modifier == parser.Optional {
@@ -1013,24 +1013,24 @@ func (g *Generator) generateWriteFieldRec(field *parser.Field, prefix string) st
 		switch underlyingType.Name {
 		// Just typecast everything to get around typedefs
 		case "bool":
-			write += "Bool(bool(%s))"
+			write += "Bool(ctx, bool(%s))"
 		case "byte", "i8":
-			write += "Byte(int8(%s))"
+			write += "Byte(ctx, int8(%s))"
 		case "i16":
-			write += "I16(int16(%s))"
+			write += "I16(ctx, int16(%s))"
 		case "i32":
-			write += "I32(int32(%s))"
+			write += "I32(ctx, int32(%s))"
 		case "i64":
-			write += "I64(int64(%s))"
+			write += "I64(ctx, int64(%s))"
 		case "double":
-			write += "Double(float64(%s))"
+			write += "Double(ctx, float64(%s))"
 		case "string":
-			write += "String(string(%s))"
+			write += "String(ctx, string(%s))"
 		case "binary":
-			write += "Binary([]byte(%s))"
+			write += "Binary(ctx, []byte(%s))"
 		default:
 			if isEnum {
-				write += "I32(int32(%s))"
+				write += "I32(ctx, int32(%s))"
 			} else {
 				panic("unknown thrift type: " + underlyingType.Name)
 			}
@@ -1040,7 +1040,7 @@ func (g *Generator) generateWriteFieldRec(field *parser.Field, prefix string) st
 		contents += fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T.%s (%d) field write error: \", p), err)\n", field.Name, field.ID)
 		contents += "\t}\n"
 	} else if g.Frugal.IsStruct(underlyingType) {
-		contents += fmt.Sprintf("\tif err := %s.Write(oprot); err != nil {\n", prefix+fName)
+		contents += fmt.Sprintf("\tif err := %s.Write(ctx, oprot); err != nil {\n", prefix+fName)
 		contents += fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T error writing struct: \", %s), err)\n", prefix+fName)
 		contents += "\t}\n"
 	} else if underlyingType.IsContainer() {
@@ -1052,28 +1052,28 @@ func (g *Generator) generateWriteFieldRec(field *parser.Field, prefix string) st
 
 		switch underlyingType.Name {
 		case "list":
-			contents += fmt.Sprintf("\tif err := oprot.WriteListBegin(%s, len(%s)); err != nil {\n", valEnumType, prefix+fName)
+			contents += fmt.Sprintf("\tif err := oprot.WriteListBegin(ctx, %s, len(%s)); err != nil {\n", valEnumType, prefix+fName)
 			contents += "\t\treturn thrift.PrependError(\"error writing list begin: \", err)\n"
 			contents += "\t}\n"
 			contents += fmt.Sprintf("\tfor _, v := range %s {\n", prefix+fName)
 			contents += g.generateWriteFieldRec(valField, "v")
 			contents += "\t}\n"
-			contents += "\tif err := oprot.WriteListEnd(); err != nil {\n"
+			contents += "\tif err := oprot.WriteListEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error writing list end: \", err)\n"
 			contents += "\t}\n"
 		case "set":
-			contents += fmt.Sprintf("\tif err := oprot.WriteSetBegin(%s, len(%s)); err != nil {\n", valEnumType, prefix+fName)
+			contents += fmt.Sprintf("\tif err := oprot.WriteSetBegin(ctx, %s, len(%s)); err != nil {\n", valEnumType, prefix+fName)
 			contents += "\t\treturn thrift.PrependError(\"error writing set begin: \", err)\n"
 			contents += "\t}\n"
 			contents += fmt.Sprintf("\tfor v, _ := range %s {\n", prefix+fName)
 			contents += g.generateWriteFieldRec(valField, "v")
 			contents += "\t}\n"
-			contents += "\tif err := oprot.WriteSetEnd(); err != nil {\n"
+			contents += "\tif err := oprot.WriteSetEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error writing set end: \", err)\n"
 			contents += "\t}\n"
 		case "map":
 			keyEnumType := g.getEnumFromThriftType(underlyingType.KeyType)
-			contents += fmt.Sprintf("\tif err := oprot.WriteMapBegin(%s, %s, len(%s)); err != nil {\n", keyEnumType, valEnumType, prefix+fName)
+			contents += fmt.Sprintf("\tif err := oprot.WriteMapBegin(ctx, %s, %s, len(%s)); err != nil {\n", keyEnumType, valEnumType, prefix+fName)
 			contents += "\t\treturn thrift.PrependError(\"error writing map begin: \", err)\n"
 			contents += "\t}\n"
 			contents += fmt.Sprintf("\tfor k, v := range %s {\n", prefix+fName)
@@ -1081,7 +1081,7 @@ func (g *Generator) generateWriteFieldRec(field *parser.Field, prefix string) st
 			contents += g.generateWriteFieldRec(keyField, "k")
 			contents += g.generateWriteFieldRec(valField, "v")
 			contents += "\t}\n"
-			contents += "\tif err := oprot.WriteMapEnd(); err != nil {\n"
+			contents += "\tif err := oprot.WriteMapEnd(ctx); err != nil {\n"
 			contents += "\t\treturn thrift.PrependError(\"error writing map end: \", err)\n"
 			contents += "\t}\n"
 		default:
@@ -1566,17 +1566,17 @@ func (g *Generator) generateSubscribeMethod(scope *parser.Scope, op *parser.Oper
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
 	subscriber += "\t\t}\n\n"
-	subscriber += "\t\tname, _, _, err := iprot.ReadMessageBegin()\n"
+	subscriber += "\t\tname, _, _, err := iprot.ReadMessageBegin(ctx)\n"
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
 	subscriber += "\t\t}\n\n"
 	subscriber += "\t\tif name != op {\n"
-	subscriber += "\t\t\tiprot.Skip(thrift.STRUCT)\n"
-	subscriber += "\t\t\tiprot.ReadMessageEnd()\n"
+	subscriber += "\t\t\tiprot.Skip(ctx, thrift.STRUCT)\n"
+	subscriber += "\t\t\tiprot.ReadMessageEnd(ctx)\n"
 	subscriber += "\t\t\treturn thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, \"Unknown function\"+name)\n"
 	subscriber += "\t\t}\n"
 	subscriber += g.generateReadFieldRec(parser.FieldFromType(op.Type, "req"), false)
-	subscriber += "\t\tiprot.ReadMessageEnd()\n\n"
+	subscriber += "\t\tiprot.ReadMessageEnd(ctx)\n\n"
 	subscriber += "\t\treturn method.Invoke([]interface{}{ctx, req}).Error()\n"
 	subscriber += "\t}\n"
 	subscriber += "}"
@@ -1913,8 +1913,8 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 	}
 
 	contents += fmt.Sprintf("\targs := %s%sArgs{}\n", servTitle, nameTitle)
-	contents += "\terr := args.Read(iprot)\n"
-	contents += "\tiprot.ReadMessageEnd()\n"
+	contents += "\terr := args.Read(ctx, iprot)\n"
+	contents += "\tiprot.ReadMessageEnd(ctx)\n"
 	contents += "\tif err != nil {\n"
 	contents += fmt.Sprintf("\t\treturn p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, %q, err.Error())\n", nameLower)
 	contents += "\t}\n"

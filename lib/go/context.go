@@ -62,6 +62,8 @@ const (
 //			header name "_cid"
 //		2)	Threadsafe
 type FContext interface {
+	context.Context
+
 	// CorrelationID returns the correlation id for the context.
 	CorrelationID() string
 
@@ -141,6 +143,7 @@ func getNextOpID() string {
 
 // FContextImpl is an implementation of FContext.
 type FContextImpl struct {
+	context.Context
 	requestHeaders      map[string]string
 	responseHeaders     map[string]string
 	ephemeralProperties map[interface{}]interface{}
@@ -156,6 +159,7 @@ func NewFContext(correlationID string) FContext {
 		correlationID = generateCorrelationID()
 	}
 	ctx := &FContextImpl{
+		Context: context.TODO(),
 		requestHeaders: map[string]string{
 			cidHeader:     correlationID,
 			opIDHeader:    getNextOpID(),

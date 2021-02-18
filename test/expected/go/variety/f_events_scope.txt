@@ -79,7 +79,7 @@ func (p *eventsPublisher) publishSomeInt(ctx frugal.FContext, user string, req i
 type eventsSomeIntMessage int64
 
 func (p eventsSomeIntMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteI64(int64(p)); err != nil {
+	if err := oprot.WriteI64(ctx, int64(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
@@ -108,7 +108,7 @@ func (p *eventsPublisher) publishSomeStr(ctx frugal.FContext, user string, req s
 type eventsSomeStrMessage string
 
 func (p eventsSomeStrMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteString(string(p)); err != nil {
+	if err := oprot.WriteString(ctx, string(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
@@ -137,26 +137,26 @@ func (p *eventsPublisher) publishSomeList(ctx frugal.FContext, user string, req 
 type eventsSomeListMessage []map[ID]*Event
 
 func (p eventsSomeListMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteListBegin(thrift.MAP, len(p)); err != nil {
+	if err := oprot.WriteListBegin(ctx, thrift.MAP, len(p)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p {
-		if err := oprot.WriteMapBegin(thrift.I64, thrift.STRUCT, len(v)); err != nil {
+		if err := oprot.WriteMapBegin(ctx, thrift.I64, thrift.STRUCT, len(v)); err != nil {
 			return thrift.PrependError("error writing map begin: ", err)
 		}
 		for k, v := range v {
-			if err := oprot.WriteI64(int64(k)); err != nil {
+			if err := oprot.WriteI64(ctx, int64(k)); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 			}
-			if err := v.Write(oprot); err != nil {
+			if err := v.Write(ctx, oprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", v), err)
 			}
 		}
-		if err := oprot.WriteMapEnd(); err != nil {
+		if err := oprot.WriteMapEnd(ctx); err != nil {
 			return thrift.PrependError("error writing map end: ", err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
 	return nil
@@ -233,21 +233,21 @@ func (l *eventsSubscriber) recvEventCreated(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		req := NewEvent()
-		if err := req.Read(iprot); err != nil {
+		if err := req.Read(ctx, iprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", req), err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
@@ -283,23 +283,23 @@ func (l *eventsSubscriber) recvSomeInt(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		var req int64
-		if v, err := iprot.ReadI64(); err != nil {
+		if v, err := iprot.ReadI64(ctx); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
 			req = v
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
@@ -335,23 +335,23 @@ func (l *eventsSubscriber) recvSomeStr(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		var req string
-		if v, err := iprot.ReadString(); err != nil {
+		if v, err := iprot.ReadString(ctx); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
 			req = v
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
@@ -387,50 +387,50 @@ func (l *eventsSubscriber) recvSomeList(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
-		_, size, err := iprot.ReadListBegin()
+		_, size, err := iprot.ReadListBegin(ctx)
 		if err != nil {
 			return thrift.PrependError("error reading list begin: ", err)
 		}
 		req := make([]map[ID]*Event, 0, size)
 		for i := 0; i < size; i++ {
-			_, _, size, err := iprot.ReadMapBegin()
+			_, _, size, err := iprot.ReadMapBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading map begin: ", err)
 			}
 			elem25 := make(map[ID]*Event, size)
 			for i := 0; i < size; i++ {
 				var elem26 ID
-				if v, err := iprot.ReadI64(); err != nil {
+				if v, err := iprot.ReadI64(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					temp := ID(v)
 					elem26 = temp
 				}
 				elem27 := NewEvent()
-				if err := elem27.Read(iprot); err != nil {
+				if err := elem27.Read(ctx, iprot); err != nil {
 					return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", elem27), err)
 				}
 				(elem25)[elem26] = elem27
 			}
-			if err := iprot.ReadMapEnd(); err != nil {
+			if err := iprot.ReadMapEnd(ctx); err != nil {
 				return thrift.PrependError("error reading map end: ", err)
 			}
 			req = append(req, elem25)
 		}
-		if err := iprot.ReadListEnd(); err != nil {
+		if err := iprot.ReadListEnd(ctx); err != nil {
 			return thrift.PrependError("error reading list end: ", err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
