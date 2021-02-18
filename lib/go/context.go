@@ -126,6 +126,7 @@ func Clone(ctx FContext) FContext {
 	}
 
 	clone := &FContextImpl{
+		Context:             ctx,
 		requestHeaders:      ctx.RequestHeaders(),
 		responseHeaders:     ctx.ResponseHeaders(),
 		ephemeralProperties: make(map[interface{}]interface{}),
@@ -262,6 +263,7 @@ func (c *FContextImpl) Timeout() time.Duration {
 // handling opids correctly.
 func (c *FContextImpl) Clone() FContextWithEphemeralProperties {
 	cloned := &FContextImpl{
+		Context:             c.Context,
 		requestHeaders:      c.RequestHeaders(),
 		responseHeaders:     c.ResponseHeaders(),
 		ephemeralProperties: c.EphemeralProperties(),

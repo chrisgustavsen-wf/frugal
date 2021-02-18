@@ -14,6 +14,7 @@
 package frugal
 
 import (
+	"context"
 	"encoding/binary"
 	"errors"
 	"fmt"
@@ -119,6 +120,7 @@ func (f *FProtocol) ReadRequestHeader() (FContext, error) {
 	}
 
 	ctx := &FContextImpl{
+		Context:             context.TODO(),
 		requestHeaders:      make(map[string]string),
 		responseHeaders:     make(map[string]string),
 		ephemeralProperties: make(map[interface{}]interface{}),
