@@ -5,6 +5,7 @@ package music
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/go"
@@ -129,8 +130,8 @@ type storeFBuyAlbum struct {
 
 func (p *storeFBuyAlbum) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
 	args := StoreBuyAlbumArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "buyAlbum", err.Error())
 	}
@@ -167,8 +168,8 @@ type storeFEnterAlbumGiveaway struct {
 func (p *storeFEnterAlbumGiveaway) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
 	logrus.Warn("Deprecated function 'Store.EnterAlbumGiveaway' was called by a client")
 	args := StoreEnterAlbumGiveawayArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "enterAlbumGiveaway", err.Error())
 	}
@@ -210,13 +211,13 @@ func (p *StoreBuyAlbumArgs) GetAcct() string {
 	return p.Acct
 }
 
-func (p *StoreBuyAlbumArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *StoreBuyAlbumArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -225,30 +226,30 @@ func (p *StoreBuyAlbumArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if err := p.ReadField1(iprot); err != nil {
+			if err := p.ReadField1(ctx, iprot); err != nil {
 				return err
 			}
 		case 2:
-			if err := p.ReadField2(iprot); err != nil {
+			if err := p.ReadField2(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumArgs) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+func (p *StoreBuyAlbumArgs) ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(ctx); err != nil {
 		return thrift.PrependError("error reading field 1: ", err)
 	} else {
 		p.ASIN = v
@@ -256,8 +257,8 @@ func (p *StoreBuyAlbumArgs) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *StoreBuyAlbumArgs) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+func (p *StoreBuyAlbumArgs) ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(ctx); err != nil {
 		return thrift.PrependError("error reading field 2: ", err)
 	} else {
 		p.Acct = v
@@ -265,46 +266,46 @@ func (p *StoreBuyAlbumArgs) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *StoreBuyAlbumArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("buyAlbum_args"); err != nil {
+func (p *StoreBuyAlbumArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "buyAlbum_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := p.writeField2(oprot); err != nil {
+	if err := p.writeField2(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumArgs) writeField1(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("ASIN", thrift.STRING, 1); err != nil {
+func (p *StoreBuyAlbumArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "ASIN", thrift.STRING, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:ASIN: ", p), err)
 	}
-	if err := oprot.WriteString(string(p.ASIN)); err != nil {
+	if err := oprot.WriteString(ctx, string(p.ASIN)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T.ASIN (1) field write error: ", p), err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:ASIN: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumArgs) writeField2(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("acct", thrift.STRING, 2); err != nil {
+func (p *StoreBuyAlbumArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "acct", thrift.STRING, 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:acct: ", p), err)
 	}
-	if err := oprot.WriteString(string(p.Acct)); err != nil {
+	if err := oprot.WriteString(ctx, string(p.Acct)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T.acct (2) field write error: ", p), err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:acct: ", p), err)
 	}
 	return nil
@@ -352,13 +353,13 @@ func (p *StoreBuyAlbumResult) GetError() *PurchasingError {
 	return p.Error
 }
 
-func (p *StoreBuyAlbumResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *StoreBuyAlbumResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -367,87 +368,87 @@ func (p *StoreBuyAlbumResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if err := p.ReadField0(iprot); err != nil {
+			if err := p.ReadField0(ctx, iprot); err != nil {
 				return err
 			}
 		case 1:
-			if err := p.ReadField1(iprot); err != nil {
+			if err := p.ReadField1(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumResult) ReadField0(iprot thrift.TProtocol) error {
+func (p *StoreBuyAlbumResult) ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
 	p.Success = NewAlbum()
-	if err := p.Success.Read(iprot); err != nil {
+	if err := p.Success.Read(ctx, iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumResult) ReadField1(iprot thrift.TProtocol) error {
+func (p *StoreBuyAlbumResult) ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
 	p.Error = NewPurchasingError()
-	if err := p.Error.Read(iprot); err != nil {
+	if err := p.Error.Read(ctx, iprot); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Error), err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("buyAlbum_result"); err != nil {
+func (p *StoreBuyAlbumResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "buyAlbum_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField0(oprot); err != nil {
+	if err := p.writeField0(ctx, oprot); err != nil {
 		return err
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumResult) writeField0(oprot thrift.TProtocol) error {
+func (p *StoreBuyAlbumResult) writeField0(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetSuccess() {
-		if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "success", thrift.STRUCT, 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err)
 		}
-		if err := p.Success.Write(oprot); err != nil {
+		if err := p.Success.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err)
 		}
 	}
 	return nil
 }
 
-func (p *StoreBuyAlbumResult) writeField1(oprot thrift.TProtocol) error {
+func (p *StoreBuyAlbumResult) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetError() {
-		if err := oprot.WriteFieldBegin("error", thrift.STRUCT, 1); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "error", thrift.STRUCT, 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:error: ", p), err)
 		}
-		if err := p.Error.Write(oprot); err != nil {
+		if err := p.Error.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Error), err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 1:error: ", p), err)
 		}
 	}
@@ -478,13 +479,13 @@ func (p *StoreEnterAlbumGiveawayArgs) GetName() string {
 	return p.Name
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -493,30 +494,30 @@ func (p *StoreEnterAlbumGiveawayArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if err := p.ReadField1(iprot); err != nil {
+			if err := p.ReadField1(ctx, iprot); err != nil {
 				return err
 			}
 		case 2:
-			if err := p.ReadField2(iprot); err != nil {
+			if err := p.ReadField2(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(ctx); err != nil {
 		return thrift.PrependError("error reading field 1: ", err)
 	} else {
 		p.Email = v
@@ -524,8 +525,8 @@ func (p *StoreEnterAlbumGiveawayArgs) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) ReadField2(ctx context.Context, iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(ctx); err != nil {
 		return thrift.PrependError("error reading field 2: ", err)
 	} else {
 		p.Name = v
@@ -533,46 +534,46 @@ func (p *StoreEnterAlbumGiveawayArgs) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("enterAlbumGiveaway_args"); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "enterAlbumGiveaway_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := p.writeField2(oprot); err != nil {
+	if err := p.writeField2(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) writeField1(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("email", thrift.STRING, 1); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "email", thrift.STRING, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:email: ", p), err)
 	}
-	if err := oprot.WriteString(string(p.Email)); err != nil {
+	if err := oprot.WriteString(ctx, string(p.Email)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T.email (1) field write error: ", p), err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:email: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayArgs) writeField2(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("name", thrift.STRING, 2); err != nil {
+func (p *StoreEnterAlbumGiveawayArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "name", thrift.STRING, 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:name: ", p), err)
 	}
-	if err := oprot.WriteString(string(p.Name)); err != nil {
+	if err := oprot.WriteString(ctx, string(p.Name)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T.name (2) field write error: ", p), err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:name: ", p), err)
 	}
 	return nil
@@ -606,13 +607,13 @@ func (p *StoreEnterAlbumGiveawayResult) GetSuccess() bool {
 	return *p.Success
 }
 
-func (p *StoreEnterAlbumGiveawayResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *StoreEnterAlbumGiveawayResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -621,26 +622,26 @@ func (p *StoreEnterAlbumGiveawayResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if err := p.ReadField0(iprot); err != nil {
+			if err := p.ReadField0(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayResult) ReadField0(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadBool(); err != nil {
+func (p *StoreEnterAlbumGiveawayResult) ReadField0(ctx context.Context, iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(ctx); err != nil {
 		return thrift.PrependError("error reading field 0: ", err)
 	} else {
 		p.Success = &v
@@ -648,31 +649,31 @@ func (p *StoreEnterAlbumGiveawayResult) ReadField0(iprot thrift.TProtocol) error
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("enterAlbumGiveaway_result"); err != nil {
+func (p *StoreEnterAlbumGiveawayResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "enterAlbumGiveaway_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField0(oprot); err != nil {
+	if err := p.writeField0(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *StoreEnterAlbumGiveawayResult) writeField0(oprot thrift.TProtocol) error {
+func (p *StoreEnterAlbumGiveawayResult) writeField0(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetSuccess() {
-		if err := oprot.WriteFieldBegin("success", thrift.BOOL, 0); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "success", thrift.BOOL, 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err)
 		}
-		if err := oprot.WriteBool(bool(*p.Success)); err != nil {
+		if err := oprot.WriteBool(ctx, bool(*p.Success)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T.success (0) field write error: ", p), err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err)
 		}
 	}

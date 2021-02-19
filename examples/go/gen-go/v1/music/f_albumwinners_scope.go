@@ -59,15 +59,15 @@ func (p *albumWinnersPublisher) publishContestStart(ctx frugal.FContext, req []*
 type albumWinnersContestStartMessage []*Album
 
 func (p albumWinnersContestStartMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteListBegin(thrift.STRUCT, len(p)); err != nil {
+	if err := oprot.WriteListBegin(ctx, thrift.STRUCT, len(p)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p {
-		if err := v.Write(oprot); err != nil {
+		if err := v.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", v), err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
 	return nil
@@ -95,7 +95,7 @@ func (p *albumWinnersPublisher) publishTimeLeft(ctx frugal.FContext, req Minutes
 type albumWinnersTimeLeftMessage Minutes
 
 func (p albumWinnersTimeLeftMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteDouble(float64(p)); err != nil {
+	if err := oprot.WriteDouble(ctx, float64(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
@@ -183,32 +183,32 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
-		_, size, err := iprot.ReadListBegin()
+		_, size, err := iprot.ReadListBegin(ctx)
 		if err != nil {
 			return thrift.PrependError("error reading list begin: ", err)
 		}
 		req := make([]*Album, 0, size)
 		for i := 0; i < size; i++ {
 			elem1 := NewAlbum()
-			if err := elem1.Read(iprot); err != nil {
+			if err := elem1.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", elem1), err)
 			}
 			req = append(req, elem1)
 		}
-		if err := iprot.ReadListEnd(); err != nil {
+		if err := iprot.ReadListEnd(ctx); err != nil {
 			return thrift.PrependError("error reading list end: ", err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
@@ -244,24 +244,24 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		var req Minutes
-		if v, err := iprot.ReadDouble(); err != nil {
+		if v, err := iprot.ReadDouble(ctx); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
 			temp := Minutes(v)
 			req = temp
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
@@ -297,21 +297,21 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		req := NewAlbum()
-		if err := req.Read(iprot); err != nil {
+		if err := req.Read(ctx, iprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", req), err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
 		return method.Invoke([]interface{}{ctx, req}).Error()
 	}
