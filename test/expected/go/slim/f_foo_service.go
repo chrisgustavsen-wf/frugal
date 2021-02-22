@@ -995,13 +995,13 @@ func (p *FooBlahArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "blah_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.Num, "num", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.Num, "num", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::num:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.Str, "Str", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Str, "Str", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Str:2 ", p), err)
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.Event, "event", 3); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.Event, "event", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::event:3 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -1119,17 +1119,17 @@ func (p *FooBlahResult) Write(ctx context.Context, oprot thrift.TProtocol) error
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI64(ctx, oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
 	if p.IsSetAwe() {
-		if err := frugal.WriteStruct(ctx, oprot, p.Awe, "awe", 1); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Awe, "awe", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::awe:1 ", p), err)
 		}
 	}
 	if p.IsSetAPI() {
-		if err := frugal.WriteStruct(ctx, oprot, p.API, "api", 2); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.API, "api", 2); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::api:2 ", p), err)
 		}
 	}
@@ -1231,7 +1231,7 @@ func (p *FooOneWayArgs) Write(ctx context.Context, oprot thrift.TProtocol) error
 	if err := oprot.WriteStructBegin(ctx, "oneWay_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI64(ctx, oprot, int64(p.ID), "id", 1); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID), "id", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::id:1 ", p), err)
 	}
 	if err := p.writeField2(ctx, oprot); err != nil {
@@ -1339,10 +1339,10 @@ func (p *FooBinMethodArgs) Write(ctx context.Context, oprot thrift.TProtocol) er
 	if err := oprot.WriteStructBegin(ctx, "bin_method_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteBinary(ctx, oprot, p.Bin, "bin", 1); err != nil {
+	if err := frugal.WriteBinaryWithContext(ctx, oprot, p.Bin, "bin", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::bin:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.Str, "Str", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Str, "Str", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Str:2 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -1438,12 +1438,12 @@ func (p *FooBinMethodResult) Write(ctx context.Context, oprot thrift.TProtocol) 
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteBinary(ctx, oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteBinaryWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
 	if p.IsSetAPI() {
-		if err := frugal.WriteStruct(ctx, oprot, p.API, "api", 1); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.API, "api", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::api:1 ", p), err)
 		}
 	}
@@ -1542,13 +1542,13 @@ func (p *FooParamModifiersArgs) Write(ctx context.Context, oprot thrift.TProtoco
 	if err := oprot.WriteStructBegin(ctx, "param_modifiers_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.OptNum, "opt_num", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.OptNum, "opt_num", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::opt_num:1 ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.DefaultNum, "default_num", 2); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.DefaultNum, "default_num", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::default_num:2 ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.ReqNum, "req_num", 3); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.ReqNum, "req_num", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::req_num:3 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -1628,7 +1628,7 @@ func (p *FooParamModifiersResult) Write(ctx context.Context, oprot thrift.TProto
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI64(ctx, oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2025,7 +2025,7 @@ func (p *FooGetThingResult) Write(ctx context.Context, oprot thrift.TProtocol) e
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteStruct(ctx, oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2160,7 +2160,7 @@ func (p *FooGetMyIntResult) Write(ctx context.Context, oprot thrift.TProtocol) e
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI32(ctx, oprot, int32(*p.Success), "success", 0); err != nil {
+		if err := frugal.WriteI32WithContext(ctx, oprot, int32(*p.Success), "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2239,7 +2239,7 @@ func (p *FooUseSubdirStructArgs) Write(ctx context.Context, oprot thrift.TProtoc
 	if err := oprot.WriteStructBegin(ctx, "use_subdir_struct_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.A, "a", 1); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.A, "a", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::a:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -2318,7 +2318,7 @@ func (p *FooUseSubdirStructResult) Write(ctx context.Context, oprot thrift.TProt
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteStruct(ctx, oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2389,7 +2389,7 @@ func (p *FooSayHelloWithArgs) Write(ctx context.Context, oprot thrift.TProtocol)
 	if err := oprot.WriteStructBegin(ctx, "sayHelloWith_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.NewMessage_, "newMessage", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.NewMessage_, "newMessage", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::newMessage:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -2469,7 +2469,7 @@ func (p *FooSayHelloWithResult) Write(ctx context.Context, oprot thrift.TProtoco
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(ctx, oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2540,7 +2540,7 @@ func (p *FooWhatDoYouSayArgs) Write(ctx context.Context, oprot thrift.TProtocol)
 	if err := oprot.WriteStructBegin(ctx, "whatDoYouSay_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.MessageArgs_, "messageArgs", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageArgs_, "messageArgs", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageArgs:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -2620,7 +2620,7 @@ func (p *FooWhatDoYouSayResult) Write(ctx context.Context, oprot thrift.TProtoco
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(ctx, oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
@@ -2691,7 +2691,7 @@ func (p *FooSayAgainArgs) Write(ctx context.Context, oprot thrift.TProtocol) err
 	if err := oprot.WriteStructBegin(ctx, "sayAgain_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.MessageResult_, "messageResult", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageResult_, "messageResult", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageResult:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -2771,7 +2771,7 @@ func (p *FooSayAgainResult) Write(ctx context.Context, oprot thrift.TProtocol) e
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(ctx, oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}

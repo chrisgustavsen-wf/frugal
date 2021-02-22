@@ -254,7 +254,7 @@ func (p *TestBase) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "TestBase"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.BaseStruct, "base_struct", 1); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.BaseStruct, "base_struct", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::base_struct:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -324,7 +324,7 @@ func (p *TestLowercase) Write(ctx context.Context, oprot thrift.TProtocol) error
 	if err := oprot.WriteStructBegin(ctx, "TestLowercase"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.LowercaseInt, "lowercaseInt", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.LowercaseInt, "lowercaseInt", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::lowercaseInt:1 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -412,10 +412,10 @@ func (p *Event) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "Event"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI64(ctx, oprot, int64(p.ID), "ID", 1); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID), "ID", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ID:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.Message, "Message", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Message, "Message", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Message:2 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -863,46 +863,46 @@ func (p *TestingDefaults) Write(ctx context.Context, oprot thrift.TProtocol) err
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetID2() {
-		if err := frugal.WriteI64(ctx, oprot, int64(p.ID2), "ID2", 1); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID2), "ID2", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::ID2:1 ", p), err)
 		}
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.Ev1, "ev1", 2); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.Ev1, "ev1", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ev1:2 ", p), err)
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.Ev2, "ev2", 3); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.Ev2, "ev2", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ev2:3 ", p), err)
 	}
-	if err := frugal.WriteI64(ctx, oprot, int64(p.ID), "ID", 4); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID), "ID", 4); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ID:4 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.Thing, "thing", 5); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Thing, "thing", 5); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::thing:5 ", p), err)
 	}
 	if p.IsSetThing2() {
-		if err := frugal.WriteString(ctx, oprot, p.Thing2, "thing2", 6); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, p.Thing2, "thing2", 6); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::thing2:6 ", p), err)
 		}
 	}
 	if err := p.writeField7(ctx, oprot); err != nil {
 		return err
 	}
-	if err := frugal.WriteI64(ctx, oprot, int64(p.ID3), "ID3", 8); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID3), "ID3", 8); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ID3:8 ", p), err)
 	}
-	if err := frugal.WriteBinary(ctx, oprot, p.BinField, "bin_field", 9); err != nil {
+	if err := frugal.WriteBinaryWithContext(ctx, oprot, p.BinField, "bin_field", 9); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::bin_field:9 ", p), err)
 	}
 	if p.IsSetBinField2() {
-		if err := frugal.WriteBinary(ctx, oprot, p.BinField2, "bin_field2", 10); err != nil {
+		if err := frugal.WriteBinaryWithContext(ctx, oprot, p.BinField2, "bin_field2", 10); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::bin_field2:10 ", p), err)
 		}
 	}
-	if err := frugal.WriteBinary(ctx, oprot, p.BinField3, "bin_field3", 11); err != nil {
+	if err := frugal.WriteBinaryWithContext(ctx, oprot, p.BinField3, "bin_field3", 11); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::bin_field3:11 ", p), err)
 	}
 	if p.IsSetBinField4() {
-		if err := frugal.WriteBinary(ctx, oprot, p.BinField4, "bin_field4", 12); err != nil {
+		if err := frugal.WriteBinaryWithContext(ctx, oprot, p.BinField4, "bin_field4", 12); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::bin_field4:12 ", p), err)
 		}
 	}
@@ -918,10 +918,10 @@ func (p *TestingDefaults) Write(ctx context.Context, oprot thrift.TProtocol) err
 	if err := p.writeField16(ctx, oprot); err != nil {
 		return err
 	}
-	if err := frugal.WriteI32(ctx, oprot, int32(p.Status), "status", 17); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, int32(p.Status), "status", 17); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::status:17 ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, int32(p.BaseStatus), "base_status", 18); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, int32(p.BaseStatus), "base_status", 18); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::base_status:18 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -1462,11 +1462,11 @@ func (p *EventWrapper) Write(ctx context.Context, oprot thrift.TProtocol) error 
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetID() {
-		if err := frugal.WriteI64(ctx, oprot, int64(*p.ID), "ID", 1); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, int64(*p.ID), "ID", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::ID:1 ", p), err)
 		}
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.Ev, "Ev", 2); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.Ev, "Ev", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Ev:2 ", p), err)
 	}
 	if err := p.writeField3(ctx, oprot); err != nil {
@@ -1484,19 +1484,19 @@ func (p *EventWrapper) Write(ctx context.Context, oprot thrift.TProtocol) error 
 	if err := p.writeField7(ctx, oprot); err != nil {
 		return err
 	}
-	if err := frugal.WriteBool(ctx, oprot, p.ABoolField, "aBoolField", 8); err != nil {
+	if err := frugal.WriteBoolWithContext(ctx, oprot, p.ABoolField, "aBoolField", 8); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::aBoolField:8 ", p), err)
 	}
-	if err := frugal.WriteStruct(ctx, oprot, p.AUnion, "a_union", 9); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.AUnion, "a_union", 9); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::a_union:9 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, string(p.TypedefOfTypedef), "typedefOfTypedef", 10); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, string(p.TypedefOfTypedef), "typedefOfTypedef", 10); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::typedefOfTypedef:10 ", p), err)
 	}
-	if err := frugal.WriteBool(ctx, oprot, p.Depr, "depr", 11); err != nil {
+	if err := frugal.WriteBoolWithContext(ctx, oprot, p.Depr, "depr", 11); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::depr:11 ", p), err)
 	}
-	if err := frugal.WriteBinary(ctx, oprot, p.DeprBinary, "deprBinary", 12); err != nil {
+	if err := frugal.WriteBinaryWithContext(ctx, oprot, p.DeprBinary, "deprBinary", 12); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::deprBinary:12 ", p), err)
 	}
 	if err := p.writeField13(ctx, oprot); err != nil {
@@ -1809,13 +1809,13 @@ func (p *FooArgs_) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "FooArgs"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.NewMessage_, "newMessage", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.NewMessage_, "newMessage", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::newMessage:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.MessageArgs_, "messageArgs", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageArgs_, "messageArgs", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageArgs:2 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.MessageResult_, "messageResult", 3); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageResult_, "messageResult", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageResult:3 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {
@@ -2063,22 +2063,22 @@ func (p *TestingUnions) Write(ctx context.Context, oprot thrift.TProtocol) error
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetAnID() {
-		if err := frugal.WriteI64(ctx, oprot, int64(*p.AnID), "AnID", 1); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, int64(*p.AnID), "AnID", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::AnID:1 ", p), err)
 		}
 	}
 	if p.IsSetAString() {
-		if err := frugal.WriteString(ctx, oprot, *p.AString, "aString", 2); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.AString, "aString", 2); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::aString:2 ", p), err)
 		}
 	}
 	if p.IsSetSomeotherthing() {
-		if err := frugal.WriteI32(ctx, oprot, int32(*p.Someotherthing), "someotherthing", 3); err != nil {
+		if err := frugal.WriteI32WithContext(ctx, oprot, int32(*p.Someotherthing), "someotherthing", 3); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::someotherthing:3 ", p), err)
 		}
 	}
 	if p.IsSetAnInt16() {
-		if err := frugal.WriteI16(ctx, oprot, *p.AnInt16, "AnInt16", 4); err != nil {
+		if err := frugal.WriteI16WithContext(ctx, oprot, *p.AnInt16, "AnInt16", 4); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::AnInt16:4 ", p), err)
 		}
 	}
@@ -2086,12 +2086,12 @@ func (p *TestingUnions) Write(ctx context.Context, oprot thrift.TProtocol) error
 		return err
 	}
 	if p.IsSetBinFieldInUnion() {
-		if err := frugal.WriteBinary(ctx, oprot, p.BinFieldInUnion, "bin_field_in_union", 6); err != nil {
+		if err := frugal.WriteBinaryWithContext(ctx, oprot, p.BinFieldInUnion, "bin_field_in_union", 6); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::bin_field_in_union:6 ", p), err)
 		}
 	}
 	if p.IsSetDepr() {
-		if err := frugal.WriteBool(ctx, oprot, *p.Depr, "depr", 7); err != nil {
+		if err := frugal.WriteBoolWithContext(ctx, oprot, *p.Depr, "depr", 7); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::depr:7 ", p), err)
 		}
 	}
@@ -2214,13 +2214,13 @@ func (p *AwesomeException) Write(ctx context.Context, oprot thrift.TProtocol) er
 	if err := oprot.WriteStructBegin(ctx, "AwesomeException"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI64(ctx, oprot, int64(p.ID), "ID", 1); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID), "ID", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::ID:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.Reason, "Reason", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Reason, "Reason", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Reason:2 ", p), err)
 	}
-	if err := frugal.WriteBool(ctx, oprot, p.Depr, "depr", 3); err != nil {
+	if err := frugal.WriteBoolWithContext(ctx, oprot, p.Depr, "depr", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::depr:3 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {

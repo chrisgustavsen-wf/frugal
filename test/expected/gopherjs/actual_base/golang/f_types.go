@@ -115,10 +115,10 @@ func (p *Thing) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteStructBegin(ctx, "thing"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(ctx, oprot, p.AnID, "an_id", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.AnID, "an_id", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::an_id:1 ", p), err)
 	}
-	if err := frugal.WriteString(ctx, oprot, p.AString, "a_string", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.AString, "a_string", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::a_string:2 ", p), err)
 	}
 	if err := oprot.WriteFieldStop(ctx); err != nil {

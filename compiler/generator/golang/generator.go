@@ -964,7 +964,7 @@ func (g *Generator) generateWriteFieldInline(field *parser.Field) (contents stri
 	}
 
 	// Actually generate the write block
-	contents += indent + fmt.Sprintf("\tif err := frugal.Write%s(ctx, oprot, %s, \"%s\", %d); err != nil {\n", writeMethod, structField, field.Name, field.ID)
+	contents += indent + fmt.Sprintf("\tif err := frugal.Write%sWithContext(ctx, oprot, %s, \"%s\", %d); err != nil {\n", writeMethod, structField, field.Name, field.ID)
 	contents += indent + fmt.Sprintf("\t\treturn thrift.PrependError(fmt.Sprintf(\"%%T::%s:%d \", p), err)", field.Name, field.ID)
 	return contents + tail + "\t}\n"
 }

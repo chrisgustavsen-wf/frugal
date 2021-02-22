@@ -57,25 +57,24 @@ func NewFBaseProcessor() *FBaseProcessor {
 // Process the request from the input protocol and write the response to the
 // output protocol.
 func (f *FBaseProcessor) Process(iprot, oprot *FProtocol) error {
-	fctx, err := iprot.ReadRequestHeader()
+	ctx, err := iprot.ReadRequestHeader()
 	if err != nil {
 		return err
 	}
-	ctx := toCTX(fctx)
 	name, _, _, err := iprot.ReadMessageBegin(ctx)
 	if err != nil {
 		return err
 	}
 	if processor, ok := f.processMap[name]; ok {
-		if err := processor.Process(fctx, iprot, oprot); err != nil {
+		if err := processor.Process(ctx, iprot, oprot); err != nil {
 			if _, ok := err.(thrift.TException); ok {
 				logger().Errorf(
 					"frugal: error occurred while processing request with correlation id %s: %s",
-					fctx.CorrelationID(), err.Error())
+					ctx.CorrelationID(), err.Error())
 			} else {
 				logger().Errorf(
 					"frugal: user handler code returned unhandled error on request with correlation id %s: %s",
-					fctx.CorrelationID(), err.Error())
+					ctx.CorrelationID(), err.Error())
 			}
 		}
 		// Return nil because the server should still send a response to the client.
@@ -83,7 +82,7 @@ func (f *FBaseProcessor) Process(iprot, oprot *FProtocol) error {
 	}
 
 	logger().Warnf("frugal: client invoked unknown function %s on request with correlation id %s",
-		name, fctx.CorrelationID())
+		name, ctx.CorrelationID())
 	if err := iprot.Skip(ctx, thrift.STRUCT); err != nil {
 		return err
 	}
@@ -93,7 +92,7 @@ func (f *FBaseProcessor) Process(iprot, oprot *FProtocol) error {
 	ex := thrift.NewTApplicationException(APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function "+name)
 	f.writeMu.Lock()
 	defer f.writeMu.Unlock()
-	if err := oprot.WriteResponseHeader(fctx); err != nil {
+	if err := oprot.WriteResponseHeader(ctx); err != nil {
 		return err
 	}
 	if err := oprot.WriteMessageBegin(ctx, name, thrift.EXCEPTION, 0); err != nil {
@@ -205,10 +204,9 @@ func (f *FBaseProcessorFunction) SendError(ctx FContext, oprot *FProtocol, kind 
 	return err
 }
 
-func (f *FBaseProcessorFunction) sendError(fctx FContext, oprot *FProtocol, kind int32, method, message string) error {
+func (f *FBaseProcessorFunction) sendError(ctx FContext, oprot *FProtocol, kind int32, method, message string) error {
 	err := thrift.NewTApplicationException(kind, message)
-	oprot.WriteResponseHeader(fctx)
-	ctx := toCTX(fctx)
+	oprot.WriteResponseHeader(ctx)
 	oprot.WriteMessageBegin(ctx, method, thrift.EXCEPTION, 0)
 	err.Write(ctx, oprot)
 	oprot.WriteMessageEnd(ctx)
@@ -217,24 +215,23 @@ func (f *FBaseProcessorFunction) sendError(fctx FContext, oprot *FProtocol, kind
 }
 
 // SendReply ...
-func (f *FBaseProcessorFunction) SendReply(fctx FContext, oprot *FProtocol, method string, result thrift.TStruct) error {
+func (f *FBaseProcessorFunction) SendReply(ctx FContext, oprot *FProtocol, method string, result thrift.TStruct) error {
 	f.writeMu.Lock()
 	defer f.writeMu.Unlock()
-	ctx := toCTX(fctx)
-	if err := oprot.WriteResponseHeader(fctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+	if err := oprot.WriteResponseHeader(ctx); err != nil {
+		return f.trapError(ctx, oprot, method, err)
 	}
 	if err := oprot.WriteMessageBegin(ctx, method, thrift.REPLY, 0); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, oprot, method, err)
 	}
 	if err := result.Write(ctx, oprot); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, oprot, method, err)
 	}
 	if err := oprot.WriteMessageEnd(ctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, oprot, method, err)
 	}
 	if err := oprot.Flush(ctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, oprot, method, err)
 	}
 	return nil
 }
