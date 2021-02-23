@@ -6,7 +6,7 @@ package include_vendor
 import (
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/go"
+	frugal "github.com/Workiva/frugal/lib/go"
 	"github.com/Workiva/some/vendored/place/vendor_namespace"
 	"github.com/apache/thrift/lib/go/thrift"
 )

@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/go"
+	frugal "github.com/Workiva/frugal/lib/go"
 	"github.com/Workiva/frugal/test/out/ValidTypes"
 	"github.com/Workiva/frugal/test/out/actual_base/golang"
 	"github.com/Workiva/frugal/test/out/subdir_include"

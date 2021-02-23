@@ -7,7 +7,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/go"
+	frugal "github.com/Workiva/frugal/lib/go"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 

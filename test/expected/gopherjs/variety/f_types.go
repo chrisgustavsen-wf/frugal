@@ -8,7 +8,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/gopherjs/frugal"
+	frugal "github.com/Workiva/frugal/lib/gopherjs/frugal"
 	"github.com/Workiva/frugal/lib/gopherjs/thrift"
 	"github.com/Workiva/frugal/test/expected/gopherjs/actual_base/golang"
 )

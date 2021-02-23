@@ -1109,9 +1109,9 @@ func (g *Generator) GenerateTypesImports(file *os.File) error {
 		contents += "\t\"github.com/apache/thrift/lib/go/thrift\"\n"
 	}
 	if g.Options[frugalImportOption] != "" {
-		contents += "\t\"" + g.Options[frugalImportOption] + "\"\n"
+		contents += "\tfrugal \"" + g.Options[frugalImportOption] + "\"\n"
 	} else {
-		contents += "\t\"github.com/Workiva/frugal/lib/go\"\n"
+		contents += "\tfrugal \"github.com/Workiva/frugal/lib/go\"\n"
 	}
 
 	protections := ""
@@ -1139,45 +1139,6 @@ func (g *Generator) GenerateTypesImports(file *os.File) error {
 	return err
 }
 
-// GenerateServiceResultArgsImports generates the necessary imports for service
-// args and result types.
-func (g *Generator) GenerateServiceResultArgsImports(file *os.File) error {
-	contents := ""
-	contents += "import (\n"
-	contents += "\t\"context\"\n"
-	contents += "\t\"bytes\"\n"
-	contents += "\t\"fmt\"\n"
-	if g.Options[thriftImportOption] != "" {
-		contents += "\t\"" + g.Options[thriftImportOption] + "\"\n"
-	} else {
-		contents += "\t\"github.com/apache/thrift/lib/go/thrift\"\n"
-	}
-
-	protections := ""
-	pkgPrefix := g.Options[packagePrefixOption]
-	for _, include := range g.Frugal.Includes {
-		if imp, err := g.generateIncludeImport(include, pkgPrefix); err != nil {
-			return err
-		} else {
-			contents += imp
-		}
-		protections += g.generateImportProtection(include)
-	}
-
-	contents += ")\n\n"
-
-	if !g.generateSlim() {
-		contents += "// (needed to ensure safety because of naive import list construction.)\n"
-		contents += "var _ = thrift.ZERO\n"
-		contents += "var _ = fmt.Printf\n"
-		contents += "var _ = bytes.Equal\n\n"
-		contents += protections
-	}
-
-	_, err := file.WriteString(contents)
-	return err
-}
-
 // GenerateServiceImports generates necessary imports for the given service.
 func (g *Generator) GenerateServiceImports(file *os.File, s *parser.Service) error {
 	imports := "import (\n"
@@ -1195,9 +1156,9 @@ func (g *Generator) GenerateServiceImports(file *os.File, s *parser.Service) err
 		imports += "\t\"github.com/apache/thrift/lib/go/thrift\"\n"
 	}
 	if g.Options[frugalImportOption] != "" {
-		imports += "\t\"" + g.Options[frugalImportOption] + "\"\n"
+		imports += "\tfrugal \"" + g.Options[frugalImportOption] + "\"\n"
 	} else {
-		imports += "\t\"github.com/Workiva/frugal/lib/go\"\n"
+		imports += "\tfrugal \"github.com/Workiva/frugal/lib/go\"\n"
 	}
 	imports += "\t\"github.com/sirupsen/logrus\"\n"
 
@@ -1240,9 +1201,9 @@ func (g *Generator) GenerateScopeImports(file *os.File, s *parser.Scope) error {
 		imports += "\t\"github.com/apache/thrift/lib/go/thrift\"\n"
 	}
 	if g.Options[frugalImportOption] != "" {
-		imports += "\t\"" + g.Options[frugalImportOption] + "\"\n"
+		imports += "\tfrugal \"" + g.Options[frugalImportOption] + "\"\n"
 	} else {
-		imports += "\t\"github.com/Workiva/frugal/lib/go\"\n"
+		imports += "\tfrugal \"github.com/Workiva/frugal/lib/go\"\n"
 	}
 
 	pkgPrefix := g.Options[packagePrefixOption]
