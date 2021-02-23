@@ -4,6 +4,7 @@
 package variety
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/go"
@@ -78,14 +79,14 @@ func (p *eventsPublisher) publishSomeInt(ctx frugal.FContext, user string, req i
 
 type eventsSomeIntMessage int64
 
-func (p eventsSomeIntMessage) Write(oprot thrift.TProtocol) error {
+func (p eventsSomeIntMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteI64(ctx, int64(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
 }
 
-func (p eventsSomeIntMessage) Read(iprot thrift.TProtocol) error {
+func (p eventsSomeIntMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
@@ -107,14 +108,14 @@ func (p *eventsPublisher) publishSomeStr(ctx frugal.FContext, user string, req s
 
 type eventsSomeStrMessage string
 
-func (p eventsSomeStrMessage) Write(oprot thrift.TProtocol) error {
+func (p eventsSomeStrMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteString(ctx, string(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
 }
 
-func (p eventsSomeStrMessage) Read(iprot thrift.TProtocol) error {
+func (p eventsSomeStrMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
@@ -136,7 +137,7 @@ func (p *eventsPublisher) publishSomeList(ctx frugal.FContext, user string, req 
 
 type eventsSomeListMessage []map[ID]*Event
 
-func (p eventsSomeListMessage) Write(oprot thrift.TProtocol) error {
+func (p eventsSomeListMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteListBegin(ctx, thrift.MAP, len(p)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
@@ -162,7 +163,7 @@ func (p eventsSomeListMessage) Write(oprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p eventsSomeListMessage) Read(iprot thrift.TProtocol) error {
+func (p eventsSomeListMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
@@ -228,10 +229,12 @@ func (l *eventsSubscriber) recvEventCreated(op string, pf *frugal.FProtocolFacto
 	method := frugal.NewMethod(l, handler, "SubscribeEventCreated", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -278,10 +281,12 @@ func (l *eventsSubscriber) recvSomeInt(op string, pf *frugal.FProtocolFactory, h
 	method := frugal.NewMethod(l, handler, "SubscribeSomeInt", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -330,10 +335,12 @@ func (l *eventsSubscriber) recvSomeStr(op string, pf *frugal.FProtocolFactory, h
 	method := frugal.NewMethod(l, handler, "SubscribeSomeStr", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -382,10 +389,12 @@ func (l *eventsSubscriber) recvSomeList(op string, pf *frugal.FProtocolFactory, 
 	method := frugal.NewMethod(l, handler, "SubscribeSomeList", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {

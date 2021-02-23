@@ -4,6 +4,7 @@
 package music
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Workiva/frugal/lib/go"
@@ -58,7 +59,7 @@ func (p *albumWinnersPublisher) publishContestStart(ctx frugal.FContext, req []*
 
 type albumWinnersContestStartMessage []*Album
 
-func (p albumWinnersContestStartMessage) Write(oprot thrift.TProtocol) error {
+func (p albumWinnersContestStartMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteListBegin(ctx, thrift.STRUCT, len(p)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
@@ -73,7 +74,7 @@ func (p albumWinnersContestStartMessage) Write(oprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p albumWinnersContestStartMessage) Read(iprot thrift.TProtocol) error {
+func (p albumWinnersContestStartMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
@@ -94,14 +95,14 @@ func (p *albumWinnersPublisher) publishTimeLeft(ctx frugal.FContext, req Minutes
 
 type albumWinnersTimeLeftMessage Minutes
 
-func (p albumWinnersTimeLeftMessage) Write(oprot thrift.TProtocol) error {
+func (p albumWinnersTimeLeftMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
 	if err := oprot.WriteDouble(ctx, float64(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
 }
 
-func (p albumWinnersTimeLeftMessage) Read(iprot thrift.TProtocol) error {
+func (p albumWinnersTimeLeftMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
@@ -178,10 +179,12 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 	method := frugal.NewMethod(l, handler, "SubscribeContestStart", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -239,10 +242,12 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 	method := frugal.NewMethod(l, handler, "SubscribeTimeLeft", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -292,10 +297,12 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 	method := frugal.NewMethod(l, handler, "SubscribeWinner", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {

@@ -1095,6 +1095,7 @@ func (g *Generator) generateWriteFieldRec(field *parser.Field, prefix string) st
 // GenerateTypesImports generates the necessary Go types imports.
 func (g *Generator) GenerateTypesImports(file *os.File) error {
 	contents := "import (\n"
+	contents += "\t\"context\"\n"
 	contents += "\t\"bytes\"\n"
 	contents += "\t\"fmt\"\n"
 	// Enums need these for some reason
@@ -1143,6 +1144,7 @@ func (g *Generator) GenerateTypesImports(file *os.File) error {
 func (g *Generator) GenerateServiceResultArgsImports(file *os.File) error {
 	contents := ""
 	contents += "import (\n"
+	contents += "\t\"context\"\n"
 	contents += "\t\"bytes\"\n"
 	contents += "\t\"fmt\"\n"
 	if g.Options[thriftImportOption] != "" {
@@ -1180,6 +1182,7 @@ func (g *Generator) GenerateServiceResultArgsImports(file *os.File) error {
 func (g *Generator) GenerateServiceImports(file *os.File, s *parser.Service) error {
 	imports := "import (\n"
 	imports += "\t\"bytes\"\n"
+	imports += "\t\"context\"\n"
 	imports += "\t\"fmt\"\n"
 	imports += "\t\"sync\"\n"
 	if len(s.TwowayMethods()) > 0 {
@@ -1228,6 +1231,7 @@ func (g *Generator) GenerateServiceImports(file *os.File, s *parser.Service) err
 // GenerateScopeImports generates necessary imports for the given scope.
 func (g *Generator) GenerateScopeImports(file *os.File, s *parser.Scope) error {
 	imports := "import (\n"
+	imports += "\t\"context\"\n"
 	imports += "\t\"fmt\"\n"
 	imports += "\t\"log\"\n\n"
 	if g.Options[thriftImportOption] != "" {
@@ -1422,11 +1426,11 @@ func (g *Generator) generateInternalPublishMethod(scope *parser.Scope, op *parse
 
 	// Pub/Sub argument parser!
 	publisher += fmt.Sprintf("type %s %s\n\n", helper, g.getGoTypeFromThriftType(op.Type))
-	publisher += fmt.Sprintf("func (p %s) Write(oprot thrift.TProtocol) error {\n", helper)
+	publisher += fmt.Sprintf("func (p %s) Write(ctx context.Context, oprot thrift.TProtocol) error {\n", helper)
 	publisher += g.generateWriteFieldRec(parser.FieldFromType(op.Type, ""), "p")
 	publisher += "\treturn nil\n"
 	publisher += "}\n\n"
-	publisher += fmt.Sprintf("func (p %s) Read(iprot thrift.TProtocol) error {\n", helper)
+	publisher += fmt.Sprintf("func (p %s) Read(ctx context.Context, iprot thrift.TProtocol) error {\n", helper)
 	publisher += "\tpanic(\"Not Implemented!\")\n"
 	publisher += "}\n"
 	return publisher
@@ -1562,10 +1566,11 @@ func (g *Generator) generateSubscribeMethod(scope *parser.Scope, op *parser.Oper
 	subscriber += fmt.Sprintf("\tmethod := frugal.NewMethod(l, handler, \"Subscribe%s\", l.middleware)\n", op.Name)
 	subscriber += "\treturn func(transport thrift.TTransport) error {\n"
 	subscriber += "\t\tiprot := pf.GetProtocol(transport)\n"
-	subscriber += "\t\tctx, err := iprot.ReadRequestHeader()\n"
+	subscriber += "\t\tfctx, err := iprot.ReadRequestHeader()\n"
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
 	subscriber += "\t\t}\n\n"
+	subscriber += "\t\tctx := frugal.ToContext(fctx)\n\n"
 	subscriber += "\t\tname, _, _, err := iprot.ReadMessageBegin(ctx)\n"
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
@@ -1912,9 +1917,10 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 		contents += fmt.Sprintf("\tlogrus.Warn(\"Deprecated function '%s.%s' was called by a client\")\n", service.Name, nameTitle)
 	}
 
+	contents += "\trealCtx := frugal.ToContext(ctx)\n"
 	contents += fmt.Sprintf("\targs := %s%sArgs{}\n", servTitle, nameTitle)
-	contents += "\terr := args.Read(ctx, iprot)\n"
-	contents += "\tiprot.ReadMessageEnd(ctx)\n"
+	contents += "\terr := args.Read(realCtx, iprot)\n"
+	contents += "\tiprot.ReadMessageEnd(realCtx)\n"
 	contents += "\tif err != nil {\n"
 	contents += fmt.Sprintf("\t\treturn p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, %q, err.Error())\n", nameLower)
 	contents += "\t}\n"

@@ -432,9 +432,10 @@ type fooFPing struct {
 }
 
 func (p *fooFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooPingArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
 	}
@@ -461,9 +462,10 @@ type fooFBlah struct {
 }
 
 func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooBlahArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "blah", err.Error())
 	}
@@ -500,9 +502,10 @@ type fooFOneWay struct {
 }
 
 func (p *fooFOneWay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooOneWayArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "oneWay", err.Error())
 	}
@@ -528,9 +531,10 @@ type fooFBinMethod struct {
 }
 
 func (p *fooFBinMethod) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooBinMethodArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "bin_method", err.Error())
 	}
@@ -565,9 +569,10 @@ type fooFParamModifiers struct {
 }
 
 func (p *fooFParamModifiers) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooParamModifiersArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "param_modifiers", err.Error())
 	}
@@ -597,9 +602,10 @@ type fooFUnderlyingTypesTest struct {
 }
 
 func (p *fooFUnderlyingTypesTest) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooUnderlyingTypesTestArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "underlying_types_test", err.Error())
 	}
@@ -629,9 +635,10 @@ type fooFGetThing struct {
 }
 
 func (p *fooFGetThing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooGetThingArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getThing", err.Error())
 	}
@@ -661,9 +668,10 @@ type fooFGetMyInt struct {
 }
 
 func (p *fooFGetMyInt) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooGetMyIntArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getMyInt", err.Error())
 	}
@@ -693,9 +701,10 @@ type fooFUseSubdirStruct struct {
 }
 
 func (p *fooFUseSubdirStruct) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooUseSubdirStructArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "use_subdir_struct", err.Error())
 	}
@@ -725,9 +734,10 @@ type fooFSayHelloWith struct {
 }
 
 func (p *fooFSayHelloWith) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooSayHelloWithArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayHelloWith", err.Error())
 	}
@@ -757,9 +767,10 @@ type fooFWhatDoYouSay struct {
 }
 
 func (p *fooFWhatDoYouSay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooWhatDoYouSayArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "whatDoYouSay", err.Error())
 	}
@@ -789,9 +800,10 @@ type fooFSayAgain struct {
 }
 
 func (p *fooFSayAgain) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := FooSayAgainArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayAgain", err.Error())
 	}

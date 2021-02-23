@@ -69,9 +69,10 @@ type intermediatefooFIntermeidateFoo struct {
 }
 
 func (p *intermediatefooFIntermeidateFoo) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	realCtx := frugal.ToContext(ctx)
 	args := IntermediateFooIntermeidateFooArgs{}
-	err := args.Read(ctx, iprot)
-	iprot.ReadMessageEnd(ctx)
+	err := args.Read(realCtx, iprot)
+	iprot.ReadMessageEnd(realCtx)
 	if err != nil {
 		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "intermeidateFoo", err.Error())
 	}

@@ -98,10 +98,12 @@ func (l *myScopeSubscriber) recvnewItem(op string, pf *frugal.FProtocolFactory, 
 	method := frugal.NewMethod(l, handler, "SubscribenewItem", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
+
+		ctx := frugal.ToContext(fctx)
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
