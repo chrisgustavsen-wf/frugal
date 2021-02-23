@@ -12,7 +12,7 @@ import (
 )
 
 type FIntermediateFoo interface {
-	IntermeidateFoo(ctx frugal.FContext) (err error)
+	IntermeidateFoo(fctx frugal.FContext) (err error)
 }
 
 type FIntermediateFooClient struct {
@@ -33,8 +33,8 @@ func NewFIntermediateFooClient(provider *frugal.FServiceProvider, middleware ...
 
 func (f *FIntermediateFooClient) Client_() frugal.FClient { return f.c }
 
-func (f *FIntermediateFooClient) IntermeidateFoo(ctx frugal.FContext) (err error) {
-	ret := f.methods["intermeidateFoo"].Invoke([]interface{}{ctx})
+func (f *FIntermediateFooClient) IntermeidateFoo(fctx frugal.FContext) (err error) {
+	ret := f.methods["intermeidateFoo"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -44,10 +44,10 @@ func (f *FIntermediateFooClient) IntermeidateFoo(ctx frugal.FContext) (err error
 	return err
 }
 
-func (f *FIntermediateFooClient) intermeidateFoo(ctx frugal.FContext) (err error) {
+func (f *FIntermediateFooClient) intermeidateFoo(fctx frugal.FContext) (err error) {
 	args := IntermediateFooIntermeidateFooArgs{}
 	result := IntermediateFooIntermeidateFooResult{}
-	err = f.Client_().Call(ctx, "intermeidateFoo", &args, &result)
+	err = f.Client_().Call(fctx, "intermeidateFoo", &args, &result)
 	if err != nil {
 		return
 	}
@@ -68,16 +68,18 @@ type intermediatefooFIntermeidateFoo struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *intermediatefooFIntermeidateFoo) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *intermediatefooFIntermeidateFoo) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := IntermediateFooIntermeidateFooArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "intermeidateFoo", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "intermeidateFoo", err.Error())
 	}
 	result := IntermediateFooIntermeidateFooResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -86,12 +88,12 @@ func (p *intermediatefooFIntermeidateFoo) Process(ctx frugal.FContext, iprot, op
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "intermeidateFoo", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "intermeidateFoo", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "intermeidateFoo", "Internal error processing intermeidateFoo: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "intermeidateFoo", "Internal error processing intermeidateFoo: "+err.Error())
 	}
-	return p.SendReply(ctx, oprot, "intermeidateFoo", &result)
+	return p.SendReply(fctx, oprot, "intermeidateFoo", &result)
 }
 
 type IntermediateFooIntermeidateFooArgs struct {

@@ -15,7 +15,7 @@ import (
 type FFooTransitiveDeps interface {
 	intermediate_include.FIntermediateFoo
 
-	Ping(ctx frugal.FContext) (err error)
+	Ping(fctx frugal.FContext) (err error)
 }
 
 type FFooTransitiveDepsClient struct {
@@ -34,8 +34,8 @@ func NewFFooTransitiveDepsClient(provider *frugal.FServiceProvider, middleware .
 	return client
 }
 
-func (f *FFooTransitiveDepsClient) Ping(ctx frugal.FContext) (err error) {
-	ret := f.methods["ping"].Invoke([]interface{}{ctx})
+func (f *FFooTransitiveDepsClient) Ping(fctx frugal.FContext) (err error) {
+	ret := f.methods["ping"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -45,10 +45,10 @@ func (f *FFooTransitiveDepsClient) Ping(ctx frugal.FContext) (err error) {
 	return err
 }
 
-func (f *FFooTransitiveDepsClient) ping(ctx frugal.FContext) (err error) {
+func (f *FFooTransitiveDepsClient) ping(fctx frugal.FContext) (err error) {
 	args := FooTransitiveDepsPingArgs{}
 	result := FooTransitiveDepsPingResult{}
-	err = f.Client_().Call(ctx, "ping", &args, &result)
+	err = f.Client_().Call(fctx, "ping", &args, &result)
 	if err != nil {
 		return
 	}
@@ -69,16 +69,18 @@ type footransitivedepsFPing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *footransitivedepsFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *footransitivedepsFPing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooTransitiveDepsPingArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
 	}
 	result := FooTransitiveDepsPingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -87,12 +89,12 @@ func (p *footransitivedepsFPing) Process(ctx frugal.FContext, iprot, oprot *frug
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "ping", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "ping", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
 	}
-	return p.SendReply(ctx, oprot, "ping", &result)
+	return p.SendReply(fctx, oprot, "ping", &result)
 }
 
 type FooTransitiveDepsPingArgs struct {

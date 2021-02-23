@@ -1,6 +1,10 @@
 package frugal
 
-import "github.com/apache/thrift/lib/go/thrift"
+import (
+	"context"
+
+	"github.com/apache/thrift/lib/go/thrift"
+)
 
 var _ FClient = (*FStandardClient)(nil)
 
@@ -53,38 +57,43 @@ func (client *FStandardClient) Close() error {
 }
 
 // Call invokes a service and waits for a response.
-func (client *FStandardClient) Call(ctx FContext, method string, args, result thrift.TStruct) error {
-	payload, err := client.prepareMessage(ctx, method, args, thrift.CALL)
+func (client *FStandardClient) Call(fctx FContext, method string, args, result thrift.TStruct) error {
+	ctx, done := ToContext(fctx)
+	defer done()
+	payload, err := client.prepareMessage(ctx, fctx, method, args, thrift.CALL)
 	if err != nil {
 		return err
 	}
-	resultTransport, err := client.transport.Request(ctx, payload)
+	resultTransport, err := client.transport.Request(fctx, payload)
 	if err != nil {
 		return err
 	}
-	return client.processReply(ctx, method, result, resultTransport)
+	return client.processReply(ctx, fctx, method, result, resultTransport)
 }
 
 // Oneway sends a message to a service, without waiting for a response.
-func (client *FStandardClient) Oneway(ctx FContext, method string, args thrift.TStruct) error {
-	payload, err := client.prepareMessage(ctx, method, args, thrift.ONEWAY)
+func (client *FStandardClient) Oneway(fctx FContext, method string, args thrift.TStruct) error {
+	ctx, done := ToContext(fctx)
+	defer done()
+	payload, err := client.prepareMessage(ctx, fctx, method, args, thrift.ONEWAY)
 	if err != nil {
 		return err
 	}
-	return client.transport.Oneway(ctx, payload)
+	return client.transport.Oneway(fctx, payload)
 }
 
 // Publish sends a message to a topic.
-func (client *FStandardClient) Publish(ctx FContext, op, topic string, message thrift.TStruct) error {
-	payload, err := client.prepareMessage(ctx, op, message, thrift.CALL)
+func (client *FStandardClient) Publish(fctx FContext, op, topic string, message thrift.TStruct) error {
+	ctx, done := ToContext(fctx)
+	defer done()
+	payload, err := client.prepareMessage(ctx, fctx, op, message, thrift.CALL)
 	if err != nil {
 		return err
 	}
 	return client.publisher.Publish(topic, payload)
 }
 
-func (client FStandardClient) prepareMessage(fctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
-	ctx := ToContext(fctx)
+func (client FStandardClient) prepareMessage(ctx context.Context, fctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
 	buffer := NewTMemoryOutputBuffer(client.limit)
 	oprot := client.protocolFactory.GetProtocol(buffer)
 	if err := oprot.WriteRequestHeader(fctx); err != nil {
@@ -105,8 +114,7 @@ func (client FStandardClient) prepareMessage(fctx FContext, method string, args 
 	return buffer.Bytes(), nil
 }
 
-func (client FStandardClient) processReply(fctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
-	ctx := ToContext(fctx)
+func (client FStandardClient) processReply(ctx context.Context, fctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
 	iprot := client.protocolFactory.GetProtocol(resultTransport)
 	if err := iprot.ReadResponseHeader(fctx); err != nil {
 		return err

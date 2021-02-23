@@ -14,6 +14,7 @@
 package frugal
 
 import (
+	"context"
 	"sync"
 
 	"github.com/apache/thrift/lib/go/thrift"
@@ -61,7 +62,8 @@ func (f *FBaseProcessor) Process(iprot, oprot *FProtocol) error {
 	if err != nil {
 		return err
 	}
-	ctx := ToContext(fctx)
+	ctx, done := ToContext(fctx)
+	defer done()
 	name, _, _, err := iprot.ReadMessageBegin(ctx)
 	if err != nil {
 		return err
@@ -198,15 +200,16 @@ func (f *FBaseProcessorFunction) InvokeMethod(args []interface{}) Results {
 }
 
 // SendError writes the error to the desired transport
-func (f *FBaseProcessorFunction) SendError(ctx FContext, oprot *FProtocol, kind int32, method, message string) error {
+func (f *FBaseProcessorFunction) SendError(fctx FContext, oprot *FProtocol, kind int32, method, message string) error {
+	ctx, done := ToContext(fctx)
+	defer done()
 	f.writeMu.Lock()
-	err := f.sendError(ctx, oprot, kind, method, message)
+	err := f.sendError(ctx, fctx, oprot, kind, method, message)
 	f.writeMu.Unlock()
 	return err
 }
 
-func (f *FBaseProcessorFunction) sendError(fctx FContext, oprot *FProtocol, kind int32, method, message string) error {
-	ctx := ToContext(fctx)
+func (f *FBaseProcessorFunction) sendError(ctx context.Context, fctx FContext, oprot *FProtocol, kind int32, method, message string) error {
 	err := thrift.NewTApplicationException(kind, message)
 	oprot.WriteResponseHeader(fctx)
 	oprot.WriteMessageBegin(ctx, method, thrift.EXCEPTION, 0)
@@ -220,28 +223,29 @@ func (f *FBaseProcessorFunction) sendError(fctx FContext, oprot *FProtocol, kind
 func (f *FBaseProcessorFunction) SendReply(fctx FContext, oprot *FProtocol, method string, result thrift.TStruct) error {
 	f.writeMu.Lock()
 	defer f.writeMu.Unlock()
-	ctx := ToContext(fctx)
+	ctx, done := ToContext(fctx)
+	defer done()
 	if err := oprot.WriteResponseHeader(fctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, fctx, oprot, method, err)
 	}
 	if err := oprot.WriteMessageBegin(ctx, method, thrift.REPLY, 0); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, fctx, oprot, method, err)
 	}
 	if err := result.Write(ctx, oprot); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, fctx, oprot, method, err)
 	}
 	if err := oprot.WriteMessageEnd(ctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, fctx, oprot, method, err)
 	}
 	if err := oprot.Flush(ctx); err != nil {
-		return f.trapError(fctx, oprot, method, err)
+		return f.trapError(ctx, fctx, oprot, method, err)
 	}
 	return nil
 }
 
-func (f *FBaseProcessorFunction) trapError(ctx FContext, oprot *FProtocol, method string, err error) error {
+func (f *FBaseProcessorFunction) trapError(ctx context.Context, fctx FContext, oprot *FProtocol, method string, err error) error {
 	if IsErrTooLarge(err) {
-		f.sendError(ctx, oprot, APPLICATION_EXCEPTION_RESPONSE_TOO_LARGE, method, err.Error())
+		f.sendError(ctx, fctx, oprot, APPLICATION_EXCEPTION_RESPONSE_TOO_LARGE, method, err.Error())
 		return nil
 	}
 	return err

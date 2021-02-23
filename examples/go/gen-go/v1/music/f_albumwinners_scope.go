@@ -17,9 +17,9 @@ import (
 type AlbumWinnersPublisher interface {
 	Open() error
 	Close() error
-	PublishContestStart(ctx frugal.FContext, req []*Album) error
-	PublishTimeLeft(ctx frugal.FContext, req Minutes) error
-	PublishWinner(ctx frugal.FContext, req *Album) error
+	PublishContestStart(fctx frugal.FContext, req []*Album) error
+	PublishTimeLeft(fctx frugal.FContext, req Minutes) error
+	PublishWinner(fctx frugal.FContext, req *Album) error
 }
 
 type albumWinnersPublisher struct {
@@ -42,19 +42,19 @@ func NewAlbumWinnersPublisher(provider *frugal.FScopeProvider, middleware ...fru
 func (p albumWinnersPublisher) Open() error  { return p.client.Open() }
 func (p albumWinnersPublisher) Close() error { return p.client.Close() }
 
-func (p *albumWinnersPublisher) PublishContestStart(ctx frugal.FContext, req []*Album) error {
-	ret := p.methods["publishContestStart"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishContestStart(fctx frugal.FContext, req []*Album) error {
+	ret := p.methods["publishContestStart"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishContestStart(ctx frugal.FContext, req []*Album) error {
+func (p *albumWinnersPublisher) publishContestStart(fctx frugal.FContext, req []*Album) error {
 	prefix := "v1.music."
 	op := "ContestStart"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, albumWinnersContestStartMessage(req))
+	return p.client.Publish(fctx, op, topic, albumWinnersContestStartMessage(req))
 }
 
 type albumWinnersContestStartMessage []*Album
@@ -78,19 +78,19 @@ func (p albumWinnersContestStartMessage) Read(ctx context.Context, iprot thrift.
 	panic("Not Implemented!")
 }
 
-func (p *albumWinnersPublisher) PublishTimeLeft(ctx frugal.FContext, req Minutes) error {
-	ret := p.methods["publishTimeLeft"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishTimeLeft(fctx frugal.FContext, req Minutes) error {
+	ret := p.methods["publishTimeLeft"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishTimeLeft(ctx frugal.FContext, req Minutes) error {
+func (p *albumWinnersPublisher) publishTimeLeft(fctx frugal.FContext, req Minutes) error {
 	prefix := "v1.music."
 	op := "TimeLeft"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, albumWinnersTimeLeftMessage(req))
+	return p.client.Publish(fctx, op, topic, albumWinnersTimeLeftMessage(req))
 }
 
 type albumWinnersTimeLeftMessage Minutes
@@ -106,19 +106,19 @@ func (p albumWinnersTimeLeftMessage) Read(ctx context.Context, iprot thrift.TPro
 	panic("Not Implemented!")
 }
 
-func (p *albumWinnersPublisher) PublishWinner(ctx frugal.FContext, req *Album) error {
-	ret := p.methods["publishWinner"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishWinner(fctx frugal.FContext, req *Album) error {
+	ret := p.methods["publishWinner"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishWinner(ctx frugal.FContext, req *Album) error {
+func (p *albumWinnersPublisher) publishWinner(fctx frugal.FContext, req *Album) error {
 	prefix := "v1.music."
 	op := "Winner"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, req)
+	return p.client.Publish(fctx, op, topic, req)
 }
 
 // Scopes are a Frugal extension to the IDL for declaring PubSub
@@ -184,7 +184,8 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -213,7 +214,7 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -247,7 +248,8 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -268,7 +270,7 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -302,7 +304,8 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -320,6 +323,6 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }

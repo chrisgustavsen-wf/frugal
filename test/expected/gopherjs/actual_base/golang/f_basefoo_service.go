@@ -12,7 +12,7 @@ import (
 )
 
 type FBaseFoo interface {
-	BasePing(ctx frugal.FContext) (err error)
+	BasePing(fctx frugal.FContext) (err error)
 }
 
 type FBaseFooClient struct {
@@ -33,8 +33,8 @@ func NewFBaseFooClient(provider *frugal.FServiceProvider, middleware ...frugal.S
 
 func (f *FBaseFooClient) Client_() frugal.FClient { return f.c }
 
-func (f *FBaseFooClient) BasePing(ctx frugal.FContext) (err error) {
-	ret := f.methods["basePing"].Invoke([]interface{}{ctx})
+func (f *FBaseFooClient) BasePing(fctx frugal.FContext) (err error) {
+	ret := f.methods["basePing"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -44,10 +44,10 @@ func (f *FBaseFooClient) BasePing(ctx frugal.FContext) (err error) {
 	return err
 }
 
-func (f *FBaseFooClient) basePing(ctx frugal.FContext) (err error) {
+func (f *FBaseFooClient) basePing(fctx frugal.FContext) (err error) {
 	args := BaseFooBasePingArgs{}
 	result := BaseFooBasePingResult{}
-	err = f.Client_().Call(ctx, "basePing", &args, &result)
+	err = f.Client_().Call(fctx, "basePing", &args, &result)
 	if err != nil {
 		return
 	}
@@ -68,16 +68,18 @@ type basefooFBasePing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *basefooFBasePing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *basefooFBasePing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := BaseFooBasePingArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "basePing", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "basePing", err.Error())
 	}
 	result := BaseFooBasePingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -86,12 +88,12 @@ func (p *basefooFBasePing) Process(ctx frugal.FContext, iprot, oprot *frugal.FPr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "basePing", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "basePing", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "basePing", "Internal error processing basePing: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "basePing", "Internal error processing basePing: "+err.Error())
 	}
-	return p.SendReply(ctx, oprot, "basePing", &result)
+	return p.SendReply(fctx, oprot, "basePing", &result)
 }
 
 type BaseFooBasePingArgs struct {

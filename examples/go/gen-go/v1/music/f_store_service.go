@@ -22,9 +22,9 @@ var _ = logrus.DebugLevel
 // Services are the API for client and server interaction.
 // Users can buy an album or enter a giveaway for a free album.
 type FStore interface {
-	BuyAlbum(ctx frugal.FContext, ASIN string, acct string) (r *Album, err error)
+	BuyAlbum(fctx frugal.FContext, ASIN string, acct string) (r *Album, err error)
 	// Deprecated: use something else
-	EnterAlbumGiveaway(ctx frugal.FContext, email string, name string) (r bool, err error)
+	EnterAlbumGiveaway(fctx frugal.FContext, email string, name string) (r bool, err error)
 }
 
 // Services are the API for client and server interaction.
@@ -48,8 +48,8 @@ func NewFStoreClient(provider *frugal.FServiceProvider, middleware ...frugal.Ser
 
 func (f *FStoreClient) Client_() frugal.FClient { return f.c }
 
-func (f *FStoreClient) BuyAlbum(ctx frugal.FContext, asin string, acct string) (r *Album, err error) {
-	ret := f.methods["buyAlbum"].Invoke([]interface{}{ctx, asin, acct})
+func (f *FStoreClient) BuyAlbum(fctx frugal.FContext, asin string, acct string) (r *Album, err error) {
+	ret := f.methods["buyAlbum"].Invoke([]interface{}{fctx, asin, acct})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -62,13 +62,13 @@ func (f *FStoreClient) BuyAlbum(ctx frugal.FContext, asin string, acct string) (
 	return r, err
 }
 
-func (f *FStoreClient) buyAlbum(ctx frugal.FContext, asin string, acct string) (r *Album, err error) {
+func (f *FStoreClient) buyAlbum(fctx frugal.FContext, asin string, acct string) (r *Album, err error) {
 	args := StoreBuyAlbumArgs{
 		ASIN: asin,
 		Acct: acct,
 	}
 	result := StoreBuyAlbumResult{}
-	err = f.Client_().Call(ctx, "buyAlbum", &args, &result)
+	err = f.Client_().Call(fctx, "buyAlbum", &args, &result)
 	if err != nil {
 		return
 	}
@@ -81,9 +81,9 @@ func (f *FStoreClient) buyAlbum(ctx frugal.FContext, asin string, acct string) (
 }
 
 // Deprecated: use something else
-func (f *FStoreClient) EnterAlbumGiveaway(ctx frugal.FContext, email string, name string) (r bool, err error) {
+func (f *FStoreClient) EnterAlbumGiveaway(fctx frugal.FContext, email string, name string) (r bool, err error) {
 	logrus.Warn("Call to deprecated function 'Store.EnterAlbumGiveaway'")
-	ret := f.methods["enterAlbumGiveaway"].Invoke([]interface{}{ctx, email, name})
+	ret := f.methods["enterAlbumGiveaway"].Invoke([]interface{}{fctx, email, name})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -96,13 +96,13 @@ func (f *FStoreClient) EnterAlbumGiveaway(ctx frugal.FContext, email string, nam
 	return r, err
 }
 
-func (f *FStoreClient) enterAlbumGiveaway(ctx frugal.FContext, email string, name string) (r bool, err error) {
+func (f *FStoreClient) enterAlbumGiveaway(fctx frugal.FContext, email string, name string) (r bool, err error) {
 	args := StoreEnterAlbumGiveawayArgs{
 		Email: email,
 		Name:  name,
 	}
 	result := StoreEnterAlbumGiveawayResult{}
-	err = f.Client_().Call(ctx, "enterAlbumGiveaway", &args, &result)
+	err = f.Client_().Call(fctx, "enterAlbumGiveaway", &args, &result)
 	if err != nil {
 		return
 	}
@@ -128,16 +128,18 @@ type storeFBuyAlbum struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *storeFBuyAlbum) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *storeFBuyAlbum) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := StoreBuyAlbumArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "buyAlbum", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "buyAlbum", err.Error())
 	}
 	result := StoreBuyAlbumResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.ASIN, args.Acct})
+	ret := p.InvokeMethod([]interface{}{fctx, args.ASIN, args.Acct})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -146,37 +148,39 @@ func (p *storeFBuyAlbum) Process(ctx frugal.FContext, iprot, oprot *frugal.FProt
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "buyAlbum", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "buyAlbum", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
 		case *PurchasingError:
 			result.Error = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "buyAlbum", "Internal error processing buyAlbum: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "buyAlbum", "Internal error processing buyAlbum: "+err.Error())
 		}
 	} else {
 		var retval *Album = ret[0].(*Album)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "buyAlbum", &result)
+	return p.SendReply(fctx, oprot, "buyAlbum", &result)
 }
 
 type storeFEnterAlbumGiveaway struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *storeFEnterAlbumGiveaway) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *storeFEnterAlbumGiveaway) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
 	logrus.Warn("Deprecated function 'Store.EnterAlbumGiveaway' was called by a client")
-	realCtx := frugal.ToContext(ctx)
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := StoreEnterAlbumGiveawayArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "enterAlbumGiveaway", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "enterAlbumGiveaway", err.Error())
 	}
 	result := StoreEnterAlbumGiveawayResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.Email, args.Name})
+	ret := p.InvokeMethod([]interface{}{fctx, args.Email, args.Name})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -185,15 +189,15 @@ func (p *storeFEnterAlbumGiveaway) Process(ctx frugal.FContext, iprot, oprot *fr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "enterAlbumGiveaway", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "enterAlbumGiveaway", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "enterAlbumGiveaway", "Internal error processing enterAlbumGiveaway: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "enterAlbumGiveaway", "Internal error processing enterAlbumGiveaway: "+err.Error())
 	} else {
 		var retval bool = ret[0].(bool)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "enterAlbumGiveaway", &result)
+	return p.SendReply(fctx, oprot, "enterAlbumGiveaway", &result)
 }
 
 type StoreBuyAlbumArgs struct {

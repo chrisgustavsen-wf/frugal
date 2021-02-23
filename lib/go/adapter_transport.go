@@ -185,14 +185,17 @@ func (f *fAdapterTransport) close(cause error) error {
 // Oneway transmits the given data and doesn't wait for a response.
 // Implementations of oneway should be threadsafe and respect the timeout
 // present on the context.
-func (f *fAdapterTransport) Oneway(ctx FContext, payload []byte) error {
+func (f *fAdapterTransport) Oneway(fctx FContext, payload []byte) error {
 	errorC := make(chan error, 1)
-	go f.send(ToContext(ctx), payload, errorC, true)
+	ctx, done := ToContext(fctx)
+	defer done()
+
+	go f.send(ctx, payload, errorC, true)
 
 	select {
 	case err := <-errorC:
 		return err
-	case <-time.After(ctx.Timeout()):
+	case <-time.After(fctx.Timeout()):
 		return thrift.NewTTransportException(TRANSPORT_EXCEPTION_TIMED_OUT, "frugal: request timed out")
 	}
 }
@@ -200,21 +203,24 @@ func (f *fAdapterTransport) Oneway(ctx FContext, payload []byte) error {
 // Request transmits the given data and waits for a response.
 // Implementations of request should be threadsafe and respect the timeout
 // present on the context.
-func (f *fAdapterTransport) Request(ctx FContext, payload []byte) (thrift.TTransport, error) {
+func (f *fAdapterTransport) Request(fctx FContext, payload []byte) (thrift.TTransport, error) {
 	resultC := make(chan []byte, 1)
 	errorC := make(chan error, 1)
 
-	f.registry.Register(ctx, resultC)
-	defer f.registry.Unregister(ctx)
+	f.registry.Register(fctx, resultC)
+	defer f.registry.Unregister(fctx)
 
-	go f.send(ToContext(ctx), payload, errorC, false)
+	ctx, done := ToContext(fctx)
+	defer done()
+
+	go f.send(ctx, payload, errorC, false)
 
 	select {
 	case result := <-resultC:
 		return &thrift.TMemoryBuffer{Buffer: bytes.NewBuffer(result)}, nil
 	case err := <-errorC:
 		return nil, err
-	case <-time.After(ctx.Timeout()):
+	case <-time.After(fctx.Timeout()):
 		return nil, thrift.NewTTransportException(TRANSPORT_EXCEPTION_TIMED_OUT, "frugal: request timed out")
 	}
 }

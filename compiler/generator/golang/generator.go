@@ -1333,7 +1333,7 @@ func (g *Generator) GeneratePublisher(file *os.File, scope *parser.Scope) error 
 	publisher += "\tOpen() error\n"
 	publisher += "\tClose() error\n"
 	for _, op := range scope.Operations {
-		publisher += fmt.Sprintf("\tPublish%s(ctx frugal.FContext, %sreq %s) error\n", op.Name, args, g.getGoTypeFromThriftType(op.Type))
+		publisher += fmt.Sprintf("\tPublish%s(fctx frugal.FContext, %sreq %s) error\n", op.Name, args, g.getGoTypeFromThriftType(op.Type))
 	}
 	publisher += "}\n\n"
 
@@ -1380,7 +1380,7 @@ func (g *Generator) generatePublishMethod(scope *parser.Scope, op *parser.Operat
 		publisher += g.GenerateInlineComment(op.Comment, "")
 	}
 
-	publisher += fmt.Sprintf("func (p *%sPublisher) Publish%s(ctx frugal.FContext, %sreq %s) error {\n",
+	publisher += fmt.Sprintf("func (p *%sPublisher) Publish%s(fctx frugal.FContext, %sreq %s) error {\n",
 		scopeLower, op.Name, args, g.getGoTypeFromThriftType(op.Type))
 	publisher += fmt.Sprintf("\tret := p.methods[\"publish%s\"].Invoke(%s)\n", op.Name, g.generateScopeArgs(scope))
 	publisher += "\tif ret[0] != nil {\n"
@@ -1403,21 +1403,21 @@ func (g *Generator) generateInternalPublishMethod(scope *parser.Scope, op *parse
 		publisher   = ""
 	)
 
-	publisher += fmt.Sprintf("func (p *%sPublisher) publish%s(ctx frugal.FContext, %sreq %s) error {\n",
+	publisher += fmt.Sprintf("func (p *%sPublisher) publish%s(fctx frugal.FContext, %sreq %s) error {\n",
 		scopeLower, op.Name, args, g.getGoTypeFromThriftType(op.Type))
 
 	// Inject the prefix variables into the FContext to send
 	for _, prefixVar := range scope.Prefix.Variables {
-		publisher += fmt.Sprintf("\tctx.AddRequestHeader(\"_topic_%s\", %s)\n", prefixVar, prefixVar)
+		publisher += fmt.Sprintf("\tfctx.AddRequestHeader(\"_topic_%s\", %s)\n", prefixVar, prefixVar)
 	}
 
 	publisher += fmt.Sprintf("\tprefix := %s\n", generatePrefixStringTemplate(scope))
 	publisher += fmt.Sprintf("\top := %q\n", op.Name)
 	publisher += "\ttopic := fmt.Sprintf(\"%s" + scopeTitle + ".%s\", prefix, op)\n"
 	if needsHelper {
-		publisher += fmt.Sprintf("\treturn p.client.Publish(ctx, op, topic, %s(req))\n", helper)
+		publisher += fmt.Sprintf("\treturn p.client.Publish(fctx, op, topic, %s(req))\n", helper)
 	} else {
-		publisher += "\treturn p.client.Publish(ctx, op, topic, req)\n"
+		publisher += "\treturn p.client.Publish(fctx, op, topic, req)\n"
 	}
 	publisher += "}\n\n"
 	if !needsHelper {
@@ -1570,7 +1570,8 @@ func (g *Generator) generateSubscribeMethod(scope *parser.Scope, op *parser.Oper
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
 	subscriber += "\t\t}\n\n"
-	subscriber += "\t\tctx := frugal.ToContext(fctx)\n\n"
+	subscriber += "\t\tctx, done := frugal.ToContext(fctx)\n"
+	subscriber += "\t\tdefer done()\n\n"
 	subscriber += "\t\tname, _, _, err := iprot.ReadMessageBegin(ctx)\n"
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
@@ -1582,7 +1583,7 @@ func (g *Generator) generateSubscribeMethod(scope *parser.Scope, op *parser.Oper
 	subscriber += "\t\t}\n"
 	subscriber += g.generateReadFieldRec(parser.FieldFromType(op.Type, "req"), false)
 	subscriber += "\t\tiprot.ReadMessageEnd(ctx)\n\n"
-	subscriber += "\t\treturn method.Invoke([]interface{}{ctx, req}).Error()\n"
+	subscriber += "\t\treturn method.Invoke([]interface{}{fctx, req}).Error()\n"
 	subscriber += "\t}\n"
 	subscriber += "}"
 
@@ -1613,7 +1614,7 @@ func (g *Generator) generateServiceInterface(service *parser.Service) string {
 	}
 	for _, method := range service.Methods {
 		contents += g.generateCommentWithDeprecated(method.Comment, "\t", method.Annotations)
-		contents += fmt.Sprintf("\t%s(ctx frugal.FContext%s) %s\n",
+		contents += fmt.Sprintf("\t%s(fctx frugal.FContext%s) %s\n",
 			snakeToCamel(method.Name), g.generateInterfaceArgs(method.Arguments),
 			g.generateReturnArgs(method))
 	}
@@ -1722,7 +1723,7 @@ func (g *Generator) generateAsyncClientMethod(service *parser.Service, method *p
 	if method.Comment != nil {
 		contents += g.GenerateInlineComment(method.Comment, "")
 	}
-	contents += fmt.Sprintf("func (f *F%sClient) %sAsync(ctx frugal.FContext%s) %s {\n",
+	contents += fmt.Sprintf("func (f *F%sClient) %sAsync(fctx frugal.FContext%s) %s {\n",
 		servTitle, nameTitle, g.generateInputArgs(method.Arguments), g.generateAsyncReturnArgs(method))
 	contents += "\terrC := make(chan error, 1)\n"
 	if method.ReturnType != nil {
@@ -1769,7 +1770,7 @@ func (g *Generator) generateClientMethod(service *parser.Service, method *parser
 		contents += fmt.Sprintf("// Deprecated%s\n", deprecationValue)
 	}
 
-	contents += fmt.Sprintf("func (f *F%sClient) %s(ctx frugal.FContext%s) %s {\n",
+	contents += fmt.Sprintf("func (f *F%sClient) %s(fctx frugal.FContext%s) %s {\n",
 		servTitle, nameTitle, g.generateInputArgs(method.Arguments), g.generateReturnArgs(method))
 
 	if deprecated && !g.generateSlim() && !g.suppressDeprecatedLogging() {
@@ -1811,7 +1812,7 @@ func (g *Generator) generateInternalClientMethod(service *parser.Service, method
 	)
 
 	contents := ""
-	contents += fmt.Sprintf("func (f *F%sClient) %s(ctx frugal.FContext%s) %s {\n",
+	contents += fmt.Sprintf("func (f *F%sClient) %s(fctx frugal.FContext%s) %s {\n",
 		servTitle, nameLower, g.generateInputArgs(method.Arguments), g.generateReturnArgs(method))
 
 	contents += fmt.Sprintf("\targs := %s%sArgs{\n", servTitle, nameTitle)
@@ -1819,13 +1820,13 @@ func (g *Generator) generateInternalClientMethod(service *parser.Service, method
 	contents += "\t}\n"
 
 	if method.Oneway {
-		contents += fmt.Sprintf("\treturn f.Client_().Oneway(ctx, %q, &args)\n", nameLower)
+		contents += fmt.Sprintf("\treturn f.Client_().Oneway(fctx, %q, &args)\n", nameLower)
 		contents += "}\n\n"
 		return contents
 	}
 
 	contents += fmt.Sprintf("\tresult := %s%sResult{}\n", servTitle, nameTitle)
-	contents += fmt.Sprintf("\terr = f.Client_().Call(ctx, %q, &args, &result)\n", nameLower)
+	contents += fmt.Sprintf("\terr = f.Client_().Call(fctx, %q, &args, &result)\n", nameLower)
 	contents += "\tif err != nil {\n"
 	contents += "\t\treturn\n"
 	contents += "\t}\n"
@@ -1911,18 +1912,19 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 	contents += "\t*frugal.FBaseProcessorFunction\n"
 	contents += "}\n\n"
 
-	contents += fmt.Sprintf("func (p *%sF%s) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {\n", servLower, nameTitle)
+	contents += fmt.Sprintf("func (p *%sF%s) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {\n", servLower, nameTitle)
 
 	if _, ok := method.Annotations.Deprecated(); ok && !g.generateSlim() && !g.suppressDeprecatedLogging() {
 		contents += fmt.Sprintf("\tlogrus.Warn(\"Deprecated function '%s.%s' was called by a client\")\n", service.Name, nameTitle)
 	}
 
-	contents += "\trealCtx := frugal.ToContext(ctx)\n"
+	contents += "\tctx, done := frugal.ToContext(fctx)\n"
+	contents += "\tdefer done()\n\n"
 	contents += fmt.Sprintf("\targs := %s%sArgs{}\n", servTitle, nameTitle)
-	contents += "\terr := args.Read(realCtx, iprot)\n"
-	contents += "\tiprot.ReadMessageEnd(realCtx)\n"
+	contents += "\terr := args.Read(ctx, iprot)\n"
+	contents += "\tiprot.ReadMessageEnd(ctx)\n"
 	contents += "\tif err != nil {\n"
-	contents += fmt.Sprintf("\t\treturn p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, %q, err.Error())\n", nameLower)
+	contents += fmt.Sprintf("\t\treturn p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, %q, err.Error())\n", nameLower)
 	contents += "\t}\n"
 	if !method.Oneway {
 		contents += fmt.Sprintf("\tresult := %s%sResult{}\n", servTitle, nameTitle)
@@ -1946,7 +1948,7 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 	}
 	contents += "\tif err != nil {\n"
 	contents += "\t\tif typedError, ok := err.(thrift.TApplicationException); ok {\n"
-	contents += fmt.Sprintf("\t\t\tp.SendError(ctx, oprot, typedError.TypeId(), %q, typedError.Error())\n", nameLower)
+	contents += fmt.Sprintf("\t\t\tp.SendError(fctx, oprot, typedError.TypeId(), %q, typedError.Error())\n", nameLower)
 	contents += "\t\t\treturn nil\n"
 	contents += "\t\t}\n"
 	if len(method.Exceptions) > 0 {
@@ -1956,10 +1958,10 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 			contents += fmt.Sprintf("\t\t\tresult.%s = v\n", snakeToCamel(err.Name))
 		}
 		contents += "\t\tdefault:\n"
-		contents += fmt.Sprintf("\t\t\treturn p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, %q, \"Internal error processing %s: \"+err.Error())", nameLower, nameLower)
+		contents += fmt.Sprintf("\t\t\treturn p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, %q, \"Internal error processing %s: \"+err.Error())", nameLower, nameLower)
 		contents += "\t\t}\n"
 	} else {
-		contents += fmt.Sprintf("\t\treturn p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, %q, \"Internal error processing %s: \"+err.Error())", nameLower, nameLower)
+		contents += fmt.Sprintf("\t\treturn p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, %q, \"Internal error processing %s: \"+err.Error())", nameLower, nameLower)
 	}
 	if method.ReturnType != nil {
 		contents += "\t} else {\n"
@@ -1979,14 +1981,14 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 		return contents
 	}
 
-	contents += fmt.Sprintf("\treturn p.SendReply(ctx, oprot, %q, &result)\n", nameLower)
+	contents += fmt.Sprintf("\treturn p.SendReply(fctx, oprot, %q, &result)\n", nameLower)
 	contents += "}\n\n"
 
 	return contents
 }
 
 func (g *Generator) generateClientArgs(method *parser.Method) string {
-	args := "[]interface{}{ctx"
+	args := "[]interface{}{fctx"
 	for _, arg := range method.Arguments {
 		args += ", " + strings.ToLower(arg.Name)
 	}
@@ -1995,7 +1997,7 @@ func (g *Generator) generateClientArgs(method *parser.Method) string {
 }
 
 func (g *Generator) generateScopeArgs(scope *parser.Scope) string {
-	args := "[]interface{}{ctx"
+	args := "[]interface{}{fctx"
 	for _, v := range scope.Prefix.Variables {
 		args += ", " + v
 	}
@@ -2005,7 +2007,7 @@ func (g *Generator) generateScopeArgs(scope *parser.Scope) string {
 }
 
 func (g *Generator) generateHandlerArgs(method *parser.Method) string {
-	args := "[]interface{}{ctx"
+	args := "[]interface{}{fctx"
 	for _, arg := range method.Arguments {
 		args += ", args." + title(arg.Name)
 	}

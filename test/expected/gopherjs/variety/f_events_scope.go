@@ -17,10 +17,10 @@ import (
 type EventsPublisher interface {
 	Open() error
 	Close() error
-	PublishEventCreated(ctx frugal.FContext, user string, req *Event) error
-	PublishSomeInt(ctx frugal.FContext, user string, req int64) error
-	PublishSomeStr(ctx frugal.FContext, user string, req string) error
-	PublishSomeList(ctx frugal.FContext, user string, req []map[ID]*Event) error
+	PublishEventCreated(fctx frugal.FContext, user string, req *Event) error
+	PublishSomeInt(fctx frugal.FContext, user string, req int64) error
+	PublishSomeStr(fctx frugal.FContext, user string, req string) error
+	PublishSomeList(fctx frugal.FContext, user string, req []map[ID]*Event) error
 }
 
 type eventsPublisher struct {
@@ -45,36 +45,36 @@ func (p eventsPublisher) Open() error  { return p.client.Open() }
 func (p eventsPublisher) Close() error { return p.client.Close() }
 
 // This is a docstring.
-func (p *eventsPublisher) PublishEventCreated(ctx frugal.FContext, user string, req *Event) error {
-	ret := p.methods["publishEventCreated"].Invoke([]interface{}{ctx, user, req})
+func (p *eventsPublisher) PublishEventCreated(fctx frugal.FContext, user string, req *Event) error {
+	ret := p.methods["publishEventCreated"].Invoke([]interface{}{fctx, user, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *eventsPublisher) publishEventCreated(ctx frugal.FContext, user string, req *Event) error {
-	ctx.AddRequestHeader("_topic_user", user)
+func (p *eventsPublisher) publishEventCreated(fctx frugal.FContext, user string, req *Event) error {
+	fctx.AddRequestHeader("_topic_user", user)
 	prefix := fmt.Sprintf("foo.%s.", user)
 	op := "EventCreated"
 	topic := fmt.Sprintf("%sEvents.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, req)
+	return p.client.Publish(fctx, op, topic, req)
 }
 
-func (p *eventsPublisher) PublishSomeInt(ctx frugal.FContext, user string, req int64) error {
-	ret := p.methods["publishSomeInt"].Invoke([]interface{}{ctx, user, req})
+func (p *eventsPublisher) PublishSomeInt(fctx frugal.FContext, user string, req int64) error {
+	ret := p.methods["publishSomeInt"].Invoke([]interface{}{fctx, user, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *eventsPublisher) publishSomeInt(ctx frugal.FContext, user string, req int64) error {
-	ctx.AddRequestHeader("_topic_user", user)
+func (p *eventsPublisher) publishSomeInt(fctx frugal.FContext, user string, req int64) error {
+	fctx.AddRequestHeader("_topic_user", user)
 	prefix := fmt.Sprintf("foo.%s.", user)
 	op := "SomeInt"
 	topic := fmt.Sprintf("%sEvents.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, eventsSomeIntMessage(req))
+	return p.client.Publish(fctx, op, topic, eventsSomeIntMessage(req))
 }
 
 type eventsSomeIntMessage int64
@@ -90,20 +90,20 @@ func (p eventsSomeIntMessage) Read(ctx context.Context, iprot thrift.TProtocol) 
 	panic("Not Implemented!")
 }
 
-func (p *eventsPublisher) PublishSomeStr(ctx frugal.FContext, user string, req string) error {
-	ret := p.methods["publishSomeStr"].Invoke([]interface{}{ctx, user, req})
+func (p *eventsPublisher) PublishSomeStr(fctx frugal.FContext, user string, req string) error {
+	ret := p.methods["publishSomeStr"].Invoke([]interface{}{fctx, user, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *eventsPublisher) publishSomeStr(ctx frugal.FContext, user string, req string) error {
-	ctx.AddRequestHeader("_topic_user", user)
+func (p *eventsPublisher) publishSomeStr(fctx frugal.FContext, user string, req string) error {
+	fctx.AddRequestHeader("_topic_user", user)
 	prefix := fmt.Sprintf("foo.%s.", user)
 	op := "SomeStr"
 	topic := fmt.Sprintf("%sEvents.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, eventsSomeStrMessage(req))
+	return p.client.Publish(fctx, op, topic, eventsSomeStrMessage(req))
 }
 
 type eventsSomeStrMessage string
@@ -119,20 +119,20 @@ func (p eventsSomeStrMessage) Read(ctx context.Context, iprot thrift.TProtocol) 
 	panic("Not Implemented!")
 }
 
-func (p *eventsPublisher) PublishSomeList(ctx frugal.FContext, user string, req []map[ID]*Event) error {
-	ret := p.methods["publishSomeList"].Invoke([]interface{}{ctx, user, req})
+func (p *eventsPublisher) PublishSomeList(fctx frugal.FContext, user string, req []map[ID]*Event) error {
+	ret := p.methods["publishSomeList"].Invoke([]interface{}{fctx, user, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *eventsPublisher) publishSomeList(ctx frugal.FContext, user string, req []map[ID]*Event) error {
-	ctx.AddRequestHeader("_topic_user", user)
+func (p *eventsPublisher) publishSomeList(fctx frugal.FContext, user string, req []map[ID]*Event) error {
+	fctx.AddRequestHeader("_topic_user", user)
 	prefix := fmt.Sprintf("foo.%s.", user)
 	op := "SomeList"
 	topic := fmt.Sprintf("%sEvents.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, eventsSomeListMessage(req))
+	return p.client.Publish(fctx, op, topic, eventsSomeListMessage(req))
 }
 
 type eventsSomeListMessage []map[ID]*Event
@@ -234,7 +234,8 @@ func (l *eventsSubscriber) recvEventCreated(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -252,7 +253,7 @@ func (l *eventsSubscriber) recvEventCreated(op string, pf *frugal.FProtocolFacto
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -286,7 +287,8 @@ func (l *eventsSubscriber) recvSomeInt(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -306,7 +308,7 @@ func (l *eventsSubscriber) recvSomeInt(op string, pf *frugal.FProtocolFactory, h
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -340,7 +342,8 @@ func (l *eventsSubscriber) recvSomeStr(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -360,7 +363,7 @@ func (l *eventsSubscriber) recvSomeStr(op string, pf *frugal.FProtocolFactory, h
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -394,7 +397,8 @@ func (l *eventsSubscriber) recvSomeList(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -441,6 +445,6 @@ func (l *eventsSubscriber) recvSomeList(op string, pf *frugal.FProtocolFactory, 
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }

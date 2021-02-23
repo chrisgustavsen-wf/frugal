@@ -30,20 +30,20 @@ type FFoo interface {
 
 	// Ping the server.
 	// Deprecated: don't use this; use "something else"
-	Ping(ctx frugal.FContext) (err error)
+	Ping(fctx frugal.FContext) (err error)
 	// Blah the server.
-	Blah(ctx frugal.FContext, num int32, Str string, event *Event) (r int64, err error)
+	Blah(fctx frugal.FContext, num int32, Str string, event *Event) (r int64, err error)
 	// oneway methods don't receive a response from the server.
-	OneWay(ctx frugal.FContext, id ID, req Request) (err error)
-	BinMethod(ctx frugal.FContext, bin []byte, Str string) (r []byte, err error)
-	ParamModifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error)
-	UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error)
-	GetThing(ctx frugal.FContext) (r *validStructs.Thing, err error)
-	GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error)
-	UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error)
-	SayHelloWith(ctx frugal.FContext, newMessage string) (r string, err error)
-	WhatDoYouSay(ctx frugal.FContext, messageArgs string) (r string, err error)
-	SayAgain(ctx frugal.FContext, messageResult string) (r string, err error)
+	OneWay(fctx frugal.FContext, id ID, req Request) (err error)
+	BinMethod(fctx frugal.FContext, bin []byte, Str string) (r []byte, err error)
+	ParamModifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error)
+	UnderlyingTypesTest(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error)
+	GetThing(fctx frugal.FContext) (r *validStructs.Thing, err error)
+	GetMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error)
+	UseSubdirStruct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error)
+	SayHelloWith(fctx frugal.FContext, newMessage string) (r string, err error)
+	WhatDoYouSay(fctx frugal.FContext, messageArgs string) (r string, err error)
+	SayAgain(fctx frugal.FContext, messageResult string) (r string, err error)
 }
 
 // This is a thrift service. Frugal will generate bindings that include
@@ -77,8 +77,8 @@ func NewFFooClient(provider *frugal.FServiceProvider, middleware ...frugal.Servi
 
 // Ping the server.
 // Deprecated: don't use this; use "something else"
-func (f *FFooClient) Ping(ctx frugal.FContext) (err error) {
-	ret := f.methods["ping"].Invoke([]interface{}{ctx})
+func (f *FFooClient) Ping(fctx frugal.FContext) (err error) {
+	ret := f.methods["ping"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -88,10 +88,10 @@ func (f *FFooClient) Ping(ctx frugal.FContext) (err error) {
 	return err
 }
 
-func (f *FFooClient) ping(ctx frugal.FContext) (err error) {
+func (f *FFooClient) ping(fctx frugal.FContext) (err error) {
 	args := FooPingArgs{}
 	result := FooPingResult{}
-	err = f.Client_().Call(ctx, "ping", &args, &result)
+	err = f.Client_().Call(fctx, "ping", &args, &result)
 	if err != nil {
 		return
 	}
@@ -99,8 +99,8 @@ func (f *FFooClient) ping(ctx frugal.FContext) (err error) {
 }
 
 // Blah the server.
-func (f *FFooClient) Blah(ctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
-	ret := f.methods["blah"].Invoke([]interface{}{ctx, num, str, event})
+func (f *FFooClient) Blah(fctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
+	ret := f.methods["blah"].Invoke([]interface{}{fctx, num, str, event})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -113,14 +113,14 @@ func (f *FFooClient) Blah(ctx frugal.FContext, num int32, str string, event *Eve
 	return r, err
 }
 
-func (f *FFooClient) blah(ctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
+func (f *FFooClient) blah(fctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
 	args := FooBlahArgs{
 		Num:   num,
 		Str:   str,
 		Event: event,
 	}
 	result := FooBlahResult{}
-	err = f.Client_().Call(ctx, "blah", &args, &result)
+	err = f.Client_().Call(fctx, "blah", &args, &result)
 	if err != nil {
 		return
 	}
@@ -137,8 +137,8 @@ func (f *FFooClient) blah(ctx frugal.FContext, num int32, str string, event *Eve
 }
 
 // oneway methods don't receive a response from the server.
-func (f *FFooClient) OneWay(ctx frugal.FContext, id ID, req Request) (err error) {
-	ret := f.methods["oneWay"].Invoke([]interface{}{ctx, id, req})
+func (f *FFooClient) OneWay(fctx frugal.FContext, id ID, req Request) (err error) {
+	ret := f.methods["oneWay"].Invoke([]interface{}{fctx, id, req})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -148,16 +148,16 @@ func (f *FFooClient) OneWay(ctx frugal.FContext, id ID, req Request) (err error)
 	return err
 }
 
-func (f *FFooClient) oneWay(ctx frugal.FContext, id ID, req Request) (err error) {
+func (f *FFooClient) oneWay(fctx frugal.FContext, id ID, req Request) (err error) {
 	args := FooOneWayArgs{
 		ID:  id,
 		Req: req,
 	}
-	return f.Client_().Oneway(ctx, "oneWay", &args)
+	return f.Client_().Oneway(fctx, "oneWay", &args)
 }
 
-func (f *FFooClient) BinMethod(ctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
-	ret := f.methods["bin_method"].Invoke([]interface{}{ctx, bin, str})
+func (f *FFooClient) BinMethod(fctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
+	ret := f.methods["bin_method"].Invoke([]interface{}{fctx, bin, str})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -170,13 +170,13 @@ func (f *FFooClient) BinMethod(ctx frugal.FContext, bin []byte, str string) (r [
 	return r, err
 }
 
-func (f *FFooClient) bin_method(ctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
+func (f *FFooClient) bin_method(fctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
 	args := FooBinMethodArgs{
 		Bin: bin,
 		Str: str,
 	}
 	result := FooBinMethodResult{}
-	err = f.Client_().Call(ctx, "bin_method", &args, &result)
+	err = f.Client_().Call(fctx, "bin_method", &args, &result)
 	if err != nil {
 		return
 	}
@@ -188,8 +188,8 @@ func (f *FFooClient) bin_method(ctx frugal.FContext, bin []byte, str string) (r 
 	return
 }
 
-func (f *FFooClient) ParamModifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
-	ret := f.methods["param_modifiers"].Invoke([]interface{}{ctx, opt_num, default_num, req_num})
+func (f *FFooClient) ParamModifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
+	ret := f.methods["param_modifiers"].Invoke([]interface{}{fctx, opt_num, default_num, req_num})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -202,14 +202,14 @@ func (f *FFooClient) ParamModifiers(ctx frugal.FContext, opt_num int32, default_
 	return r, err
 }
 
-func (f *FFooClient) param_modifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
+func (f *FFooClient) param_modifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
 	args := FooParamModifiersArgs{
 		OptNum:     opt_num,
 		DefaultNum: default_num,
 		ReqNum:     req_num,
 	}
 	result := FooParamModifiersResult{}
-	err = f.Client_().Call(ctx, "param_modifiers", &args, &result)
+	err = f.Client_().Call(fctx, "param_modifiers", &args, &result)
 	if err != nil {
 		return
 	}
@@ -217,8 +217,8 @@ func (f *FFooClient) param_modifiers(ctx frugal.FContext, opt_num int32, default
 	return
 }
 
-func (f *FFooClient) UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
-	ret := f.methods["underlying_types_test"].Invoke([]interface{}{ctx, list_type, set_type})
+func (f *FFooClient) UnderlyingTypesTest(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
+	ret := f.methods["underlying_types_test"].Invoke([]interface{}{fctx, list_type, set_type})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -231,13 +231,13 @@ func (f *FFooClient) UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, se
 	return r, err
 }
 
-func (f *FFooClient) underlying_types_test(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
+func (f *FFooClient) underlying_types_test(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
 	args := FooUnderlyingTypesTestArgs{
 		ListType: list_type,
 		SetType:  set_type,
 	}
 	result := FooUnderlyingTypesTestResult{}
-	err = f.Client_().Call(ctx, "underlying_types_test", &args, &result)
+	err = f.Client_().Call(fctx, "underlying_types_test", &args, &result)
 	if err != nil {
 		return
 	}
@@ -245,8 +245,8 @@ func (f *FFooClient) underlying_types_test(ctx frugal.FContext, list_type []ID, 
 	return
 }
 
-func (f *FFooClient) GetThing(ctx frugal.FContext) (r *validStructs.Thing, err error) {
-	ret := f.methods["getThing"].Invoke([]interface{}{ctx})
+func (f *FFooClient) GetThing(fctx frugal.FContext) (r *validStructs.Thing, err error) {
+	ret := f.methods["getThing"].Invoke([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -259,10 +259,10 @@ func (f *FFooClient) GetThing(ctx frugal.FContext) (r *validStructs.Thing, err e
 	return r, err
 }
 
-func (f *FFooClient) getThing(ctx frugal.FContext) (r *validStructs.Thing, err error) {
+func (f *FFooClient) getThing(fctx frugal.FContext) (r *validStructs.Thing, err error) {
 	args := FooGetThingArgs{}
 	result := FooGetThingResult{}
-	err = f.Client_().Call(ctx, "getThing", &args, &result)
+	err = f.Client_().Call(fctx, "getThing", &args, &result)
 	if err != nil {
 		return
 	}
@@ -270,8 +270,8 @@ func (f *FFooClient) getThing(ctx frugal.FContext) (r *validStructs.Thing, err e
 	return
 }
 
-func (f *FFooClient) GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error) {
-	ret := f.methods["getMyInt"].Invoke([]interface{}{ctx})
+func (f *FFooClient) GetMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error) {
+	ret := f.methods["getMyInt"].Invoke([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -284,10 +284,10 @@ func (f *FFooClient) GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err erro
 	return r, err
 }
 
-func (f *FFooClient) getMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error) {
+func (f *FFooClient) getMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error) {
 	args := FooGetMyIntArgs{}
 	result := FooGetMyIntResult{}
-	err = f.Client_().Call(ctx, "getMyInt", &args, &result)
+	err = f.Client_().Call(fctx, "getMyInt", &args, &result)
 	if err != nil {
 		return
 	}
@@ -295,8 +295,8 @@ func (f *FFooClient) getMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err erro
 	return
 }
 
-func (f *FFooClient) UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
-	ret := f.methods["use_subdir_struct"].Invoke([]interface{}{ctx, a})
+func (f *FFooClient) UseSubdirStruct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
+	ret := f.methods["use_subdir_struct"].Invoke([]interface{}{fctx, a})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -309,12 +309,12 @@ func (f *FFooClient) UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (
 	return r, err
 }
 
-func (f *FFooClient) use_subdir_struct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
+func (f *FFooClient) use_subdir_struct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
 	args := FooUseSubdirStructArgs{
 		A: a,
 	}
 	result := FooUseSubdirStructResult{}
-	err = f.Client_().Call(ctx, "use_subdir_struct", &args, &result)
+	err = f.Client_().Call(fctx, "use_subdir_struct", &args, &result)
 	if err != nil {
 		return
 	}
@@ -322,8 +322,8 @@ func (f *FFooClient) use_subdir_struct(ctx frugal.FContext, a *subdir_include.A)
 	return
 }
 
-func (f *FFooClient) SayHelloWith(ctx frugal.FContext, newmessage string) (r string, err error) {
-	ret := f.methods["sayHelloWith"].Invoke([]interface{}{ctx, newmessage})
+func (f *FFooClient) SayHelloWith(fctx frugal.FContext, newmessage string) (r string, err error) {
+	ret := f.methods["sayHelloWith"].Invoke([]interface{}{fctx, newmessage})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -336,12 +336,12 @@ func (f *FFooClient) SayHelloWith(ctx frugal.FContext, newmessage string) (r str
 	return r, err
 }
 
-func (f *FFooClient) sayHelloWith(ctx frugal.FContext, newmessage string) (r string, err error) {
+func (f *FFooClient) sayHelloWith(fctx frugal.FContext, newmessage string) (r string, err error) {
 	args := FooSayHelloWithArgs{
 		NewMessage_: newmessage,
 	}
 	result := FooSayHelloWithResult{}
-	err = f.Client_().Call(ctx, "sayHelloWith", &args, &result)
+	err = f.Client_().Call(fctx, "sayHelloWith", &args, &result)
 	if err != nil {
 		return
 	}
@@ -349,8 +349,8 @@ func (f *FFooClient) sayHelloWith(ctx frugal.FContext, newmessage string) (r str
 	return
 }
 
-func (f *FFooClient) WhatDoYouSay(ctx frugal.FContext, messageargs string) (r string, err error) {
-	ret := f.methods["whatDoYouSay"].Invoke([]interface{}{ctx, messageargs})
+func (f *FFooClient) WhatDoYouSay(fctx frugal.FContext, messageargs string) (r string, err error) {
+	ret := f.methods["whatDoYouSay"].Invoke([]interface{}{fctx, messageargs})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -363,12 +363,12 @@ func (f *FFooClient) WhatDoYouSay(ctx frugal.FContext, messageargs string) (r st
 	return r, err
 }
 
-func (f *FFooClient) whatDoYouSay(ctx frugal.FContext, messageargs string) (r string, err error) {
+func (f *FFooClient) whatDoYouSay(fctx frugal.FContext, messageargs string) (r string, err error) {
 	args := FooWhatDoYouSayArgs{
 		MessageArgs_: messageargs,
 	}
 	result := FooWhatDoYouSayResult{}
-	err = f.Client_().Call(ctx, "whatDoYouSay", &args, &result)
+	err = f.Client_().Call(fctx, "whatDoYouSay", &args, &result)
 	if err != nil {
 		return
 	}
@@ -376,8 +376,8 @@ func (f *FFooClient) whatDoYouSay(ctx frugal.FContext, messageargs string) (r st
 	return
 }
 
-func (f *FFooClient) SayAgain(ctx frugal.FContext, messageresult string) (r string, err error) {
-	ret := f.methods["sayAgain"].Invoke([]interface{}{ctx, messageresult})
+func (f *FFooClient) SayAgain(fctx frugal.FContext, messageresult string) (r string, err error) {
+	ret := f.methods["sayAgain"].Invoke([]interface{}{fctx, messageresult})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -390,12 +390,12 @@ func (f *FFooClient) SayAgain(ctx frugal.FContext, messageresult string) (r stri
 	return r, err
 }
 
-func (f *FFooClient) sayAgain(ctx frugal.FContext, messageresult string) (r string, err error) {
+func (f *FFooClient) sayAgain(fctx frugal.FContext, messageresult string) (r string, err error) {
 	args := FooSayAgainArgs{
 		MessageResult_: messageresult,
 	}
 	result := FooSayAgainResult{}
-	err = f.Client_().Call(ctx, "sayAgain", &args, &result)
+	err = f.Client_().Call(fctx, "sayAgain", &args, &result)
 	if err != nil {
 		return
 	}
@@ -431,16 +431,18 @@ type fooFPing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFPing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooPingArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
 	}
 	result := FooPingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -449,28 +451,30 @@ func (p *fooFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "ping", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "ping", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
 	}
-	return p.SendReply(ctx, oprot, "ping", &result)
+	return p.SendReply(fctx, oprot, "ping", &result)
 }
 
 type fooFBlah struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFBlah) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooBlahArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "blah", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "blah", err.Error())
 	}
 	result := FooBlahResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.Num, args.Str, args.Event})
+	ret := p.InvokeMethod([]interface{}{fctx, args.Num, args.Str, args.Event})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -479,7 +483,7 @@ func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "blah", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "blah", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
@@ -488,28 +492,30 @@ func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 		case *golang.APIException:
 			result.API = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "blah", "Internal error processing blah: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "blah", "Internal error processing blah: "+err.Error())
 		}
 	} else {
 		var retval int64 = ret[0].(int64)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "blah", &result)
+	return p.SendReply(fctx, oprot, "blah", &result)
 }
 
 type fooFOneWay struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFOneWay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFOneWay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooOneWayArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "oneWay", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "oneWay", err.Error())
 	}
-	ret := p.InvokeMethod([]interface{}{ctx, args.ID, args.Req})
+	ret := p.InvokeMethod([]interface{}{fctx, args.ID, args.Req})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -518,10 +524,10 @@ func (p *fooFOneWay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "oneWay", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "oneWay", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "oneWay", "Internal error processing oneWay: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "oneWay", "Internal error processing oneWay: "+err.Error())
 	}
 	return err
 }
@@ -530,16 +536,18 @@ type fooFBinMethod struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFBinMethod) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFBinMethod) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooBinMethodArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "bin_method", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "bin_method", err.Error())
 	}
 	result := FooBinMethodResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.Bin, args.Str})
+	ret := p.InvokeMethod([]interface{}{fctx, args.Bin, args.Str})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -548,36 +556,38 @@ func (p *fooFBinMethod) Process(ctx frugal.FContext, iprot, oprot *frugal.FProto
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "bin_method", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "bin_method", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
 		case *golang.APIException:
 			result.API = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "bin_method", "Internal error processing bin_method: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "bin_method", "Internal error processing bin_method: "+err.Error())
 		}
 	} else {
 		var retval []byte = ret[0].([]byte)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "bin_method", &result)
+	return p.SendReply(fctx, oprot, "bin_method", &result)
 }
 
 type fooFParamModifiers struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFParamModifiers) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFParamModifiers) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooParamModifiersArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "param_modifiers", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "param_modifiers", err.Error())
 	}
 	result := FooParamModifiersResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.OptNum, args.DefaultNum, args.ReqNum})
+	ret := p.InvokeMethod([]interface{}{fctx, args.OptNum, args.DefaultNum, args.ReqNum})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -586,31 +596,33 @@ func (p *fooFParamModifiers) Process(ctx frugal.FContext, iprot, oprot *frugal.F
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "param_modifiers", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "param_modifiers", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "param_modifiers", "Internal error processing param_modifiers: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "param_modifiers", "Internal error processing param_modifiers: "+err.Error())
 	} else {
 		var retval int64 = ret[0].(int64)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "param_modifiers", &result)
+	return p.SendReply(fctx, oprot, "param_modifiers", &result)
 }
 
 type fooFUnderlyingTypesTest struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFUnderlyingTypesTest) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFUnderlyingTypesTest) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooUnderlyingTypesTestArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "underlying_types_test", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "underlying_types_test", err.Error())
 	}
 	result := FooUnderlyingTypesTestResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.ListType, args.SetType})
+	ret := p.InvokeMethod([]interface{}{fctx, args.ListType, args.SetType})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -619,31 +631,33 @@ func (p *fooFUnderlyingTypesTest) Process(ctx frugal.FContext, iprot, oprot *fru
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "underlying_types_test", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "underlying_types_test", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "underlying_types_test", "Internal error processing underlying_types_test: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "underlying_types_test", "Internal error processing underlying_types_test: "+err.Error())
 	} else {
 		var retval []ID = ret[0].([]ID)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "underlying_types_test", &result)
+	return p.SendReply(fctx, oprot, "underlying_types_test", &result)
 }
 
 type fooFGetThing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFGetThing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFGetThing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooGetThingArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getThing", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getThing", err.Error())
 	}
 	result := FooGetThingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -652,31 +666,33 @@ func (p *fooFGetThing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "getThing", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "getThing", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getThing", "Internal error processing getThing: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getThing", "Internal error processing getThing: "+err.Error())
 	} else {
 		var retval *validStructs.Thing = ret[0].(*validStructs.Thing)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "getThing", &result)
+	return p.SendReply(fctx, oprot, "getThing", &result)
 }
 
 type fooFGetMyInt struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFGetMyInt) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFGetMyInt) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooGetMyIntArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getMyInt", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getMyInt", err.Error())
 	}
 	result := FooGetMyIntResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -685,31 +701,33 @@ func (p *fooFGetMyInt) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "getMyInt", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "getMyInt", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getMyInt", "Internal error processing getMyInt: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getMyInt", "Internal error processing getMyInt: "+err.Error())
 	} else {
 		var retval ValidTypes.MyInt = ret[0].(ValidTypes.MyInt)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "getMyInt", &result)
+	return p.SendReply(fctx, oprot, "getMyInt", &result)
 }
 
 type fooFUseSubdirStruct struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFUseSubdirStruct) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFUseSubdirStruct) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooUseSubdirStructArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "use_subdir_struct", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "use_subdir_struct", err.Error())
 	}
 	result := FooUseSubdirStructResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.A})
+	ret := p.InvokeMethod([]interface{}{fctx, args.A})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -718,31 +736,33 @@ func (p *fooFUseSubdirStruct) Process(ctx frugal.FContext, iprot, oprot *frugal.
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "use_subdir_struct", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "use_subdir_struct", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "use_subdir_struct", "Internal error processing use_subdir_struct: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "use_subdir_struct", "Internal error processing use_subdir_struct: "+err.Error())
 	} else {
 		var retval *subdir_include.A = ret[0].(*subdir_include.A)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "use_subdir_struct", &result)
+	return p.SendReply(fctx, oprot, "use_subdir_struct", &result)
 }
 
 type fooFSayHelloWith struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFSayHelloWith) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFSayHelloWith) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooSayHelloWithArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayHelloWith", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayHelloWith", err.Error())
 	}
 	result := FooSayHelloWithResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.NewMessage_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.NewMessage_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -751,31 +771,33 @@ func (p *fooFSayHelloWith) Process(ctx frugal.FContext, iprot, oprot *frugal.FPr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "sayHelloWith", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "sayHelloWith", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayHelloWith", "Internal error processing sayHelloWith: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayHelloWith", "Internal error processing sayHelloWith: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "sayHelloWith", &result)
+	return p.SendReply(fctx, oprot, "sayHelloWith", &result)
 }
 
 type fooFWhatDoYouSay struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFWhatDoYouSay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFWhatDoYouSay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooWhatDoYouSayArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "whatDoYouSay", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "whatDoYouSay", err.Error())
 	}
 	result := FooWhatDoYouSayResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.MessageArgs_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.MessageArgs_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -784,31 +806,33 @@ func (p *fooFWhatDoYouSay) Process(ctx frugal.FContext, iprot, oprot *frugal.FPr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "whatDoYouSay", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "whatDoYouSay", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "whatDoYouSay", "Internal error processing whatDoYouSay: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "whatDoYouSay", "Internal error processing whatDoYouSay: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "whatDoYouSay", &result)
+	return p.SendReply(fctx, oprot, "whatDoYouSay", &result)
 }
 
 type fooFSayAgain struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFSayAgain) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *fooFSayAgain) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := FooSayAgainArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayAgain", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayAgain", err.Error())
 	}
 	result := FooSayAgainResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.MessageResult_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.MessageResult_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -817,15 +841,15 @@ func (p *fooFSayAgain) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "sayAgain", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "sayAgain", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayAgain", "Internal error processing sayAgain: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayAgain", "Internal error processing sayAgain: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "sayAgain", &result)
+	return p.SendReply(fctx, oprot, "sayAgain", &result)
 }
 
 type FooPingArgs struct {

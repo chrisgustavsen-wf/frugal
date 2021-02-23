@@ -24,7 +24,7 @@ var _ = logrus.DebugLevel
 type FMyService interface {
 	vendor_namespace.FVendoredBase
 
-	GetItem(ctx frugal.FContext) (r *vendor_namespace.Item, err error)
+	GetItem(fctx frugal.FContext) (r *vendor_namespace.Item, err error)
 }
 
 type FMyServiceClient struct {
@@ -43,8 +43,8 @@ func NewFMyServiceClient(provider *frugal.FServiceProvider, middleware ...frugal
 	return client
 }
 
-func (f *FMyServiceClient) GetItem(ctx frugal.FContext) (r *vendor_namespace.Item, err error) {
-	ret := f.methods["getItem"].Invoke([]interface{}{ctx})
+func (f *FMyServiceClient) GetItem(fctx frugal.FContext) (r *vendor_namespace.Item, err error) {
+	ret := f.methods["getItem"].Invoke([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -57,10 +57,10 @@ func (f *FMyServiceClient) GetItem(ctx frugal.FContext) (r *vendor_namespace.Ite
 	return r, err
 }
 
-func (f *FMyServiceClient) getItem(ctx frugal.FContext) (r *vendor_namespace.Item, err error) {
+func (f *FMyServiceClient) getItem(fctx frugal.FContext) (r *vendor_namespace.Item, err error) {
 	args := MyServiceGetItemArgs{}
 	result := MyServiceGetItemResult{}
-	err = f.Client_().Call(ctx, "getItem", &args, &result)
+	err = f.Client_().Call(fctx, "getItem", &args, &result)
 	if err != nil {
 		return
 	}
@@ -86,16 +86,18 @@ type myserviceFGetItem struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *myserviceFGetItem) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	realCtx := frugal.ToContext(ctx)
+func (p *myserviceFGetItem) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, done := frugal.ToContext(fctx)
+	defer done()
+
 	args := MyServiceGetItemArgs{}
-	err := args.Read(realCtx, iprot)
-	iprot.ReadMessageEnd(realCtx)
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getItem", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getItem", err.Error())
 	}
 	result := MyServiceGetItemResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -104,20 +106,20 @@ func (p *myserviceFGetItem) Process(ctx frugal.FContext, iprot, oprot *frugal.FP
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "getItem", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "getItem", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
 		case *excepts.InvalidData:
 			result.D = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getItem", "Internal error processing getItem: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getItem", "Internal error processing getItem: "+err.Error())
 		}
 	} else {
 		var retval *vendor_namespace.Item = ret[0].(*vendor_namespace.Item)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "getItem", &result)
+	return p.SendReply(fctx, oprot, "getItem", &result)
 }
 
 type MyServiceGetItemArgs struct {

@@ -14,7 +14,7 @@ import (
 type MyScopePublisher interface {
 	Open() error
 	Close() error
-	PublishnewItem(ctx frugal.FContext, req *vendor_namespace.Item) error
+	PublishnewItem(fctx frugal.FContext, req *vendor_namespace.Item) error
 }
 
 type myScopePublisher struct {
@@ -35,19 +35,19 @@ func NewMyScopePublisher(provider *frugal.FScopeProvider, middleware ...frugal.S
 func (p myScopePublisher) Open() error  { return p.client.Open() }
 func (p myScopePublisher) Close() error { return p.client.Close() }
 
-func (p *myScopePublisher) PublishnewItem(ctx frugal.FContext, req *vendor_namespace.Item) error {
-	ret := p.methods["publishnewItem"].Invoke([]interface{}{ctx, req})
+func (p *myScopePublisher) PublishnewItem(fctx frugal.FContext, req *vendor_namespace.Item) error {
+	ret := p.methods["publishnewItem"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *myScopePublisher) publishnewItem(ctx frugal.FContext, req *vendor_namespace.Item) error {
+func (p *myScopePublisher) publishnewItem(fctx frugal.FContext, req *vendor_namespace.Item) error {
 	prefix := ""
 	op := "newItem"
 	topic := fmt.Sprintf("%sMyScope.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, req)
+	return p.client.Publish(fctx, op, topic, req)
 }
 
 type MyScopeSubscriber interface {
@@ -103,7 +103,8 @@ func (l *myScopeSubscriber) recvnewItem(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		ctx := frugal.ToContext(fctx)
+		ctx, done := frugal.ToContext(fctx)
+		defer done()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -121,6 +122,6 @@ func (l *myScopeSubscriber) recvnewItem(op string, pf *frugal.FProtocolFactory, 
 		}
 		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
