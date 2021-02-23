@@ -62,8 +62,8 @@ func (f *FBaseProcessor) Process(iprot, oprot *FProtocol) error {
 	if err != nil {
 		return err
 	}
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	name, _, _, err := iprot.ReadMessageBegin(ctx)
 	if err != nil {
 		return err
@@ -201,8 +201,8 @@ func (f *FBaseProcessorFunction) InvokeMethod(args []interface{}) Results {
 
 // SendError writes the error to the desired transport
 func (f *FBaseProcessorFunction) SendError(fctx FContext, oprot *FProtocol, kind int32, method, message string) error {
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	f.writeMu.Lock()
 	err := f.sendError(ctx, fctx, oprot, kind, method, message)
 	f.writeMu.Unlock()
@@ -223,8 +223,8 @@ func (f *FBaseProcessorFunction) sendError(ctx context.Context, fctx FContext, o
 func (f *FBaseProcessorFunction) SendReply(fctx FContext, oprot *FProtocol, method string, result thrift.TStruct) error {
 	f.writeMu.Lock()
 	defer f.writeMu.Unlock()
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	if err := oprot.WriteResponseHeader(fctx); err != nil {
 		return f.trapError(ctx, fctx, oprot, method, err)
 	}

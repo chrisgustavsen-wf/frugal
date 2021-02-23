@@ -687,7 +687,7 @@ func (g *Generator) generateWrite(s *parser.Struct, sName string) string {
 
 	// Only one field can be set for a union, make sure that's the case
 	if s.Type == parser.StructTypeUnion {
-		contents += fmt.Sprintf("\tif c := p.CountSetFields%s(ctx); c != 1 {\n", sName)
+		contents += fmt.Sprintf("\tif c := p.CountSetFields%s(); c != 1 {\n", sName)
 		contents += "\t\treturn thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf(\"%T write union: exactly one field must be set (%d set).\", p, c))\n"
 		contents += "\t}\n"
 	}
@@ -1570,8 +1570,8 @@ func (g *Generator) generateSubscribeMethod(scope *parser.Scope, op *parser.Oper
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
 	subscriber += "\t\t}\n\n"
-	subscriber += "\t\tctx, done := frugal.ToContext(fctx)\n"
-	subscriber += "\t\tdefer done()\n\n"
+	subscriber += "\t\tctx, cancelFn := frugal.ToContext(fctx)\n"
+	subscriber += "\t\tdefer cancelFn()\n\n"
 	subscriber += "\t\tname, _, _, err := iprot.ReadMessageBegin(ctx)\n"
 	subscriber += "\t\tif err != nil {\n"
 	subscriber += "\t\t\treturn err\n"
@@ -1918,8 +1918,8 @@ func (g *Generator) generateMethodProcessor(service *parser.Service, method *par
 		contents += fmt.Sprintf("\tlogrus.Warn(\"Deprecated function '%s.%s' was called by a client\")\n", service.Name, nameTitle)
 	}
 
-	contents += "\tctx, done := frugal.ToContext(fctx)\n"
-	contents += "\tdefer done()\n\n"
+	contents += "\tctx, cancelFn := frugal.ToContext(fctx)\n"
+	contents += "\tdefer cancelFn()\n\n"
 	contents += fmt.Sprintf("\targs := %s%sArgs{}\n", servTitle, nameTitle)
 	contents += "\terr := args.Read(ctx, iprot)\n"
 	contents += "\tiprot.ReadMessageEnd(ctx)\n"

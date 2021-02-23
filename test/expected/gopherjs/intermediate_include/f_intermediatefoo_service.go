@@ -69,8 +69,8 @@ type intermediatefooFIntermeidateFoo struct {
 }
 
 func (p *intermediatefooFIntermeidateFoo) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := IntermediateFooIntermeidateFooArgs{}
 	err := args.Read(ctx, iprot)

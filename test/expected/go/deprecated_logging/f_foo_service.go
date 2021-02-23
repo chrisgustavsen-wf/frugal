@@ -432,8 +432,8 @@ type fooFPing struct {
 }
 
 func (p *fooFPing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooPingArgs{}
 	err := args.Read(ctx, iprot)
@@ -464,8 +464,8 @@ type fooFBlah struct {
 }
 
 func (p *fooFBlah) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooBlahArgs{}
 	err := args.Read(ctx, iprot)
@@ -506,8 +506,8 @@ type fooFOneWay struct {
 }
 
 func (p *fooFOneWay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooOneWayArgs{}
 	err := args.Read(ctx, iprot)
@@ -537,8 +537,8 @@ type fooFBinMethod struct {
 }
 
 func (p *fooFBinMethod) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooBinMethodArgs{}
 	err := args.Read(ctx, iprot)
@@ -577,8 +577,8 @@ type fooFParamModifiers struct {
 }
 
 func (p *fooFParamModifiers) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooParamModifiersArgs{}
 	err := args.Read(ctx, iprot)
@@ -612,8 +612,8 @@ type fooFUnderlyingTypesTest struct {
 }
 
 func (p *fooFUnderlyingTypesTest) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooUnderlyingTypesTestArgs{}
 	err := args.Read(ctx, iprot)
@@ -647,8 +647,8 @@ type fooFGetThing struct {
 }
 
 func (p *fooFGetThing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooGetThingArgs{}
 	err := args.Read(ctx, iprot)
@@ -682,8 +682,8 @@ type fooFGetMyInt struct {
 }
 
 func (p *fooFGetMyInt) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooGetMyIntArgs{}
 	err := args.Read(ctx, iprot)
@@ -717,8 +717,8 @@ type fooFUseSubdirStruct struct {
 }
 
 func (p *fooFUseSubdirStruct) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooUseSubdirStructArgs{}
 	err := args.Read(ctx, iprot)
@@ -752,8 +752,8 @@ type fooFSayHelloWith struct {
 }
 
 func (p *fooFSayHelloWith) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooSayHelloWithArgs{}
 	err := args.Read(ctx, iprot)
@@ -787,8 +787,8 @@ type fooFWhatDoYouSay struct {
 }
 
 func (p *fooFWhatDoYouSay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooWhatDoYouSayArgs{}
 	err := args.Read(ctx, iprot)
@@ -822,8 +822,8 @@ type fooFSayAgain struct {
 }
 
 func (p *fooFSayAgain) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := FooSayAgainArgs{}
 	err := args.Read(ctx, iprot)

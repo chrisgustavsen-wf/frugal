@@ -234,8 +234,8 @@ func (l *eventsSubscriber) recvEventCreated(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -287,8 +287,8 @@ func (l *eventsSubscriber) recvSomeInt(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -342,8 +342,8 @@ func (l *eventsSubscriber) recvSomeStr(op string, pf *frugal.FProtocolFactory, h
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -397,8 +397,8 @@ func (l *eventsSubscriber) recvSomeList(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {

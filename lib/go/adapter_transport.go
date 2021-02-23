@@ -18,7 +18,6 @@ import (
 	"context"
 	"io"
 	"sync"
-	"time"
 
 	"github.com/apache/thrift/lib/go/thrift"
 )
@@ -187,15 +186,15 @@ func (f *fAdapterTransport) close(cause error) error {
 // present on the context.
 func (f *fAdapterTransport) Oneway(fctx FContext, payload []byte) error {
 	errorC := make(chan error, 1)
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 
 	go f.send(ctx, payload, errorC, true)
 
 	select {
 	case err := <-errorC:
 		return err
-	case <-time.After(fctx.Timeout()):
+	case <-ctx.Done():
 		return thrift.NewTTransportException(TRANSPORT_EXCEPTION_TIMED_OUT, "frugal: request timed out")
 	}
 }
@@ -210,8 +209,8 @@ func (f *fAdapterTransport) Request(fctx FContext, payload []byte) (thrift.TTran
 	f.registry.Register(fctx, resultC)
 	defer f.registry.Unregister(fctx)
 
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 
 	go f.send(ctx, payload, errorC, false)
 
@@ -220,7 +219,7 @@ func (f *fAdapterTransport) Request(fctx FContext, payload []byte) (thrift.TTran
 		return &thrift.TMemoryBuffer{Buffer: bytes.NewBuffer(result)}, nil
 	case err := <-errorC:
 		return nil, err
-	case <-time.After(fctx.Timeout()):
+	case <-ctx.Done():
 		return nil, thrift.NewTTransportException(TRANSPORT_EXCEPTION_TIMED_OUT, "frugal: request timed out")
 	}
 }

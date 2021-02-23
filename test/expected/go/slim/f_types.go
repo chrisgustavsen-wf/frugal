@@ -2056,7 +2056,7 @@ func (p *TestingUnions) Read(ctx context.Context, iprot thrift.TProtocol) error 
 }
 
 func (p *TestingUnions) Write(ctx context.Context, oprot thrift.TProtocol) error {
-	if c := p.CountSetFieldsTestingUnions(ctx); c != 1 {
+	if c := p.CountSetFieldsTestingUnions(); c != 1 {
 		return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("%T write union: exactly one field must be set (%d set).", p, c))
 	}
 	if err := oprot.WriteStructBegin(ctx, "TestingUnions"); err != nil {

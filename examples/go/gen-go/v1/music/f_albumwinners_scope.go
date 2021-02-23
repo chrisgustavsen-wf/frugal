@@ -184,8 +184,8 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -248,8 +248,8 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
@@ -304,8 +304,8 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {

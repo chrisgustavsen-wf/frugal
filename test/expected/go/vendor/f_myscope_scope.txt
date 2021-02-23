@@ -103,8 +103,8 @@ func (l *myScopeSubscriber) recvnewItem(op string, pf *frugal.FProtocolFactory, 
 			return err
 		}
 
-		ctx, done := frugal.ToContext(fctx)
-		defer done()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
 
 		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {

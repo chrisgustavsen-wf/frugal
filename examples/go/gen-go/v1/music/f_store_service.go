@@ -129,8 +129,8 @@ type storeFBuyAlbum struct {
 }
 
 func (p *storeFBuyAlbum) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := StoreBuyAlbumArgs{}
 	err := args.Read(ctx, iprot)
@@ -170,8 +170,8 @@ type storeFEnterAlbumGiveaway struct {
 
 func (p *storeFEnterAlbumGiveaway) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
 	logrus.Warn("Deprecated function 'Store.EnterAlbumGiveaway' was called by a client")
-	ctx, done := frugal.ToContext(fctx)
-	defer done()
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
 
 	args := StoreEnterAlbumGiveawayArgs{}
 	err := args.Read(ctx, iprot)

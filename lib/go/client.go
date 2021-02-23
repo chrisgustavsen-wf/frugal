@@ -58,8 +58,8 @@ func (client *FStandardClient) Close() error {
 
 // Call invokes a service and waits for a response.
 func (client *FStandardClient) Call(fctx FContext, method string, args, result thrift.TStruct) error {
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	payload, err := client.prepareMessage(ctx, fctx, method, args, thrift.CALL)
 	if err != nil {
 		return err
@@ -73,8 +73,8 @@ func (client *FStandardClient) Call(fctx FContext, method string, args, result t
 
 // Oneway sends a message to a service, without waiting for a response.
 func (client *FStandardClient) Oneway(fctx FContext, method string, args thrift.TStruct) error {
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	payload, err := client.prepareMessage(ctx, fctx, method, args, thrift.ONEWAY)
 	if err != nil {
 		return err
@@ -84,8 +84,8 @@ func (client *FStandardClient) Oneway(fctx FContext, method string, args thrift.
 
 // Publish sends a message to a topic.
 func (client *FStandardClient) Publish(fctx FContext, op, topic string, message thrift.TStruct) error {
-	ctx, done := ToContext(fctx)
-	defer done()
+	ctx, cancelFn := ToContext(fctx)
+	defer cancelFn()
 	payload, err := client.prepareMessage(ctx, fctx, op, message, thrift.CALL)
 	if err != nil {
 		return err
