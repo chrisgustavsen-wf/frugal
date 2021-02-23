@@ -62,7 +62,6 @@ const (
 //			header name "_cid"
 //		2)	Threadsafe
 type FContext interface {
-	context.Context
 
 	// CorrelationID returns the correlation id for the context.
 	CorrelationID() string
@@ -126,7 +125,6 @@ func Clone(ctx FContext) FContext {
 	}
 
 	clone := &FContextImpl{
-		Context:             ctx,
 		requestHeaders:      ctx.RequestHeaders(),
 		responseHeaders:     ctx.ResponseHeaders(),
 		ephemeralProperties: make(map[interface{}]interface{}),
@@ -144,7 +142,6 @@ func getNextOpID() string {
 
 // FContextImpl is an implementation of FContext.
 type FContextImpl struct {
-	context.Context
 	requestHeaders      map[string]string
 	responseHeaders     map[string]string
 	ephemeralProperties map[interface{}]interface{}
@@ -160,7 +157,6 @@ func NewFContext(correlationID string) FContext {
 		correlationID = generateCorrelationID()
 	}
 	ctx := &FContextImpl{
-		Context: context.TODO(),
 		requestHeaders: map[string]string{
 			cidHeader:     correlationID,
 			opIDHeader:    getNextOpID(),
@@ -263,7 +259,6 @@ func (c *FContextImpl) Timeout() time.Duration {
 // handling opids correctly.
 func (c *FContextImpl) Clone() FContextWithEphemeralProperties {
 	cloned := &FContextImpl{
-		Context:             c.Context,
 		requestHeaders:      c.RequestHeaders(),
 		responseHeaders:     c.ResponseHeaders(),
 		ephemeralProperties: c.EphemeralProperties(),
@@ -331,3 +326,21 @@ func setResponseOpID(ctx FContext, id string) {
 var generateCorrelationID = func() string {
 	return nuid.Next()
 }
+
+// ToContext converts a FContext to a context.Context for integration with thrift.
+func ToContext(fctx FContext) context.Context {
+	if ctx, ok := fctx.(context.Context); ok {
+		return ctx
+	}
+	return timeoutCtx{
+		Context:  context.Background(),
+		deadline: time.Now().Add(fctx.Timeout()), // borrowed form https://golang.org/pkg/context/#WithTimeout
+	}
+}
+
+type timeoutCtx struct {
+	context.Context
+	deadline time.Time
+}
+
+func (ctx timeoutCtx) Deadline() (time.Time, bool) { return ctx.deadline, true }

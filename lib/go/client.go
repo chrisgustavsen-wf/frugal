@@ -83,10 +83,11 @@ func (client *FStandardClient) Publish(ctx FContext, op, topic string, message t
 	return client.publisher.Publish(topic, payload)
 }
 
-func (client FStandardClient) prepareMessage(ctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
+func (client FStandardClient) prepareMessage(fctx FContext, method string, args thrift.TStruct, kind thrift.TMessageType) ([]byte, error) {
+	ctx := ToContext(fctx)
 	buffer := NewTMemoryOutputBuffer(client.limit)
 	oprot := client.protocolFactory.GetProtocol(buffer)
-	if err := oprot.WriteRequestHeader(ctx); err != nil {
+	if err := oprot.WriteRequestHeader(fctx); err != nil {
 		return nil, err
 	}
 	if err := oprot.WriteMessageBegin(ctx, method, kind, 0); err != nil {
@@ -104,9 +105,10 @@ func (client FStandardClient) prepareMessage(ctx FContext, method string, args t
 	return buffer.Bytes(), nil
 }
 
-func (client FStandardClient) processReply(ctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
+func (client FStandardClient) processReply(fctx FContext, method string, result thrift.TStruct, resultTransport thrift.TTransport) error {
+	ctx := ToContext(fctx)
 	iprot := client.protocolFactory.GetProtocol(resultTransport)
-	if err := iprot.ReadResponseHeader(ctx); err != nil {
+	if err := iprot.ReadResponseHeader(fctx); err != nil {
 		return err
 	}
 	oMethod, mTypeID, _, err := iprot.ReadMessageBegin(ctx)
