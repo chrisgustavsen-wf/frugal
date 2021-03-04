@@ -4,9 +4,10 @@
 package music
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/go"
+	frugal "github.com/Workiva/frugal/lib/go"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 
@@ -16,9 +17,9 @@ import (
 type AlbumWinnersPublisher interface {
 	Open() error
 	Close() error
-	PublishContestStart(ctx frugal.FContext, req []*Album) error
-	PublishTimeLeft(ctx frugal.FContext, req Minutes) error
-	PublishWinner(ctx frugal.FContext, req *Album) error
+	PublishContestStart(fctx frugal.FContext, req []*Album) error
+	PublishTimeLeft(fctx frugal.FContext, req Minutes) error
+	PublishWinner(fctx frugal.FContext, req *Album) error
 }
 
 type albumWinnersPublisher struct {
@@ -41,83 +42,83 @@ func NewAlbumWinnersPublisher(provider *frugal.FScopeProvider, middleware ...fru
 func (p albumWinnersPublisher) Open() error  { return p.client.Open() }
 func (p albumWinnersPublisher) Close() error { return p.client.Close() }
 
-func (p *albumWinnersPublisher) PublishContestStart(ctx frugal.FContext, req []*Album) error {
-	ret := p.methods["publishContestStart"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishContestStart(fctx frugal.FContext, req []*Album) error {
+	ret := p.methods["publishContestStart"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishContestStart(ctx frugal.FContext, req []*Album) error {
+func (p *albumWinnersPublisher) publishContestStart(fctx frugal.FContext, req []*Album) error {
 	prefix := "v1.music."
 	op := "ContestStart"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, albumWinnersContestStartMessage(req))
+	return p.client.Publish(fctx, op, topic, albumWinnersContestStartMessage(req))
 }
 
 type albumWinnersContestStartMessage []*Album
 
-func (p albumWinnersContestStartMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteListBegin(thrift.STRUCT, len(p)); err != nil {
+func (p albumWinnersContestStartMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteListBegin(ctx, thrift.STRUCT, len(p)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p {
-		if err := v.Write(oprot); err != nil {
+		if err := v.Write(ctx, oprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", v), err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
 	return nil
 }
 
-func (p albumWinnersContestStartMessage) Read(iprot thrift.TProtocol) error {
+func (p albumWinnersContestStartMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
-func (p *albumWinnersPublisher) PublishTimeLeft(ctx frugal.FContext, req Minutes) error {
-	ret := p.methods["publishTimeLeft"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishTimeLeft(fctx frugal.FContext, req Minutes) error {
+	ret := p.methods["publishTimeLeft"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishTimeLeft(ctx frugal.FContext, req Minutes) error {
+func (p *albumWinnersPublisher) publishTimeLeft(fctx frugal.FContext, req Minutes) error {
 	prefix := "v1.music."
 	op := "TimeLeft"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, albumWinnersTimeLeftMessage(req))
+	return p.client.Publish(fctx, op, topic, albumWinnersTimeLeftMessage(req))
 }
 
 type albumWinnersTimeLeftMessage Minutes
 
-func (p albumWinnersTimeLeftMessage) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteDouble(float64(p)); err != nil {
+func (p albumWinnersTimeLeftMessage) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteDouble(ctx, float64(p)); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 	}
 	return nil
 }
 
-func (p albumWinnersTimeLeftMessage) Read(iprot thrift.TProtocol) error {
+func (p albumWinnersTimeLeftMessage) Read(ctx context.Context, iprot thrift.TProtocol) error {
 	panic("Not Implemented!")
 }
 
-func (p *albumWinnersPublisher) PublishWinner(ctx frugal.FContext, req *Album) error {
-	ret := p.methods["publishWinner"].Invoke([]interface{}{ctx, req})
+func (p *albumWinnersPublisher) PublishWinner(fctx frugal.FContext, req *Album) error {
+	ret := p.methods["publishWinner"].Invoke([]interface{}{fctx, req})
 	if ret[0] != nil {
 		return ret[0].(error)
 	}
 	return nil
 }
 
-func (p *albumWinnersPublisher) publishWinner(ctx frugal.FContext, req *Album) error {
+func (p *albumWinnersPublisher) publishWinner(fctx frugal.FContext, req *Album) error {
 	prefix := "v1.music."
 	op := "Winner"
 	topic := fmt.Sprintf("%sAlbumWinners.%s", prefix, op)
-	return p.client.Publish(ctx, op, topic, req)
+	return p.client.Publish(fctx, op, topic, req)
 }
 
 // Scopes are a Frugal extension to the IDL for declaring PubSub
@@ -178,39 +179,42 @@ func (l *albumWinnersSubscriber) recvContestStart(op string, pf *frugal.FProtoco
 	method := frugal.NewMethod(l, handler, "SubscribeContestStart", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
+
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
-		_, size, err := iprot.ReadListBegin()
+		_, size, err := iprot.ReadListBegin(ctx)
 		if err != nil {
 			return thrift.PrependError("error reading list begin: ", err)
 		}
 		req := make([]*Album, 0, size)
 		for i := 0; i < size; i++ {
 			elem1 := NewAlbum()
-			if err := elem1.Read(iprot); err != nil {
+			if err := elem1.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", elem1), err)
 			}
 			req = append(req, elem1)
 		}
-		if err := iprot.ReadListEnd(); err != nil {
+		if err := iprot.ReadListEnd(ctx); err != nil {
 			return thrift.PrependError("error reading list end: ", err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -239,31 +243,34 @@ func (l *albumWinnersSubscriber) recvTimeLeft(op string, pf *frugal.FProtocolFac
 	method := frugal.NewMethod(l, handler, "SubscribeTimeLeft", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
+
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		var req Minutes
-		if v, err := iprot.ReadDouble(); err != nil {
+		if v, err := iprot.ReadDouble(ctx); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
 			temp := Minutes(v)
 			req = temp
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }
 
@@ -292,27 +299,30 @@ func (l *albumWinnersSubscriber) recvWinner(op string, pf *frugal.FProtocolFacto
 	method := frugal.NewMethod(l, handler, "SubscribeWinner", l.middleware)
 	return func(transport thrift.TTransport) error {
 		iprot := pf.GetProtocol(transport)
-		ctx, err := iprot.ReadRequestHeader()
+		fctx, err := iprot.ReadRequestHeader()
 		if err != nil {
 			return err
 		}
 
-		name, _, _, err := iprot.ReadMessageBegin()
+		ctx, cancelFn := frugal.ToContext(fctx)
+		defer cancelFn()
+
+		name, _, _, err := iprot.ReadMessageBegin(ctx)
 		if err != nil {
 			return err
 		}
 
 		if name != op {
-			iprot.Skip(thrift.STRUCT)
-			iprot.ReadMessageEnd()
+			iprot.Skip(ctx, thrift.STRUCT)
+			iprot.ReadMessageEnd(ctx)
 			return thrift.NewTApplicationException(frugal.APPLICATION_EXCEPTION_UNKNOWN_METHOD, "Unknown function"+name)
 		}
 		req := NewAlbum()
-		if err := req.Read(iprot); err != nil {
+		if err := req.Read(ctx, iprot); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", req), err)
 		}
-		iprot.ReadMessageEnd()
+		iprot.ReadMessageEnd(ctx)
 
-		return method.Invoke([]interface{}{ctx, req}).Error()
+		return method.Invoke([]interface{}{fctx, req}).Error()
 	}
 }

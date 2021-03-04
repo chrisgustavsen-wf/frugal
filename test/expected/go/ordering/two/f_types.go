@@ -5,6 +5,7 @@ package two
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	"github.com/apache/thrift/lib/go/thrift"
@@ -32,13 +33,13 @@ func (p *Two) GetSomeField() []bool {
 	return p.SomeField
 }
 
-func (p *Two) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *Two) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -47,77 +48,77 @@ func (p *Two) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if err := p.ReadField1(iprot); err != nil {
+			if err := p.ReadField1(ctx, iprot); err != nil {
 				return err
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *Two) ReadField1(iprot thrift.TProtocol) error {
-	_, size, err := iprot.ReadListBegin()
+func (p *Two) ReadField1(ctx context.Context, iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin(ctx)
 	if err != nil {
 		return thrift.PrependError("error reading list begin: ", err)
 	}
 	p.SomeField = make([]bool, 0, size)
 	for i := 0; i < size; i++ {
 		var elem4 bool
-		if v, err := iprot.ReadBool(); err != nil {
+		if v, err := iprot.ReadBool(ctx); err != nil {
 			return thrift.PrependError("error reading field 0: ", err)
 		} else {
 			elem4 = v
 		}
 		p.SomeField = append(p.SomeField, elem4)
 	}
-	if err := iprot.ReadListEnd(); err != nil {
+	if err := iprot.ReadListEnd(ctx); err != nil {
 		return thrift.PrependError("error reading list end: ", err)
 	}
 	return nil
 }
 
-func (p *Two) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("Two"); err != nil {
+func (p *Two) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "Two"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *Two) writeField1(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("some_field", thrift.LIST, 1); err != nil {
+func (p *Two) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "some_field", thrift.LIST, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:some_field: ", p), err)
 	}
-	if err := oprot.WriteListBegin(thrift.BOOL, len(p.SomeField)); err != nil {
+	if err := oprot.WriteListBegin(ctx, thrift.BOOL, len(p.SomeField)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p.SomeField {
-		if err := oprot.WriteBool(bool(v)); err != nil {
+		if err := oprot.WriteBool(ctx, bool(v)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:some_field: ", p), err)
 	}
 	return nil

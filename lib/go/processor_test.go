@@ -99,7 +99,7 @@ func TestFBaseProcessorError(t *testing.T) {
 	assert.True(t,
 		strings.Contains(
 			string(logBuf.Bytes()),
-			"frugal: error occurred while processing request with correlation id 123: error"))
+			"frugal: user handler code returned unhandled error on request with correlation id 123: error"))
 }
 
 // Ensures FBaseProcessor returns a TTransportException if the transport read

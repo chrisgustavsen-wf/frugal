@@ -4,9 +4,10 @@
 package variety
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/Workiva/frugal/lib/go"
+	frugal "github.com/Workiva/frugal/lib/go"
 	"github.com/Workiva/frugal/test/out/ValidTypes"
 	"github.com/Workiva/frugal/test/out/actual_base/golang"
 	"github.com/Workiva/frugal/test/out/subdir_include"
@@ -21,20 +22,20 @@ type FFoo interface {
 
 	// Ping the server.
 	// Deprecated: don't use this; use "something else"
-	Ping(ctx frugal.FContext) (err error)
+	Ping(fctx frugal.FContext) (err error)
 	// Blah the server.
-	Blah(ctx frugal.FContext, num int32, Str string, event *Event) (r int64, err error)
+	Blah(fctx frugal.FContext, num int32, Str string, event *Event) (r int64, err error)
 	// oneway methods don't receive a response from the server.
-	OneWay(ctx frugal.FContext, id ID, req Request) (err error)
-	BinMethod(ctx frugal.FContext, bin []byte, Str string) (r []byte, err error)
-	ParamModifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error)
-	UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error)
-	GetThing(ctx frugal.FContext) (r *validStructs.Thing, err error)
-	GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error)
-	UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error)
-	SayHelloWith(ctx frugal.FContext, newMessage string) (r string, err error)
-	WhatDoYouSay(ctx frugal.FContext, messageArgs string) (r string, err error)
-	SayAgain(ctx frugal.FContext, messageResult string) (r string, err error)
+	OneWay(fctx frugal.FContext, id ID, req Request) (err error)
+	BinMethod(fctx frugal.FContext, bin []byte, Str string) (r []byte, err error)
+	ParamModifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error)
+	UnderlyingTypesTest(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error)
+	GetThing(fctx frugal.FContext) (r *validStructs.Thing, err error)
+	GetMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error)
+	UseSubdirStruct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error)
+	SayHelloWith(fctx frugal.FContext, newMessage string) (r string, err error)
+	WhatDoYouSay(fctx frugal.FContext, messageArgs string) (r string, err error)
+	SayAgain(fctx frugal.FContext, messageResult string) (r string, err error)
 }
 
 // This is a thrift service. Frugal will generate bindings that include
@@ -68,8 +69,8 @@ func NewFFooClient(provider *frugal.FServiceProvider, middleware ...frugal.Servi
 
 // Ping the server.
 // Deprecated: don't use this; use "something else"
-func (f *FFooClient) Ping(ctx frugal.FContext) (err error) {
-	ret := f.methods["ping"].Invoke([]interface{}{ctx})
+func (f *FFooClient) Ping(fctx frugal.FContext) (err error) {
+	ret := f.methods["ping"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -79,10 +80,10 @@ func (f *FFooClient) Ping(ctx frugal.FContext) (err error) {
 	return err
 }
 
-func (f *FFooClient) ping(ctx frugal.FContext) (err error) {
+func (f *FFooClient) ping(fctx frugal.FContext) (err error) {
 	args := FooPingArgs{}
 	result := FooPingResult{}
-	err = f.Client_().Call(ctx, "ping", &args, &result)
+	err = f.Client_().Call(fctx, "ping", &args, &result)
 	if err != nil {
 		return
 	}
@@ -90,8 +91,8 @@ func (f *FFooClient) ping(ctx frugal.FContext) (err error) {
 }
 
 // Blah the server.
-func (f *FFooClient) Blah(ctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
-	ret := f.methods["blah"].Invoke([]interface{}{ctx, num, str, event})
+func (f *FFooClient) Blah(fctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
+	ret := f.methods["blah"].Invoke([]interface{}{fctx, num, str, event})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -104,14 +105,14 @@ func (f *FFooClient) Blah(ctx frugal.FContext, num int32, str string, event *Eve
 	return r, err
 }
 
-func (f *FFooClient) blah(ctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
+func (f *FFooClient) blah(fctx frugal.FContext, num int32, str string, event *Event) (r int64, err error) {
 	args := FooBlahArgs{
 		Num:   num,
 		Str:   str,
 		Event: event,
 	}
 	result := FooBlahResult{}
-	err = f.Client_().Call(ctx, "blah", &args, &result)
+	err = f.Client_().Call(fctx, "blah", &args, &result)
 	if err != nil {
 		return
 	}
@@ -128,8 +129,8 @@ func (f *FFooClient) blah(ctx frugal.FContext, num int32, str string, event *Eve
 }
 
 // oneway methods don't receive a response from the server.
-func (f *FFooClient) OneWay(ctx frugal.FContext, id ID, req Request) (err error) {
-	ret := f.methods["oneWay"].Invoke([]interface{}{ctx, id, req})
+func (f *FFooClient) OneWay(fctx frugal.FContext, id ID, req Request) (err error) {
+	ret := f.methods["oneWay"].Invoke([]interface{}{fctx, id, req})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -139,16 +140,16 @@ func (f *FFooClient) OneWay(ctx frugal.FContext, id ID, req Request) (err error)
 	return err
 }
 
-func (f *FFooClient) oneWay(ctx frugal.FContext, id ID, req Request) (err error) {
+func (f *FFooClient) oneWay(fctx frugal.FContext, id ID, req Request) (err error) {
 	args := FooOneWayArgs{
 		ID:  id,
 		Req: req,
 	}
-	return f.Client_().Oneway(ctx, "oneWay", &args)
+	return f.Client_().Oneway(fctx, "oneWay", &args)
 }
 
-func (f *FFooClient) BinMethod(ctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
-	ret := f.methods["bin_method"].Invoke([]interface{}{ctx, bin, str})
+func (f *FFooClient) BinMethod(fctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
+	ret := f.methods["bin_method"].Invoke([]interface{}{fctx, bin, str})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -161,13 +162,13 @@ func (f *FFooClient) BinMethod(ctx frugal.FContext, bin []byte, str string) (r [
 	return r, err
 }
 
-func (f *FFooClient) bin_method(ctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
+func (f *FFooClient) bin_method(fctx frugal.FContext, bin []byte, str string) (r []byte, err error) {
 	args := FooBinMethodArgs{
 		Bin: bin,
 		Str: str,
 	}
 	result := FooBinMethodResult{}
-	err = f.Client_().Call(ctx, "bin_method", &args, &result)
+	err = f.Client_().Call(fctx, "bin_method", &args, &result)
 	if err != nil {
 		return
 	}
@@ -179,8 +180,8 @@ func (f *FFooClient) bin_method(ctx frugal.FContext, bin []byte, str string) (r 
 	return
 }
 
-func (f *FFooClient) ParamModifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
-	ret := f.methods["param_modifiers"].Invoke([]interface{}{ctx, opt_num, default_num, req_num})
+func (f *FFooClient) ParamModifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
+	ret := f.methods["param_modifiers"].Invoke([]interface{}{fctx, opt_num, default_num, req_num})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -193,14 +194,14 @@ func (f *FFooClient) ParamModifiers(ctx frugal.FContext, opt_num int32, default_
 	return r, err
 }
 
-func (f *FFooClient) param_modifiers(ctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
+func (f *FFooClient) param_modifiers(fctx frugal.FContext, opt_num int32, default_num int32, req_num int32) (r int64, err error) {
 	args := FooParamModifiersArgs{
 		OptNum:     opt_num,
 		DefaultNum: default_num,
 		ReqNum:     req_num,
 	}
 	result := FooParamModifiersResult{}
-	err = f.Client_().Call(ctx, "param_modifiers", &args, &result)
+	err = f.Client_().Call(fctx, "param_modifiers", &args, &result)
 	if err != nil {
 		return
 	}
@@ -208,8 +209,8 @@ func (f *FFooClient) param_modifiers(ctx frugal.FContext, opt_num int32, default
 	return
 }
 
-func (f *FFooClient) UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
-	ret := f.methods["underlying_types_test"].Invoke([]interface{}{ctx, list_type, set_type})
+func (f *FFooClient) UnderlyingTypesTest(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
+	ret := f.methods["underlying_types_test"].Invoke([]interface{}{fctx, list_type, set_type})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -222,13 +223,13 @@ func (f *FFooClient) UnderlyingTypesTest(ctx frugal.FContext, list_type []ID, se
 	return r, err
 }
 
-func (f *FFooClient) underlying_types_test(ctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
+func (f *FFooClient) underlying_types_test(fctx frugal.FContext, list_type []ID, set_type map[ID]bool) (r []ID, err error) {
 	args := FooUnderlyingTypesTestArgs{
 		ListType: list_type,
 		SetType:  set_type,
 	}
 	result := FooUnderlyingTypesTestResult{}
-	err = f.Client_().Call(ctx, "underlying_types_test", &args, &result)
+	err = f.Client_().Call(fctx, "underlying_types_test", &args, &result)
 	if err != nil {
 		return
 	}
@@ -236,8 +237,8 @@ func (f *FFooClient) underlying_types_test(ctx frugal.FContext, list_type []ID, 
 	return
 }
 
-func (f *FFooClient) GetThing(ctx frugal.FContext) (r *validStructs.Thing, err error) {
-	ret := f.methods["getThing"].Invoke([]interface{}{ctx})
+func (f *FFooClient) GetThing(fctx frugal.FContext) (r *validStructs.Thing, err error) {
+	ret := f.methods["getThing"].Invoke([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -250,10 +251,10 @@ func (f *FFooClient) GetThing(ctx frugal.FContext) (r *validStructs.Thing, err e
 	return r, err
 }
 
-func (f *FFooClient) getThing(ctx frugal.FContext) (r *validStructs.Thing, err error) {
+func (f *FFooClient) getThing(fctx frugal.FContext) (r *validStructs.Thing, err error) {
 	args := FooGetThingArgs{}
 	result := FooGetThingResult{}
-	err = f.Client_().Call(ctx, "getThing", &args, &result)
+	err = f.Client_().Call(fctx, "getThing", &args, &result)
 	if err != nil {
 		return
 	}
@@ -261,8 +262,8 @@ func (f *FFooClient) getThing(ctx frugal.FContext) (r *validStructs.Thing, err e
 	return
 }
 
-func (f *FFooClient) GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error) {
-	ret := f.methods["getMyInt"].Invoke([]interface{}{ctx})
+func (f *FFooClient) GetMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error) {
+	ret := f.methods["getMyInt"].Invoke([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -275,10 +276,10 @@ func (f *FFooClient) GetMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err erro
 	return r, err
 }
 
-func (f *FFooClient) getMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err error) {
+func (f *FFooClient) getMyInt(fctx frugal.FContext) (r ValidTypes.MyInt, err error) {
 	args := FooGetMyIntArgs{}
 	result := FooGetMyIntResult{}
-	err = f.Client_().Call(ctx, "getMyInt", &args, &result)
+	err = f.Client_().Call(fctx, "getMyInt", &args, &result)
 	if err != nil {
 		return
 	}
@@ -286,8 +287,8 @@ func (f *FFooClient) getMyInt(ctx frugal.FContext) (r ValidTypes.MyInt, err erro
 	return
 }
 
-func (f *FFooClient) UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
-	ret := f.methods["use_subdir_struct"].Invoke([]interface{}{ctx, a})
+func (f *FFooClient) UseSubdirStruct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
+	ret := f.methods["use_subdir_struct"].Invoke([]interface{}{fctx, a})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -300,12 +301,12 @@ func (f *FFooClient) UseSubdirStruct(ctx frugal.FContext, a *subdir_include.A) (
 	return r, err
 }
 
-func (f *FFooClient) use_subdir_struct(ctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
+func (f *FFooClient) use_subdir_struct(fctx frugal.FContext, a *subdir_include.A) (r *subdir_include.A, err error) {
 	args := FooUseSubdirStructArgs{
 		A: a,
 	}
 	result := FooUseSubdirStructResult{}
-	err = f.Client_().Call(ctx, "use_subdir_struct", &args, &result)
+	err = f.Client_().Call(fctx, "use_subdir_struct", &args, &result)
 	if err != nil {
 		return
 	}
@@ -313,8 +314,8 @@ func (f *FFooClient) use_subdir_struct(ctx frugal.FContext, a *subdir_include.A)
 	return
 }
 
-func (f *FFooClient) SayHelloWith(ctx frugal.FContext, newmessage string) (r string, err error) {
-	ret := f.methods["sayHelloWith"].Invoke([]interface{}{ctx, newmessage})
+func (f *FFooClient) SayHelloWith(fctx frugal.FContext, newmessage string) (r string, err error) {
+	ret := f.methods["sayHelloWith"].Invoke([]interface{}{fctx, newmessage})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -327,12 +328,12 @@ func (f *FFooClient) SayHelloWith(ctx frugal.FContext, newmessage string) (r str
 	return r, err
 }
 
-func (f *FFooClient) sayHelloWith(ctx frugal.FContext, newmessage string) (r string, err error) {
+func (f *FFooClient) sayHelloWith(fctx frugal.FContext, newmessage string) (r string, err error) {
 	args := FooSayHelloWithArgs{
 		NewMessage_: newmessage,
 	}
 	result := FooSayHelloWithResult{}
-	err = f.Client_().Call(ctx, "sayHelloWith", &args, &result)
+	err = f.Client_().Call(fctx, "sayHelloWith", &args, &result)
 	if err != nil {
 		return
 	}
@@ -340,8 +341,8 @@ func (f *FFooClient) sayHelloWith(ctx frugal.FContext, newmessage string) (r str
 	return
 }
 
-func (f *FFooClient) WhatDoYouSay(ctx frugal.FContext, messageargs string) (r string, err error) {
-	ret := f.methods["whatDoYouSay"].Invoke([]interface{}{ctx, messageargs})
+func (f *FFooClient) WhatDoYouSay(fctx frugal.FContext, messageargs string) (r string, err error) {
+	ret := f.methods["whatDoYouSay"].Invoke([]interface{}{fctx, messageargs})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -354,12 +355,12 @@ func (f *FFooClient) WhatDoYouSay(ctx frugal.FContext, messageargs string) (r st
 	return r, err
 }
 
-func (f *FFooClient) whatDoYouSay(ctx frugal.FContext, messageargs string) (r string, err error) {
+func (f *FFooClient) whatDoYouSay(fctx frugal.FContext, messageargs string) (r string, err error) {
 	args := FooWhatDoYouSayArgs{
 		MessageArgs_: messageargs,
 	}
 	result := FooWhatDoYouSayResult{}
-	err = f.Client_().Call(ctx, "whatDoYouSay", &args, &result)
+	err = f.Client_().Call(fctx, "whatDoYouSay", &args, &result)
 	if err != nil {
 		return
 	}
@@ -367,8 +368,8 @@ func (f *FFooClient) whatDoYouSay(ctx frugal.FContext, messageargs string) (r st
 	return
 }
 
-func (f *FFooClient) SayAgain(ctx frugal.FContext, messageresult string) (r string, err error) {
-	ret := f.methods["sayAgain"].Invoke([]interface{}{ctx, messageresult})
+func (f *FFooClient) SayAgain(fctx frugal.FContext, messageresult string) (r string, err error) {
+	ret := f.methods["sayAgain"].Invoke([]interface{}{fctx, messageresult})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -381,12 +382,12 @@ func (f *FFooClient) SayAgain(ctx frugal.FContext, messageresult string) (r stri
 	return r, err
 }
 
-func (f *FFooClient) sayAgain(ctx frugal.FContext, messageresult string) (r string, err error) {
+func (f *FFooClient) sayAgain(fctx frugal.FContext, messageresult string) (r string, err error) {
 	args := FooSayAgainArgs{
 		MessageResult_: messageresult,
 	}
 	result := FooSayAgainResult{}
-	err = f.Client_().Call(ctx, "sayAgain", &args, &result)
+	err = f.Client_().Call(fctx, "sayAgain", &args, &result)
 	if err != nil {
 		return
 	}
@@ -422,15 +423,18 @@ type fooFPing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFPing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooPingArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "ping", err.Error())
 	}
 	result := FooPingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -439,27 +443,30 @@ func (p *fooFPing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "ping", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "ping", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "ping", "Internal error processing ping: "+err.Error())
 	}
-	return p.SendReply(ctx, oprot, "ping", &result)
+	return p.SendReply(fctx, oprot, "ping", &result)
 }
 
 type fooFBlah struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFBlah) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooBlahArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "blah", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "blah", err.Error())
 	}
 	result := FooBlahResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.Num, args.Str, args.Event})
+	ret := p.InvokeMethod([]interface{}{fctx, args.Num, args.Str, args.Event})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -468,7 +475,7 @@ func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "blah", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "blah", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
@@ -477,27 +484,30 @@ func (p *fooFBlah) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) 
 		case *golang.APIException:
 			result.API = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "blah", "Internal error processing blah: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "blah", "Internal error processing blah: "+err.Error())
 		}
 	} else {
 		var retval int64 = ret[0].(int64)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "blah", &result)
+	return p.SendReply(fctx, oprot, "blah", &result)
 }
 
 type fooFOneWay struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFOneWay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFOneWay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooOneWayArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "oneWay", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "oneWay", err.Error())
 	}
-	ret := p.InvokeMethod([]interface{}{ctx, args.ID, args.Req})
+	ret := p.InvokeMethod([]interface{}{fctx, args.ID, args.Req})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
 	}
@@ -506,10 +516,10 @@ func (p *fooFOneWay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "oneWay", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "oneWay", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "oneWay", "Internal error processing oneWay: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "oneWay", "Internal error processing oneWay: "+err.Error())
 	}
 	return err
 }
@@ -518,15 +528,18 @@ type fooFBinMethod struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFBinMethod) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFBinMethod) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooBinMethodArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "bin_method", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "bin_method", err.Error())
 	}
 	result := FooBinMethodResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.Bin, args.Str})
+	ret := p.InvokeMethod([]interface{}{fctx, args.Bin, args.Str})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -535,35 +548,38 @@ func (p *fooFBinMethod) Process(ctx frugal.FContext, iprot, oprot *frugal.FProto
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "bin_method", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "bin_method", typedError.Error())
 			return nil
 		}
 		switch v := err.(type) {
 		case *golang.APIException:
 			result.API = v
 		default:
-			return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "bin_method", "Internal error processing bin_method: "+err.Error())
+			return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "bin_method", "Internal error processing bin_method: "+err.Error())
 		}
 	} else {
 		var retval []byte = ret[0].([]byte)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "bin_method", &result)
+	return p.SendReply(fctx, oprot, "bin_method", &result)
 }
 
 type fooFParamModifiers struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFParamModifiers) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFParamModifiers) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooParamModifiersArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "param_modifiers", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "param_modifiers", err.Error())
 	}
 	result := FooParamModifiersResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.OptNum, args.DefaultNum, args.ReqNum})
+	ret := p.InvokeMethod([]interface{}{fctx, args.OptNum, args.DefaultNum, args.ReqNum})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -572,30 +588,33 @@ func (p *fooFParamModifiers) Process(ctx frugal.FContext, iprot, oprot *frugal.F
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "param_modifiers", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "param_modifiers", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "param_modifiers", "Internal error processing param_modifiers: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "param_modifiers", "Internal error processing param_modifiers: "+err.Error())
 	} else {
 		var retval int64 = ret[0].(int64)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "param_modifiers", &result)
+	return p.SendReply(fctx, oprot, "param_modifiers", &result)
 }
 
 type fooFUnderlyingTypesTest struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFUnderlyingTypesTest) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFUnderlyingTypesTest) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooUnderlyingTypesTestArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "underlying_types_test", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "underlying_types_test", err.Error())
 	}
 	result := FooUnderlyingTypesTestResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.ListType, args.SetType})
+	ret := p.InvokeMethod([]interface{}{fctx, args.ListType, args.SetType})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -604,30 +623,33 @@ func (p *fooFUnderlyingTypesTest) Process(ctx frugal.FContext, iprot, oprot *fru
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "underlying_types_test", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "underlying_types_test", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "underlying_types_test", "Internal error processing underlying_types_test: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "underlying_types_test", "Internal error processing underlying_types_test: "+err.Error())
 	} else {
 		var retval []ID = ret[0].([]ID)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "underlying_types_test", &result)
+	return p.SendReply(fctx, oprot, "underlying_types_test", &result)
 }
 
 type fooFGetThing struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFGetThing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFGetThing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooGetThingArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getThing", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getThing", err.Error())
 	}
 	result := FooGetThingResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -636,30 +658,33 @@ func (p *fooFGetThing) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "getThing", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "getThing", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getThing", "Internal error processing getThing: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getThing", "Internal error processing getThing: "+err.Error())
 	} else {
 		var retval *validStructs.Thing = ret[0].(*validStructs.Thing)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "getThing", &result)
+	return p.SendReply(fctx, oprot, "getThing", &result)
 }
 
 type fooFGetMyInt struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFGetMyInt) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFGetMyInt) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooGetMyIntArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getMyInt", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "getMyInt", err.Error())
 	}
 	result := FooGetMyIntResult{}
-	ret := p.InvokeMethod([]interface{}{ctx})
+	ret := p.InvokeMethod([]interface{}{fctx})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -668,30 +693,33 @@ func (p *fooFGetMyInt) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "getMyInt", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "getMyInt", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getMyInt", "Internal error processing getMyInt: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "getMyInt", "Internal error processing getMyInt: "+err.Error())
 	} else {
 		var retval ValidTypes.MyInt = ret[0].(ValidTypes.MyInt)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "getMyInt", &result)
+	return p.SendReply(fctx, oprot, "getMyInt", &result)
 }
 
 type fooFUseSubdirStruct struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFUseSubdirStruct) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFUseSubdirStruct) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooUseSubdirStructArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "use_subdir_struct", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "use_subdir_struct", err.Error())
 	}
 	result := FooUseSubdirStructResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.A})
+	ret := p.InvokeMethod([]interface{}{fctx, args.A})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -700,30 +728,33 @@ func (p *fooFUseSubdirStruct) Process(ctx frugal.FContext, iprot, oprot *frugal.
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "use_subdir_struct", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "use_subdir_struct", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "use_subdir_struct", "Internal error processing use_subdir_struct: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "use_subdir_struct", "Internal error processing use_subdir_struct: "+err.Error())
 	} else {
 		var retval *subdir_include.A = ret[0].(*subdir_include.A)
 		result.Success = retval
 	}
-	return p.SendReply(ctx, oprot, "use_subdir_struct", &result)
+	return p.SendReply(fctx, oprot, "use_subdir_struct", &result)
 }
 
 type fooFSayHelloWith struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFSayHelloWith) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFSayHelloWith) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooSayHelloWithArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayHelloWith", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayHelloWith", err.Error())
 	}
 	result := FooSayHelloWithResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.NewMessage_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.NewMessage_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -732,30 +763,33 @@ func (p *fooFSayHelloWith) Process(ctx frugal.FContext, iprot, oprot *frugal.FPr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "sayHelloWith", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "sayHelloWith", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayHelloWith", "Internal error processing sayHelloWith: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayHelloWith", "Internal error processing sayHelloWith: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "sayHelloWith", &result)
+	return p.SendReply(fctx, oprot, "sayHelloWith", &result)
 }
 
 type fooFWhatDoYouSay struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFWhatDoYouSay) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFWhatDoYouSay) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooWhatDoYouSayArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "whatDoYouSay", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "whatDoYouSay", err.Error())
 	}
 	result := FooWhatDoYouSayResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.MessageArgs_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.MessageArgs_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -764,30 +798,33 @@ func (p *fooFWhatDoYouSay) Process(ctx frugal.FContext, iprot, oprot *frugal.FPr
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "whatDoYouSay", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "whatDoYouSay", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "whatDoYouSay", "Internal error processing whatDoYouSay: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "whatDoYouSay", "Internal error processing whatDoYouSay: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "whatDoYouSay", &result)
+	return p.SendReply(fctx, oprot, "whatDoYouSay", &result)
 }
 
 type fooFSayAgain struct {
 	*frugal.FBaseProcessorFunction
 }
 
-func (p *fooFSayAgain) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+func (p *fooFSayAgain) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	ctx, cancelFn := frugal.ToContext(fctx)
+	defer cancelFn()
+
 	args := FooSayAgainArgs{}
-	err := args.Read(iprot)
-	iprot.ReadMessageEnd()
+	err := args.Read(ctx, iprot)
+	iprot.ReadMessageEnd(ctx)
 	if err != nil {
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayAgain", err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_PROTOCOL_ERROR, "sayAgain", err.Error())
 	}
 	result := FooSayAgainResult{}
-	ret := p.InvokeMethod([]interface{}{ctx, args.MessageResult_})
+	ret := p.InvokeMethod([]interface{}{fctx, args.MessageResult_})
 	if len(ret) != 2 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 2", len(ret)))
 	}
@@ -796,15 +833,15 @@ func (p *fooFSayAgain) Process(ctx frugal.FContext, iprot, oprot *frugal.FProtoc
 	}
 	if err != nil {
 		if typedError, ok := err.(thrift.TApplicationException); ok {
-			p.SendError(ctx, oprot, typedError.TypeId(), "sayAgain", typedError.Error())
+			p.SendError(fctx, oprot, typedError.TypeId(), "sayAgain", typedError.Error())
 			return nil
 		}
-		return p.SendError(ctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayAgain", "Internal error processing sayAgain: "+err.Error())
+		return p.SendError(fctx, oprot, frugal.APPLICATION_EXCEPTION_INTERNAL_ERROR, "sayAgain", "Internal error processing sayAgain: "+err.Error())
 	} else {
 		var retval string = ret[0].(string)
 		result.Success = &retval
 	}
-	return p.SendReply(ctx, oprot, "sayAgain", &result)
+	return p.SendReply(fctx, oprot, "sayAgain", &result)
 }
 
 type FooPingArgs struct {
@@ -814,40 +851,40 @@ func NewFooPingArgs() *FooPingArgs {
 	return &FooPingArgs{}
 }
 
-func (p *FooPingArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooPingArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooPingArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("Ping_args"); err != nil {
+func (p *FooPingArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "Ping_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -867,40 +904,40 @@ func NewFooPingResult() *FooPingResult {
 	return &FooPingResult{}
 }
 
-func (p *FooPingResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooPingResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooPingResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("Ping_result"); err != nil {
+func (p *FooPingResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "Ping_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -944,13 +981,13 @@ func (p *FooBlahArgs) GetEvent() *Event {
 	return p.Event
 }
 
-func (p *FooBlahArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooBlahArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -959,54 +996,54 @@ func (p *FooBlahArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.Num = v
 			}
 		case 2:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 2: ", err)
 			} else {
 				p.Str = v
 			}
 		case 3:
 			p.Event = NewEvent()
-			if err := p.Event.Read(iprot); err != nil {
+			if err := p.Event.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Event), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooBlahArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("blah_args"); err != nil {
+func (p *FooBlahArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "blah_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(oprot, p.Num, "num", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.Num, "num", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::num:1 ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.Str, "Str", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Str, "Str", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Str:2 ", p), err)
 	}
-	if err := frugal.WriteStruct(oprot, p.Event, "event", 3); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.Event, "event", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::event:3 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1068,13 +1105,13 @@ func (p *FooBlahResult) GetAPI() *golang.APIException {
 	return p.API
 }
 
-func (p *FooBlahResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooBlahResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1083,59 +1120,59 @@ func (p *FooBlahResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadI64(); err != nil {
+			if v, err := iprot.ReadI64(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = &v
 			}
 		case 1:
 			p.Awe = NewAwesomeException()
-			if err := p.Awe.Read(iprot); err != nil {
+			if err := p.Awe.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Awe), err)
 			}
 		case 2:
 			p.API = golang.NewAPIException()
-			if err := p.API.Read(iprot); err != nil {
+			if err := p.API.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.API), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooBlahResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("blah_result"); err != nil {
+func (p *FooBlahResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "blah_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI64(oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
 	if p.IsSetAwe() {
-		if err := frugal.WriteStruct(oprot, p.Awe, "awe", 1); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Awe, "awe", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::awe:1 ", p), err)
 		}
 	}
 	if p.IsSetAPI() {
-		if err := frugal.WriteStruct(oprot, p.API, "api", 2); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.API, "api", 2); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::api:2 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1165,13 +1202,13 @@ func (p *FooOneWayArgs) GetReq() Request {
 	return p.Req
 }
 
-func (p *FooOneWayArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooOneWayArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1180,90 +1217,90 @@ func (p *FooOneWayArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadI64(); err != nil {
+			if v, err := iprot.ReadI64(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				temp := ID(v)
 				p.ID = temp
 			}
 		case 2:
-			_, _, size, err := iprot.ReadMapBegin()
+			_, _, size, err := iprot.ReadMapBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading map begin: ", err)
 			}
 			p.Req = make(Request, size)
 			for i := 0; i < size; i++ {
 				var elem20 Int
-				if v, err := iprot.ReadI32(); err != nil {
+				if v, err := iprot.ReadI32(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					temp := Int(v)
 					elem20 = temp
 				}
 				var elem21 string
-				if v, err := iprot.ReadString(); err != nil {
+				if v, err := iprot.ReadString(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					elem21 = v
 				}
 				(p.Req)[elem20] = elem21
 			}
-			if err := iprot.ReadMapEnd(); err != nil {
+			if err := iprot.ReadMapEnd(ctx); err != nil {
 				return thrift.PrependError("error reading map end: ", err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooOneWayArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("oneWay_args"); err != nil {
+func (p *FooOneWayArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "oneWay_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI64(oprot, int64(p.ID), "id", 1); err != nil {
+	if err := frugal.WriteI64WithContext(ctx, oprot, int64(p.ID), "id", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::id:1 ", p), err)
 	}
-	if err := p.writeField2(oprot); err != nil {
+	if err := p.writeField2(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *FooOneWayArgs) writeField2(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("req", thrift.MAP, 2); err != nil {
+func (p *FooOneWayArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "req", thrift.MAP, 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:req: ", p), err)
 	}
-	if err := oprot.WriteMapBegin(thrift.I32, thrift.STRING, len(p.Req)); err != nil {
+	if err := oprot.WriteMapBegin(ctx, thrift.I32, thrift.STRING, len(p.Req)); err != nil {
 		return thrift.PrependError("error writing map begin: ", err)
 	}
 	for k, v := range p.Req {
-		if err := oprot.WriteI32(int32(k)); err != nil {
+		if err := oprot.WriteI32(ctx, int32(k)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 		}
-		if err := oprot.WriteString(string(v)); err != nil {
+		if err := oprot.WriteString(ctx, string(v)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 		}
 	}
-	if err := oprot.WriteMapEnd(); err != nil {
+	if err := oprot.WriteMapEnd(ctx); err != nil {
 		return thrift.PrependError("error writing map end: ", err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:req: ", p), err)
 	}
 	return nil
@@ -1293,13 +1330,13 @@ func (p *FooBinMethodArgs) GetStr() string {
 	return p.Str
 }
 
-func (p *FooBinMethodArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooBinMethodArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1308,46 +1345,46 @@ func (p *FooBinMethodArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadBinary(); err != nil {
+			if v, err := iprot.ReadBinary(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.Bin = v
 			}
 		case 2:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 2: ", err)
 			} else {
 				p.Str = v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooBinMethodArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("bin_method_args"); err != nil {
+func (p *FooBinMethodArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "bin_method_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteBinary(oprot, p.Bin, "bin", 1); err != nil {
+	if err := frugal.WriteBinaryWithContext(ctx, oprot, p.Bin, "bin", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::bin:1 ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.Str, "Str", 2); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.Str, "Str", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::Str:2 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1392,13 +1429,13 @@ func (p *FooBinMethodResult) GetAPI() *golang.APIException {
 	return p.API
 }
 
-func (p *FooBinMethodResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooBinMethodResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1407,49 +1444,49 @@ func (p *FooBinMethodResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadBinary(); err != nil {
+			if v, err := iprot.ReadBinary(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = v
 			}
 		case 1:
 			p.API = golang.NewAPIException()
-			if err := p.API.Read(iprot); err != nil {
+			if err := p.API.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.API), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooBinMethodResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("bin_method_result"); err != nil {
+func (p *FooBinMethodResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "bin_method_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteBinary(oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteBinaryWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
 	if p.IsSetAPI() {
-		if err := frugal.WriteStruct(oprot, p.API, "api", 1); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.API, "api", 1); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::api:1 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1484,15 +1521,15 @@ func (p *FooParamModifiersArgs) GetReqNum() int32 {
 	return p.ReqNum
 }
 
-func (p *FooParamModifiersArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooParamModifiersArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	issetReqNum := false
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1501,34 +1538,34 @@ func (p *FooParamModifiersArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.OptNum = v
 			}
 		case 2:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 2: ", err)
 			} else {
 				p.DefaultNum = v
 			}
 		case 3:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 3: ", err)
 			} else {
 				p.ReqNum = v
 			}
 			issetReqNum = true
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	if !issetReqNum {
@@ -1537,23 +1574,23 @@ func (p *FooParamModifiersArgs) Read(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *FooParamModifiersArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("param_modifiers_args"); err != nil {
+func (p *FooParamModifiersArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "param_modifiers_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteI32(oprot, p.OptNum, "opt_num", 1); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.OptNum, "opt_num", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::opt_num:1 ", p), err)
 	}
-	if err := frugal.WriteI32(oprot, p.DefaultNum, "default_num", 2); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.DefaultNum, "default_num", 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::default_num:2 ", p), err)
 	}
-	if err := frugal.WriteI32(oprot, p.ReqNum, "req_num", 3); err != nil {
+	if err := frugal.WriteI32WithContext(ctx, oprot, p.ReqNum, "req_num", 3); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::req_num:3 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1587,13 +1624,13 @@ func (p *FooParamModifiersResult) GetSuccess() int64 {
 	return *p.Success
 }
 
-func (p *FooParamModifiersResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooParamModifiersResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1602,39 +1639,39 @@ func (p *FooParamModifiersResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadI64(); err != nil {
+			if v, err := iprot.ReadI64(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = &v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooParamModifiersResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("param_modifiers_result"); err != nil {
+func (p *FooParamModifiersResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "param_modifiers_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI64(oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteI64WithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1664,13 +1701,13 @@ func (p *FooUnderlyingTypesTestArgs) GetSetType() map[ID]bool {
 	return p.SetType
 }
 
-func (p *FooUnderlyingTypesTestArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooUnderlyingTypesTestArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1679,14 +1716,14 @@ func (p *FooUnderlyingTypesTestArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			_, size, err := iprot.ReadListBegin()
+			_, size, err := iprot.ReadListBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading list begin: ", err)
 			}
 			p.ListType = make([]ID, 0, size)
 			for i := 0; i < size; i++ {
 				var elem22 ID
-				if v, err := iprot.ReadI64(); err != nil {
+				if v, err := iprot.ReadI64(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					temp := ID(v)
@@ -1694,18 +1731,18 @@ func (p *FooUnderlyingTypesTestArgs) Read(iprot thrift.TProtocol) error {
 				}
 				p.ListType = append(p.ListType, elem22)
 			}
-			if err := iprot.ReadListEnd(); err != nil {
+			if err := iprot.ReadListEnd(ctx); err != nil {
 				return thrift.PrependError("error reading list end: ", err)
 			}
 		case 2:
-			_, size, err := iprot.ReadSetBegin()
+			_, size, err := iprot.ReadSetBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading set begin: ", err)
 			}
 			p.SetType = make(map[ID]bool, size)
 			for i := 0; i < size; i++ {
 				var elem23 ID
-				if v, err := iprot.ReadI64(); err != nil {
+				if v, err := iprot.ReadI64(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					temp := ID(v)
@@ -1713,80 +1750,80 @@ func (p *FooUnderlyingTypesTestArgs) Read(iprot thrift.TProtocol) error {
 				}
 				(p.SetType)[elem23] = true
 			}
-			if err := iprot.ReadSetEnd(); err != nil {
+			if err := iprot.ReadSetEnd(ctx); err != nil {
 				return thrift.PrependError("error reading set end: ", err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooUnderlyingTypesTestArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("underlying_types_test_args"); err != nil {
+func (p *FooUnderlyingTypesTestArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "underlying_types_test_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField1(oprot); err != nil {
+	if err := p.writeField1(ctx, oprot); err != nil {
 		return err
 	}
-	if err := p.writeField2(oprot); err != nil {
+	if err := p.writeField2(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *FooUnderlyingTypesTestArgs) writeField1(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("list_type", thrift.LIST, 1); err != nil {
+func (p *FooUnderlyingTypesTestArgs) writeField1(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "list_type", thrift.LIST, 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:list_type: ", p), err)
 	}
-	if err := oprot.WriteListBegin(thrift.I64, len(p.ListType)); err != nil {
+	if err := oprot.WriteListBegin(ctx, thrift.I64, len(p.ListType)); err != nil {
 		return thrift.PrependError("error writing list begin: ", err)
 	}
 	for _, v := range p.ListType {
-		if err := oprot.WriteI64(int64(v)); err != nil {
+		if err := oprot.WriteI64(ctx, int64(v)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 		}
 	}
-	if err := oprot.WriteListEnd(); err != nil {
+	if err := oprot.WriteListEnd(ctx); err != nil {
 		return thrift.PrependError("error writing list end: ", err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 1:list_type: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooUnderlyingTypesTestArgs) writeField2(oprot thrift.TProtocol) error {
-	if err := oprot.WriteFieldBegin("set_type", thrift.SET, 2); err != nil {
+func (p *FooUnderlyingTypesTestArgs) writeField2(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteFieldBegin(ctx, "set_type", thrift.SET, 2); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:set_type: ", p), err)
 	}
-	if err := oprot.WriteSetBegin(thrift.I64, len(p.SetType)); err != nil {
+	if err := oprot.WriteSetBegin(ctx, thrift.I64, len(p.SetType)); err != nil {
 		return thrift.PrependError("error writing set begin: ", err)
 	}
 	for v, _ := range p.SetType {
-		if err := oprot.WriteI64(int64(v)); err != nil {
+		if err := oprot.WriteI64(ctx, int64(v)); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 		}
 	}
-	if err := oprot.WriteSetEnd(); err != nil {
+	if err := oprot.WriteSetEnd(ctx); err != nil {
 		return thrift.PrependError("error writing set end: ", err)
 	}
-	if err := oprot.WriteFieldEnd(); err != nil {
+	if err := oprot.WriteFieldEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write field end error 2:set_type: ", p), err)
 	}
 	return nil
@@ -1817,13 +1854,13 @@ func (p *FooUnderlyingTypesTestResult) GetSuccess() []ID {
 	return p.Success
 }
 
-func (p *FooUnderlyingTypesTestResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooUnderlyingTypesTestResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -1832,14 +1869,14 @@ func (p *FooUnderlyingTypesTestResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			_, size, err := iprot.ReadListBegin()
+			_, size, err := iprot.ReadListBegin(ctx)
 			if err != nil {
 				return thrift.PrependError("error reading list begin: ", err)
 			}
 			p.Success = make([]ID, 0, size)
 			for i := 0; i < size; i++ {
 				var elem24 ID
-				if v, err := iprot.ReadI64(); err != nil {
+				if v, err := iprot.ReadI64(ctx); err != nil {
 					return thrift.PrependError("error reading field 0: ", err)
 				} else {
 					temp := ID(v)
@@ -1847,57 +1884,57 @@ func (p *FooUnderlyingTypesTestResult) Read(iprot thrift.TProtocol) error {
 				}
 				p.Success = append(p.Success, elem24)
 			}
-			if err := iprot.ReadListEnd(); err != nil {
+			if err := iprot.ReadListEnd(ctx); err != nil {
 				return thrift.PrependError("error reading list end: ", err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooUnderlyingTypesTestResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("underlying_types_test_result"); err != nil {
+func (p *FooUnderlyingTypesTestResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "underlying_types_test_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := p.writeField0(oprot); err != nil {
+	if err := p.writeField0(ctx, oprot); err != nil {
 		return err
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
 }
 
-func (p *FooUnderlyingTypesTestResult) writeField0(oprot thrift.TProtocol) error {
+func (p *FooUnderlyingTypesTestResult) writeField0(ctx context.Context, oprot thrift.TProtocol) error {
 	if p.IsSetSuccess() {
-		if err := oprot.WriteFieldBegin("success", thrift.LIST, 0); err != nil {
+		if err := oprot.WriteFieldBegin(ctx, "success", thrift.LIST, 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err)
 		}
-		if err := oprot.WriteListBegin(thrift.I64, len(p.Success)); err != nil {
+		if err := oprot.WriteListBegin(ctx, thrift.I64, len(p.Success)); err != nil {
 			return thrift.PrependError("error writing list begin: ", err)
 		}
 		for _, v := range p.Success {
-			if err := oprot.WriteI64(int64(v)); err != nil {
+			if err := oprot.WriteI64(ctx, int64(v)); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T. (0) field write error: ", p), err)
 			}
 		}
-		if err := oprot.WriteListEnd(); err != nil {
+		if err := oprot.WriteListEnd(ctx); err != nil {
 			return thrift.PrependError("error writing list end: ", err)
 		}
-		if err := oprot.WriteFieldEnd(); err != nil {
+		if err := oprot.WriteFieldEnd(ctx); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err)
 		}
 	}
@@ -1918,40 +1955,40 @@ func NewFooGetThingArgs() *FooGetThingArgs {
 	return &FooGetThingArgs{}
 }
 
-func (p *FooGetThingArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooGetThingArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooGetThingArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getThing_args"); err != nil {
+func (p *FooGetThingArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getThing_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -1985,13 +2022,13 @@ func (p *FooGetThingResult) GetSuccess() *validStructs.Thing {
 	return p.Success
 }
 
-func (p *FooGetThingResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooGetThingResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2001,37 +2038,37 @@ func (p *FooGetThingResult) Read(iprot thrift.TProtocol) error {
 		switch fieldId {
 		case 0:
 			p.Success = validStructs.NewThing()
-			if err := p.Success.Read(iprot); err != nil {
+			if err := p.Success.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooGetThingResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getThing_result"); err != nil {
+func (p *FooGetThingResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getThing_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteStruct(oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2051,40 +2088,40 @@ func NewFooGetMyIntArgs() *FooGetMyIntArgs {
 	return &FooGetMyIntArgs{}
 }
 
-func (p *FooGetMyIntArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooGetMyIntArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-		if err := iprot.Skip(fieldTypeId); err != nil {
+		if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 			return err
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooGetMyIntArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getMyInt_args"); err != nil {
+func (p *FooGetMyIntArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getMyInt_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2118,13 +2155,13 @@ func (p *FooGetMyIntResult) GetSuccess() ValidTypes.MyInt {
 	return *p.Success
 }
 
-func (p *FooGetMyIntResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooGetMyIntResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2133,40 +2170,40 @@ func (p *FooGetMyIntResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadI32(); err != nil {
+			if v, err := iprot.ReadI32(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				temp := ValidTypes.MyInt(v)
 				p.Success = &temp
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooGetMyIntResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("getMyInt_result"); err != nil {
+func (p *FooGetMyIntResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "getMyInt_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteI32(oprot, int32(*p.Success), "success", 0); err != nil {
+		if err := frugal.WriteI32WithContext(ctx, oprot, int32(*p.Success), "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2200,13 +2237,13 @@ func (p *FooUseSubdirStructArgs) GetA() *subdir_include.A {
 	return p.A
 }
 
-func (p *FooUseSubdirStructArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooUseSubdirStructArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2216,35 +2253,35 @@ func (p *FooUseSubdirStructArgs) Read(iprot thrift.TProtocol) error {
 		switch fieldId {
 		case 1:
 			p.A = subdir_include.NewA()
-			if err := p.A.Read(iprot); err != nil {
+			if err := p.A.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.A), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooUseSubdirStructArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("use_subdir_struct_args"); err != nil {
+func (p *FooUseSubdirStructArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "use_subdir_struct_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteStruct(oprot, p.A, "a", 1); err != nil {
+	if err := frugal.WriteStructWithContext(ctx, oprot, p.A, "a", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::a:1 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2278,13 +2315,13 @@ func (p *FooUseSubdirStructResult) GetSuccess() *subdir_include.A {
 	return p.Success
 }
 
-func (p *FooUseSubdirStructResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooUseSubdirStructResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2294,37 +2331,37 @@ func (p *FooUseSubdirStructResult) Read(iprot thrift.TProtocol) error {
 		switch fieldId {
 		case 0:
 			p.Success = subdir_include.NewA()
-			if err := p.Success.Read(iprot); err != nil {
+			if err := p.Success.Read(ctx, iprot); err != nil {
 				return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooUseSubdirStructResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("use_subdir_struct_result"); err != nil {
+func (p *FooUseSubdirStructResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "use_subdir_struct_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteStruct(oprot, p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStructWithContext(ctx, oprot, p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2349,13 +2386,13 @@ func (p *FooSayHelloWithArgs) GetNewMessage_() string {
 	return p.NewMessage_
 }
 
-func (p *FooSayHelloWithArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooSayHelloWithArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2364,37 +2401,37 @@ func (p *FooSayHelloWithArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.NewMessage_ = v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooSayHelloWithArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("sayHelloWith_args"); err != nil {
+func (p *FooSayHelloWithArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "sayHelloWith_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.NewMessage_, "newMessage", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.NewMessage_, "newMessage", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::newMessage:1 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2428,13 +2465,13 @@ func (p *FooSayHelloWithResult) GetSuccess() string {
 	return *p.Success
 }
 
-func (p *FooSayHelloWithResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooSayHelloWithResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2443,39 +2480,39 @@ func (p *FooSayHelloWithResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = &v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooSayHelloWithResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("sayHelloWith_result"); err != nil {
+func (p *FooSayHelloWithResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "sayHelloWith_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2500,13 +2537,13 @@ func (p *FooWhatDoYouSayArgs) GetMessageArgs_() string {
 	return p.MessageArgs_
 }
 
-func (p *FooWhatDoYouSayArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooWhatDoYouSayArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2515,37 +2552,37 @@ func (p *FooWhatDoYouSayArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.MessageArgs_ = v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooWhatDoYouSayArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("whatDoYouSay_args"); err != nil {
+func (p *FooWhatDoYouSayArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "whatDoYouSay_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.MessageArgs_, "messageArgs", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageArgs_, "messageArgs", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageArgs:1 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2579,13 +2616,13 @@ func (p *FooWhatDoYouSayResult) GetSuccess() string {
 	return *p.Success
 }
 
-func (p *FooWhatDoYouSayResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooWhatDoYouSayResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2594,39 +2631,39 @@ func (p *FooWhatDoYouSayResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = &v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooWhatDoYouSayResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("whatDoYouSay_result"); err != nil {
+func (p *FooWhatDoYouSayResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "whatDoYouSay_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2651,13 +2688,13 @@ func (p *FooSayAgainArgs) GetMessageResult_() string {
 	return p.MessageResult_
 }
 
-func (p *FooSayAgainArgs) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooSayAgainArgs) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2666,37 +2703,37 @@ func (p *FooSayAgainArgs) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 1:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 1: ", err)
 			} else {
 				p.MessageResult_ = v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooSayAgainArgs) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("sayAgain_args"); err != nil {
+func (p *FooSayAgainArgs) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "sayAgain_args"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
-	if err := frugal.WriteString(oprot, p.MessageResult_, "messageResult", 1); err != nil {
+	if err := frugal.WriteStringWithContext(ctx, oprot, p.MessageResult_, "messageResult", 1); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T::messageResult:1 ", p), err)
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
@@ -2730,13 +2767,13 @@ func (p *FooSayAgainResult) GetSuccess() string {
 	return *p.Success
 }
 
-func (p *FooSayAgainResult) Read(iprot thrift.TProtocol) error {
-	if _, err := iprot.ReadStructBegin(); err != nil {
+func (p *FooSayAgainResult) Read(ctx context.Context, iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
 	}
 
 	for {
-		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin(ctx)
 		if err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
 		}
@@ -2745,39 +2782,39 @@ func (p *FooSayAgainResult) Read(iprot thrift.TProtocol) error {
 		}
 		switch fieldId {
 		case 0:
-			if v, err := iprot.ReadString(); err != nil {
+			if v, err := iprot.ReadString(ctx); err != nil {
 				return thrift.PrependError("error reading field 0: ", err)
 			} else {
 				p.Success = &v
 			}
 		default:
-			if err := iprot.Skip(fieldTypeId); err != nil {
+			if err := iprot.Skip(ctx, fieldTypeId); err != nil {
 				return err
 			}
 		}
-		if err := iprot.ReadFieldEnd(); err != nil {
+		if err := iprot.ReadFieldEnd(ctx); err != nil {
 			return err
 		}
 	}
-	if err := iprot.ReadStructEnd(); err != nil {
+	if err := iprot.ReadStructEnd(ctx); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 	}
 	return nil
 }
 
-func (p *FooSayAgainResult) Write(oprot thrift.TProtocol) error {
-	if err := oprot.WriteStructBegin("sayAgain_result"); err != nil {
+func (p *FooSayAgainResult) Write(ctx context.Context, oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin(ctx, "sayAgain_result"); err != nil {
 		return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
 	}
 	if p.IsSetSuccess() {
-		if err := frugal.WriteString(oprot, *p.Success, "success", 0); err != nil {
+		if err := frugal.WriteStringWithContext(ctx, oprot, *p.Success, "success", 0); err != nil {
 			return thrift.PrependError(fmt.Sprintf("%T::success:0 ", p), err)
 		}
 	}
-	if err := oprot.WriteFieldStop(); err != nil {
+	if err := oprot.WriteFieldStop(ctx); err != nil {
 		return thrift.PrependError("write field stop error: ", err)
 	}
-	if err := oprot.WriteStructEnd(); err != nil {
+	if err := oprot.WriteStructEnd(ctx); err != nil {
 		return thrift.PrependError("write struct stop error: ", err)
 	}
 	return nil
