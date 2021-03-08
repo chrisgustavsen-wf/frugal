@@ -24,7 +24,7 @@ import org.apache.thrift.transport.TTransportFactory;
  * TFramedTransport is a buffered TTransport that ensures a fully read message
  * every time by preceding messages with a 4-byte frame size.
  */
-class TFramedTransport extends TTransport {
+public class TFramedTransport extends TTransport {
 
     protected static final int DEFAULT_MAX_LENGTH = 2147483647;
 
@@ -126,16 +126,25 @@ class TFramedTransport extends TTransport {
         transport.flush();
     }
 
+    // TODO: These functions *appear* safe to add. A first pass on testing
+    //       and very brief usage search did not show that these functions
+    //       are ever used within our own protocols and as far as we know,
+    //       this transport is never used by a 'real' thrift protocol which
+    //       may rely on these functions.
+    //
+    //       In light of this, we're going to proceed with adding these,
+    //       HOWEVER, given that this class seems to be copied from old
+    //       mainline thrift, it's *likely* that we can delete it entirely
+    //       and simply rely upon the canonical version. We should do this
+    //       as soon as is prudent.
     @Override
     public TConfiguration getConfiguration() {
         throw new RuntimeException("Not Yet Implemented");
     }
-
     @Override
     public void updateKnownMessageSize(long l) throws TTransportException {
         throw new RuntimeException("Not Yet Implemented");
     }
-
     @Override
     public void checkReadBytesAvailable(long l) throws TTransportException {
         throw new RuntimeException("Not Yet Implemented");

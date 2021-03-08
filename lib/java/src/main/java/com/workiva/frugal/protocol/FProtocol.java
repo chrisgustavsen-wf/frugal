@@ -123,7 +123,7 @@ public class FProtocol extends TProtocol {
 
     @Override
     public int getMinSerializedSize(byte b) throws TException {
-        throw new RuntimeException("Not Yet Implemented");
+        return wrapped.getMinSerializedSize(b);
     }
 
     @Override
