@@ -431,8 +431,7 @@ public class FNatsServer implements FServer {
                 // Send response.
                 conn.publish(reply, output.getWriteBytes());
             } catch (TTransportException e) {
-                LOGGER.error("error processing request", e);
-                return;
+                LOGGER.error("failed to construct TMemoryInputTransport", e);
             } finally {
                 eventHandler.onRequestEnded(ephemeralProperties);
             }
