@@ -15,6 +15,7 @@ package com.workiva.frugal.transport;
 
 import com.workiva.frugal.exception.TTransportExceptionType;
 import com.workiva.frugal.util.ProtocolUtils;
+import org.apache.thrift.TConfiguration;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
@@ -124,6 +125,16 @@ public class TMemoryOutputBuffer extends TTransport {
     public void reset() {
         buffer.reset();
         init();
+    }
+
+    public TConfiguration getConfiguration() {
+        throw new RuntimeException("Not Yet Implemented");
+    }
+    public void updateKnownMessageSize(long size) throws TTransportException {
+        throw new RuntimeException("Not Yet Implemented");
+    }
+    public void checkReadBytesAvailable(long numBytes) throws TTransportException {
+        throw new RuntimeException("Not Yet Implemented");
     }
 
 }
