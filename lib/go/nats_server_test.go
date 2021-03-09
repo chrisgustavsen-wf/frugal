@@ -14,12 +14,13 @@
 package frugal
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/nats-io/nats.go"
+	nats "github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -64,7 +65,7 @@ func TestFStatelessNatsServer(t *testing.T) {
 	buffer := NewTMemoryOutputBuffer(0)
 	proto := protoFactory.GetProtocol(buffer)
 	proto.WriteRequestHeader(ctx)
-	proto.WriteBinary([]byte{1, 2, 3, 4, 5})
+	proto.WriteBinary(context.TODO(), []byte{1, 2, 3, 4, 5})
 	resultTrans, err := tr.Request(ctx, buffer.Bytes())
 	assert.Nil(t, err)
 
@@ -72,7 +73,7 @@ func TestFStatelessNatsServer(t *testing.T) {
 	ctx = NewFContext("")
 	err = resultProto.ReadResponseHeader(ctx)
 	assert.Nil(t, err)
-	resultBytes, err := resultProto.ReadBinary()
+	resultBytes, err := resultProto.ReadBinary(context.TODO())
 	assert.Nil(t, err)
 	assert.Equal(t, "foo", string(resultBytes))
 }
@@ -86,13 +87,13 @@ func (p *processor) Process(in, out *FProtocol) error {
 	if err != nil {
 		return err
 	}
-	bytes, err := in.ReadBinary()
+	bytes, err := in.ReadBinary(context.TODO())
 	if err != nil {
 		return err
 	}
 	assert.Equal(p.t, []byte{1, 2, 3, 4, 5}, bytes)
 	out.WriteResponseHeader(ctx)
-	out.WriteString("foo")
+	out.WriteString(context.TODO(), "foo")
 	return nil
 }
 

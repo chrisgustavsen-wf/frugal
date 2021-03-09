@@ -50,7 +50,9 @@ def update_compiler(version, root):
         f.write(s)
     # Install the binary with the updated version
     os.chdir(root)
-    if subprocess.call(['godep', 'go', 'install']) != 0:
+    if subprocess.call(['go', 'mod', 'download']) != 0:
+        raise Exception('downloading modules failed')
+    if subprocess.call(['go', 'install']) != 0:
         raise Exception('installing frugal binary failed')
 
 

@@ -3,17 +3,7 @@
 set -ex
 
 export FRUGAL_HOME=$GOPATH/src/github.com/Workiva/frugal
-
-cd $FRUGAL_HOME/lib/go && GO111MODULE=on go mod vendor
-cd $FRUGAL_HOME
-
-# setup a vendor folder with frugals dependencies and frugal
-cd test/integration/go
-mkdir vendor
-cp -r $FRUGAL_HOME/lib/go/vendor/* vendor/
-rm -rf $FRUGAL_HOME/lib/go/vendor
-mkdir -p vendor/github.com/Workiva/frugal/lib/go
-cp -r $FRUGAL_HOME/lib/go/* vendor/github.com/Workiva/frugal/lib/go
+cd $FRUGAL_HOME/test/integration/go
 
 # Create Go binaries
 rm -rf test/integration/go/bin/*
