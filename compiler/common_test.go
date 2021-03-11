@@ -33,13 +33,14 @@ var (
 	includeVendor       = idl("include_vendor.frugal")
 	includeVendorNoPath = idl("include_vendor_no_path.frugal")
 	vendorNamespace     = idl("vendor_namespace.frugal")
-)
 
-var copyFilesPtr = flag.Bool("copy-files", false, "")
+	// Flag that can be passed to `go test` to update the gold files
+	copyFilesPtr = flag.Bool("copy-files", false, "")
+)
 
 func idl(name string) string { return "testdata/idl/" + name }
 func exp(name string) string { return "testdata/expected/" + name }
-func gen(name string) string { return "testdata/out/" + name }
+func gen(name string) string { return outputDir + "/" + name }
 
 type Comparison struct {
 	ExpectedPath  string
@@ -53,7 +54,7 @@ func (pairs ComparisonList) Run(t *testing.T, options compiler.Options) {
 		t.Fatal("Unexpected error", err)
 	}
 	for i, pair := range pairs {
-		if pair.GeneratedPath[0] != '/' {
+		if pair.GeneratedPath[0] != '/' { // don't modify absolute paths
 			pairs[i].GeneratedPath = gen(pair.GeneratedPath)
 		}
 		pairs[i].ExpectedPath = exp(pair.ExpectedPath)
