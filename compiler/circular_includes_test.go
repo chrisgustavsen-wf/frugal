@@ -16,15 +16,14 @@ package compiler_test
 import (
 	"testing"
 
-	"github.com/Workiva/frugal/compiler"
 	"github.com/stretchr/testify/assert"
-)
 
-const circularFile = "idl/circular_1.frugal"
+	"github.com/Workiva/frugal/compiler"
+)
 
 func TestCircularIncludes(t *testing.T) {
 	options := compiler.Options{
-		File:   circularFile,
+		File:   idl("circular_1.frugal"),
 		Gen:    "go",
 		Out:    "out",
 		Delim:  ".",

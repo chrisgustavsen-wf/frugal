@@ -21,7 +21,7 @@ import (
 
 func TestInvalid(t *testing.T) {
 	options := compiler.Options{
-		File:  invalidFile,
+		File:  idl("invalid.frugalz"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -33,7 +33,7 @@ func TestInvalid(t *testing.T) {
 
 func TestDuplicateServices(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateServices,
+		File:  idl("duplicate_services.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -45,7 +45,7 @@ func TestDuplicateServices(t *testing.T) {
 
 func TestDuplicateScopes(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateScopes,
+		File:  idl("duplicate_scopes.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -57,7 +57,7 @@ func TestDuplicateScopes(t *testing.T) {
 
 func TestDuplicateMethods(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateMethods,
+		File:  idl("duplicate_methods.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -69,7 +69,7 @@ func TestDuplicateMethods(t *testing.T) {
 
 func TestDuplicateOperations(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateOperations,
+		File:  idl("duplicate_operations.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -81,7 +81,7 @@ func TestDuplicateOperations(t *testing.T) {
 
 func TestDuplicateMethodArgIds(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateMethodArgIds,
+		File:  idl("duplicate_arg_ids.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -93,7 +93,7 @@ func TestDuplicateMethodArgIds(t *testing.T) {
 
 func TestDuplicateStructFieldIds(t *testing.T) {
 	options := compiler.Options{
-		File:  duplicateStructFieldIds,
+		File:  idl("duplicate_field_ids.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -106,7 +106,7 @@ func TestDuplicateStructFieldIds(t *testing.T) {
 // Ensures an error is returned when a "*" namespace has a vendor annotation.
 func TestWildcardNamespaceWithVendorAnnotation(t *testing.T) {
 	options := compiler.Options{
-		File:  badNamespace,
+		File:  idl("bad_namespace.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,
@@ -119,7 +119,7 @@ func TestWildcardNamespaceWithVendorAnnotation(t *testing.T) {
 // Ensures an error is returned when a scope operation has an invalid type.
 func TestInvalidScopeOperationType(t *testing.T) {
 	options := compiler.Options{
-		File:  badOpType,
+		File:  idl("ad_op_type.frugal"),
 		Gen:   "go",
 		Out:   outputDir,
 		Delim: delim,

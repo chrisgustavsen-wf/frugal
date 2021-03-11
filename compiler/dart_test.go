@@ -14,7 +14,6 @@
 package compiler_test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/Workiva/frugal/compiler"
@@ -33,28 +32,28 @@ func TestValidDartFrugalCompiler(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/dart/variety/f_awesome_exception.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_awesome_exception.dart")},
-		{"_expected/dart/variety/f_event.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_event.dart")},
-		{"_expected/dart/variety/f_event_wrapper.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_event_wrapper.dart")},
-		{"_expected/dart/variety/f_its_an_enum.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_its_an_enum.dart")},
-		{"_expected/dart/variety/f_test_base.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_test_base.dart")},
-		{"_expected/dart/variety/f_testing_defaults.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_testing_defaults.dart")},
-		{"_expected/dart/variety/f_testing_unions.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_testing_unions.dart")},
-		{"_expected/dart/variety/f_health_condition.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_health_condition.dart")},
-		{"_expected/dart/variety/f_test_lowercase.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_test_lowercase.dart")},
-		{"_expected/dart/variety/f_foo_args.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_foo_args.dart")},
-		{"_expected/dart/variety/f_variety_constants.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_variety_constants.dart")},
-		{"_expected/dart/variety/f_events_scope.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_events_scope.dart")},
-		{"_expected/dart/variety/f_foo_service.dart", filepath.Join(outputDir, "variety", "lib", "src", "f_foo_service.dart")},
-		{"_expected/dart/variety/variety.dart", filepath.Join(outputDir, "variety", "lib", "variety.dart")},
+		{"dart/variety/f_awesome_exception.dart", "variety/lib/src/f_awesome_exception.dart"},
+		{"dart/variety/f_event.dart", "variety/lib/src/f_event.dart"},
+		{"dart/variety/f_event_wrapper.dart", "variety/lib/src/f_event_wrapper.dart"},
+		{"dart/variety/f_its_an_enum.dart", "variety/lib/src/f_its_an_enum.dart"},
+		{"dart/variety/f_test_base.dart", "variety/lib/src/f_test_base.dart"},
+		{"dart/variety/f_testing_defaults.dart", "variety/lib/src/f_testing_defaults.dart"},
+		{"dart/variety/f_testing_unions.dart", "variety/lib/src/f_testing_unions.dart"},
+		{"dart/variety/f_health_condition.dart", "variety/lib/src/f_health_condition.dart"},
+		{"dart/variety/f_test_lowercase.dart", "variety/lib/src/f_test_lowercase.dart"},
+		{"dart/variety/f_foo_args.dart", "variety/lib/src/f_foo_args.dart"},
+		{"dart/variety/f_variety_constants.dart", "variety/lib/src/f_variety_constants.dart"},
+		{"dart/variety/f_events_scope.dart", "variety/lib/src/f_events_scope.dart"},
+		{"dart/variety/f_foo_service.dart", "variety/lib/src/f_foo_service.dart"},
+		{"dart/variety/variety.dart", "variety/lib/variety.dart"},
 
-		{"_expected/dart/actual_base/f_actual_base_dart_constants.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_actual_base_dart_constants.dart")},
-		{"_expected/dart/actual_base/f_api_exception.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_api_exception.dart")},
-		{"_expected/dart/actual_base/f_thing.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_thing.dart")},
-		{"_expected/dart/actual_base/f_base_health_condition.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_base_health_condition.dart")},
-		{"_expected/dart/actual_base/f_base_foo_service.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_base_foo_service.dart")},
-		{"_expected/dart/actual_base/f_nested_thing.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "src", "f_nested_thing.dart")},
-		{"_expected/dart/actual_base/actual_base_dart.dart", filepath.Join(outputDir, "actual_base_dart", "lib", "actual_base_dart.dart")},
+		{"dart/actual_base/f_actual_base_dart_constants.dart", "actual_base_dart/lib/src/f_actual_base_dart_constants.dart"},
+		{"dart/actual_base/f_api_exception.dart", "actual_base_dart/lib/src/f_api_exception.dart"},
+		{"dart/actual_base/f_thing.dart", "actual_base_dart/lib/src/f_thing.dart"},
+		{"dart/actual_base/f_base_health_condition.dart", "actual_base_dart/lib/src/f_base_health_condition.dart"},
+		{"dart/actual_base/f_base_foo_service.dart", "actual_base_dart/lib/src/f_base_foo_service.dart"},
+		{"dart/actual_base/f_nested_thing.dart", "actual_base_dart/lib/src/f_nested_thing.dart"},
+		{"dart/actual_base/actual_base_dart.dart", "actual_base_dart/lib/actual_base_dart.dart"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -73,28 +72,28 @@ func TestValidDartUseNullForUnset(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/dart.nullunset/variety/f_awesome_exception.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_awesome_exception.dart")},
-		{"_expected/dart.nullunset/variety/f_event.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_event.dart")},
-		{"_expected/dart.nullunset/variety/f_event_wrapper.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_event_wrapper.dart")},
-		{"_expected/dart.nullunset/variety/f_its_an_enum.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_its_an_enum.dart")},
-		{"_expected/dart.nullunset/variety/f_test_base.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_test_base.dart")},
-		{"_expected/dart.nullunset/variety/f_testing_defaults.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_testing_defaults.dart")},
-		{"_expected/dart.nullunset/variety/f_testing_unions.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_testing_unions.dart")},
-		{"_expected/dart.nullunset/variety/f_health_condition.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_health_condition.dart")},
-		{"_expected/dart.nullunset/variety/f_test_lowercase.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_test_lowercase.dart")},
-		{"_expected/dart.nullunset/variety/f_foo_args.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_foo_args.dart")},
-		{"_expected/dart.nullunset/variety/f_variety_constants.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_variety_constants.dart")},
-		{"_expected/dart.nullunset/variety/f_events_scope.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_events_scope.dart")},
-		{"_expected/dart.nullunset/variety/f_foo_service.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "src", "f_foo_service.dart")},
-		{"_expected/dart.nullunset/variety/variety.dart", filepath.Join(outputDir, "nullunset", "variety", "lib", "variety.dart")},
+		{"dart.nullunset/variety/f_awesome_exception.dart", "nullunset/variety/lib/src/f_awesome_exception.dart"},
+		{"dart.nullunset/variety/f_event.dart", "nullunset/variety/lib/src/f_event.dart"},
+		{"dart.nullunset/variety/f_event_wrapper.dart", "nullunset/variety/lib/src/f_event_wrapper.dart"},
+		{"dart.nullunset/variety/f_its_an_enum.dart", "nullunset/variety/lib/src/f_its_an_enum.dart"},
+		{"dart.nullunset/variety/f_test_base.dart", "nullunset/variety/lib/src/f_test_base.dart"},
+		{"dart.nullunset/variety/f_testing_defaults.dart", "nullunset/variety/lib/src/f_testing_defaults.dart"},
+		{"dart.nullunset/variety/f_testing_unions.dart", "nullunset/variety/lib/src/f_testing_unions.dart"},
+		{"dart.nullunset/variety/f_health_condition.dart", "nullunset/variety/lib/src/f_health_condition.dart"},
+		{"dart.nullunset/variety/f_test_lowercase.dart", "nullunset/variety/lib/src/f_test_lowercase.dart"},
+		{"dart.nullunset/variety/f_foo_args.dart", "nullunset/variety/lib/src/f_foo_args.dart"},
+		{"dart.nullunset/variety/f_variety_constants.dart", "nullunset/variety/lib/src/f_variety_constants.dart"},
+		{"dart.nullunset/variety/f_events_scope.dart", "nullunset/variety/lib/src/f_events_scope.dart"},
+		{"dart.nullunset/variety/f_foo_service.dart", "nullunset/variety/lib/src/f_foo_service.dart"},
+		{"dart.nullunset/variety/variety.dart", "nullunset/variety/lib/variety.dart"},
 
-		{"_expected/dart.nullunset/actual_base/f_actual_base_dart_constants.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_actual_base_dart_constants.dart")},
-		{"_expected/dart.nullunset/actual_base/f_api_exception.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_api_exception.dart")},
-		{"_expected/dart.nullunset/actual_base/f_thing.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_thing.dart")},
-		{"_expected/dart.nullunset/actual_base/f_base_health_condition.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_base_health_condition.dart")},
-		{"_expected/dart.nullunset/actual_base/f_base_foo_service.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_base_foo_service.dart")},
-		{"_expected/dart.nullunset/actual_base/f_nested_thing.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "src", "f_nested_thing.dart")},
-		{"_expected/dart.nullunset/actual_base/actual_base_dart.dart", filepath.Join(outputDir, "nullunset", "actual_base_dart", "lib", "actual_base_dart.dart")},
+		{"dart.nullunset/actual_base/f_actual_base_dart_constants.dart", "nullunset/actual_base_dart/lib/src/f_actual_base_dart_constants.dart"},
+		{"dart.nullunset/actual_base/f_api_exception.dart", "nullunset/actual_base_dart/lib/src/f_api_exception.dart"},
+		{"dart.nullunset/actual_base/f_thing.dart", "nullunset/actual_base_dart/lib/src/f_thing.dart"},
+		{"dart.nullunset/actual_base/f_base_health_condition.dart", "nullunset/actual_base_dart/lib/src/f_base_health_condition.dart"},
+		{"dart.nullunset/actual_base/f_base_foo_service.dart", "nullunset/actual_base_dart/lib/src/f_base_foo_service.dart"},
+		{"dart.nullunset/actual_base/f_nested_thing.dart", "nullunset/actual_base_dart/lib/src/f_nested_thing.dart"},
+		{"dart.nullunset/actual_base/actual_base_dart.dart", "nullunset/actual_base_dart/lib/actual_base_dart.dart"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -102,7 +101,7 @@ func TestValidDartUseNullForUnset(t *testing.T) {
 
 func TestValidDartEnums(t *testing.T) {
 	options := compiler.Options{
-		File:    "idl/enum.frugal",
+		File:    idl("enum.frugal"),
 		Gen:     "dart:use_enums",
 		Out:     outputDir,
 		Delim:   delim,
@@ -113,8 +112,8 @@ func TestValidDartEnums(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/dart/enum/f_testing_enums.dart", filepath.Join(outputDir, "enum_dart", "lib", "src", "f_testing_enums.dart")},
-		{"_expected/dart/enum/enum_dart.dart", filepath.Join(outputDir, "enum_dart", "lib", "enum_dart.dart")},
+		{"dart/enum/f_testing_enums.dart", "enum_dart/lib/src/f_testing_enums.dart"},
+		{"dart/enum/enum_dart.dart", "enum_dart/lib/enum_dart.dart"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -134,26 +133,11 @@ func TestValidDartVendor(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{
-			"_expected/dart/include_vendor/f_my_scope_scope.dart",
-			filepath.Join(outputDir, "include_vendor", "lib", "src", "f_my_scope_scope.dart"),
-		},
-		{
-			"_expected/dart/include_vendor/f_my_service_service.dart",
-			filepath.Join(outputDir, "include_vendor", "lib", "src", "f_my_service_service.dart"),
-		},
-		{
-			"_expected/dart/include_vendor/f_vendored_references.dart",
-			filepath.Join(outputDir, "include_vendor", "lib", "src", "f_vendored_references.dart"),
-		},
-		{
-			"_expected/dart/include_vendor/include_vendor.dart",
-			filepath.Join(outputDir, "include_vendor", "lib", "include_vendor.dart"),
-		},
-		{
-			"_expected/dart/include_vendor/pubspec.yaml",
-			filepath.Join(outputDir, "include_vendor", "pubspec.yaml"),
-		},
+		{"dart/include_vendor/f_my_scope_scope.dart", "include_vendor/lib/src/f_my_scope_scope.dart"},
+		{"dart/include_vendor/f_my_service_service.dart", "include_vendor/lib/src/f_my_service_service.dart"},
+		{"dart/include_vendor/f_vendored_references.dart", "include_vendor/lib/src/f_vendored_references.dart"},
+		{"dart/include_vendor/include_vendor.dart", "include_vendor/lib/include_vendor.dart"},
+		{"dart/include_vendor/pubspec.yaml", "include_vendor/pubspec.yaml"},
 	}
 
 	copyAllFiles(t, files)
@@ -188,11 +172,11 @@ func TestValidDartVendorNamespaceTargetGenerate(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/dart/vendor_namespace/vendor_namespace.dart", filepath.Join(outputDir, "vendor_namespace", "lib", "vendor_namespace.dart")},
-		{"_expected/dart/vendor_namespace/f_item.dart", filepath.Join(outputDir, "vendor_namespace", "lib", "src", "f_item.dart")},
-		{"_expected/dart/vendor_namespace/f_vendored_base_service.dart", filepath.Join(outputDir, "vendor_namespace", "lib", "src", "f_vendored_base_service.dart")},
-		{"_expected/dart/vendor_namespace/f_vendor_namespace_constants.dart", filepath.Join(outputDir, "vendor_namespace", "lib", "src", "f_vendor_namespace_constants.dart")},
-		{"_expected/dart/vendor_namespace/f_my_enum.dart", filepath.Join(outputDir, "vendor_namespace", "lib", "src", "f_my_enum.dart")},
+		{"dart/vendor_namespace/vendor_namespace.dart", "vendor_namespace/lib/vendor_namespace.dart"},
+		{"dart/vendor_namespace/f_item.dart", "vendor_namespace/lib/src/f_item.dart"},
+		{"dart/vendor_namespace/f_vendored_base_service.dart", "vendor_namespace/lib/src/f_vendored_base_service.dart"},
+		{"dart/vendor_namespace/f_vendor_namespace_constants.dart", "vendor_namespace/lib/src/f_vendor_namespace_constants.dart"},
+		{"dart/vendor_namespace/f_my_enum.dart", "vendor_namespace/lib/src/f_my_enum.dart"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)

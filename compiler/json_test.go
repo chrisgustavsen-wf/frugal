@@ -14,7 +14,6 @@
 package compiler_test
 
 import (
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -42,7 +41,7 @@ func TestValidJsonFrugalCompiler(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/frugal.json", filepath.Join(outputDir, "frugal.json")},
+		{"frugal.json", "frugal.json"},
 	}
 
 	copyAllFiles(t, files)

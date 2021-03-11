@@ -22,25 +22,22 @@ import (
 )
 
 const (
-	outputDir               = "_out"
-	delim                   = "."
-	validFile               = "idl/valid.frugal"
-	invalidFile             = "idl/invalid.frugal"
-	duplicateServices       = "idl/duplicate_services.frugal"
-	duplicateScopes         = "idl/duplicate_scopes.frugal"
-	duplicateMethods        = "idl/duplicate_methods.frugal"
-	duplicateOperations     = "idl/duplicate_operations.frugal"
-	duplicateMethodArgIds   = "idl/duplicate_arg_ids.frugal"
-	duplicateStructFieldIds = "idl/duplicate_field_ids.frugal"
-	frugalGenFile           = "idl/variety.frugal"
-	badNamespace            = "idl/bad_namespace.frugal"
-	badOpType               = "idl/bad_op_type.frugal"
-	includeVendor           = "idl/include_vendor.frugal"
-	includeVendorNoPath     = "idl/include_vendor_no_path.frugal"
-	vendorNamespace         = "idl/vendor_namespace.frugal"
+	outputDir = "testdata/out"
+	delim     = "."
+)
+
+var (
+	frugalGenFile       = idl("variety.frugal")
+	includeVendor       = idl("include_vendor.frugal")
+	includeVendorNoPath = idl("include_vendor_no_path.frugal")
+	vendorNamespace     = idl("vendor_namespace.frugal")
 )
 
 var copyFilesPtr = flag.Bool("copy-files", false, "")
+
+func idl(name string) string { return "testdata/idl/" + name }
+func exp(name string) string { return "testdata/expected/" + name }
+func gen(name string) string { return "testdata/out/" + name }
 
 type FileComparisonPair struct {
 	ExpectedPath  string
@@ -80,7 +77,11 @@ func compareFiles(t *testing.T, expectedPath, generatedPath string) {
 
 func compareAllFiles(t *testing.T, pairs []FileComparisonPair) {
 	for _, pair := range pairs {
-		compareFiles(t, pair.ExpectedPath, pair.GeneratedPath)
+		out := pair.GeneratedPath
+		if out[0] != '/' {
+			out = gen(out)
+		}
+		compareFiles(t, exp(pair.ExpectedPath), out)
 	}
 }
 
@@ -101,14 +102,17 @@ func copyAllFiles(t *testing.T, pairs []FileComparisonPair) {
 
 func copyFilePair(pair FileComparisonPair) error {
 	// TODO automatically create a missing expected file?
-
-	generatedFile, err := os.Open(pair.GeneratedPath)
+	out := pair.GeneratedPath
+	if out[0] != '/' {
+		out = gen(out)
+	}
+	generatedFile, err := os.Open(out)
 	if err != nil {
 		return err
 	}
 	defer generatedFile.Close()
 
-	expectedFile, err := os.Create(pair.ExpectedPath)
+	expectedFile, err := os.Create(exp(pair.ExpectedPath))
 	if err != nil {
 		return err
 	}

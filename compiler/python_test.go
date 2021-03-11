@@ -33,17 +33,17 @@ func TestValidPython(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python/variety/__init__.py", filepath.Join(outputDir, "variety", "python", "__init__.py")},
-		{"_expected/python/variety/constants.py", filepath.Join(outputDir, "variety", "python", "constants.py")},
-		{"_expected/python/variety/ttypes.py", filepath.Join(outputDir, "variety", "python", "ttypes.py")},
-		{"_expected/python/variety/f_Events_publisher.py", filepath.Join(outputDir, "variety", "python", "f_Events_publisher.py")},
-		{"_expected/python/variety/f_Events_subscriber.py", filepath.Join(outputDir, "variety", "python", "f_Events_subscriber.py")},
-		{"_expected/python/variety/f_Foo.py", filepath.Join(outputDir, "variety", "python", "f_Foo.py")},
+		{"python/variety/__init__.py", "variety/python/__init__.py"},
+		{"python/variety/constants.py", "variety/python/constants.py"},
+		{"python/variety/ttypes.py", "variety/python/ttypes.py"},
+		{"python/variety/f_Events_publisher.py", "variety/python/f_Events_publisher.py"},
+		{"python/variety/f_Events_subscriber.py", "variety/python/f_Events_subscriber.py"},
+		{"python/variety/f_Foo.py", "variety/python/f_Foo.py"},
 
-		{"_expected/python/actual_base/__init__.py", filepath.Join(outputDir, "actual_base", "python", "__init__.py")},
-		{"_expected/python/actual_base/constants.py", filepath.Join(outputDir, "actual_base", "python", "constants.py")},
-		{"_expected/python/actual_base/ttypes.py", filepath.Join(outputDir, "actual_base", "python", "ttypes.py")},
-		{"_expected/python/actual_base/f_BaseFoo.py", filepath.Join(outputDir, "actual_base", "python", "f_BaseFoo.py")},
+		{"python/actual_base/__init__.py", "actual_base/python/__init__.py"},
+		{"python/actual_base/constants.py", "actual_base/python/constants.py"},
+		{"python/actual_base/ttypes.py", "actual_base/python/ttypes.py"},
+		{"python/actual_base/f_BaseFoo.py", "actual_base/python/f_BaseFoo.py"},
 	}
 
 	copyAllFiles(t, files)
@@ -63,17 +63,17 @@ func TestValidPythonTornado(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python.tornado/variety/__init__.py", filepath.Join(outputDir, "tornado", "variety", "python", "__init__.py")},
-		{"_expected/python.tornado/variety/constants.py", filepath.Join(outputDir, "tornado", "variety", "python", "constants.py")},
-		{"_expected/python.tornado/variety/ttypes.py", filepath.Join(outputDir, "tornado", "variety", "python", "ttypes.py")},
-		{"_expected/python.tornado/variety/f_Events_publisher.py", filepath.Join(outputDir, "tornado", "variety", "python", "f_Events_publisher.py")},
-		{"_expected/python.tornado/variety/f_Events_subscriber.py", filepath.Join(outputDir, "tornado", "variety", "python", "f_Events_subscriber.py")},
-		{"_expected/python.tornado/variety/f_Foo.py", filepath.Join(outputDir, "tornado", "variety", "python", "f_Foo.py")},
+		{"python.tornado/variety/__init__.py", "tornado/variety/python/__init__.py"},
+		{"python.tornado/variety/constants.py", "tornado/variety/python/constants.py"},
+		{"python.tornado/variety/ttypes.py", "tornado/variety/python/ttypes.py"},
+		{"python.tornado/variety/f_Events_publisher.py", "tornado/variety/python/f_Events_publisher.py"},
+		{"python.tornado/variety/f_Events_subscriber.py", "tornado/variety/python/f_Events_subscriber.py"},
+		{"python.tornado/variety/f_Foo.py", "tornado/variety/python/f_Foo.py"},
 
-		{"_expected/python.tornado/actual_base/__init__.py", filepath.Join(outputDir, "tornado", "actual_base", "python", "__init__.py")},
-		{"_expected/python.tornado/actual_base/constants.py", filepath.Join(outputDir, "tornado", "actual_base", "python", "constants.py")},
-		{"_expected/python.tornado/actual_base/ttypes.py", filepath.Join(outputDir, "tornado", "actual_base", "python", "ttypes.py")},
-		{"_expected/python.tornado/actual_base/f_BaseFoo.py", filepath.Join(outputDir, "tornado", "actual_base", "python", "f_BaseFoo.py")},
+		{"python.tornado/actual_base/__init__.py", "tornado/actual_base/python/__init__.py"},
+		{"python.tornado/actual_base/constants.py", "tornado/actual_base/python/constants.py"},
+		{"python.tornado/actual_base/ttypes.py", "tornado/actual_base/python/ttypes.py"},
+		{"python.tornado/actual_base/f_BaseFoo.py", "tornado/actual_base/python/f_BaseFoo.py"},
 	}
 
 	copyAllFiles(t, files)
@@ -93,17 +93,17 @@ func TestValidPythonAsyncIO(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python.asyncio/variety/__init__.py", filepath.Join(outputDir, "asyncio", "variety", "python", "__init__.py")},
-		{"_expected/python.asyncio/variety/constants.py", filepath.Join(outputDir, "asyncio", "variety", "python", "constants.py")},
-		{"_expected/python.asyncio/variety/ttypes.py", filepath.Join(outputDir, "asyncio", "variety", "python", "ttypes.py")},
-		{"_expected/python.asyncio/variety/f_Events_publisher.py", filepath.Join(outputDir, "asyncio", "variety", "python", "f_Events_publisher.py")},
-		{"_expected/python.asyncio/variety/f_Events_subscriber.py", filepath.Join(outputDir, "asyncio", "variety", "python", "f_Events_subscriber.py")},
-		{"_expected/python.asyncio/variety/f_Foo.py", filepath.Join(outputDir, "asyncio", "variety", "python", "f_Foo.py")},
+		{"python.asyncio/variety/__init__.py", "asyncio/variety/python/__init__.py"},
+		{"python.asyncio/variety/constants.py", "asyncio/variety/python/constants.py"},
+		{"python.asyncio/variety/ttypes.py", "asyncio/variety/python/ttypes.py"},
+		{"python.asyncio/variety/f_Events_publisher.py", "asyncio/variety/python/f_Events_publisher.py"},
+		{"python.asyncio/variety/f_Events_subscriber.py", "asyncio/variety/python/f_Events_subscriber.py"},
+		{"python.asyncio/variety/f_Foo.py", "asyncio/variety/python/f_Foo.py"},
 
-		{"_expected/python.asyncio/actual_base/__init__.py", filepath.Join(outputDir, "asyncio", "actual_base", "python", "__init__.py")},
-		{"_expected/python.asyncio/actual_base/constants.py", filepath.Join(outputDir, "asyncio", "actual_base", "python", "constants.py")},
-		{"_expected/python.asyncio/actual_base/ttypes.py", filepath.Join(outputDir, "asyncio", "actual_base", "python", "ttypes.py")},
-		{"_expected/python.asyncio/actual_base/f_BaseFoo.py", filepath.Join(outputDir, "asyncio", "actual_base", "python", "f_BaseFoo.py")},
+		{"python.asyncio/actual_base/__init__.py", "asyncio/actual_base/python/__init__.py"},
+		{"python.asyncio/actual_base/constants.py", "asyncio/actual_base/python/constants.py"},
+		{"python.asyncio/actual_base/ttypes.py", "asyncio/actual_base/python/ttypes.py"},
+		{"python.asyncio/actual_base/f_BaseFoo.py", "asyncio/actual_base/python/f_BaseFoo.py"},
 	}
 
 	copyAllFiles(t, files)
@@ -112,7 +112,7 @@ func TestValidPythonAsyncIO(t *testing.T) {
 
 func TestPythonPackagePrefix(t *testing.T) {
 	options := compiler.Options{
-		File:    "idl/service_inheritance.frugal",
+		File:    idl("service_inheritance.frugal"),
 		Gen:     "py:package_prefix=generic_package_prefix.",
 		Out:     outputDir,
 		Delim:   delim,
@@ -123,9 +123,9 @@ func TestPythonPackagePrefix(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python/package_prefix/f_Foo.py", filepath.Join(outputDir, "service_inheritance", "f_Foo.py")},
-		{"_expected/python/package_prefix/ttypes.py", filepath.Join(outputDir, "service_inheritance", "ttypes.py")},
-		{"_expected/python/package_prefix/constants.py", filepath.Join(outputDir, "service_inheritance", "constants.py")},
+		{"python/package_prefix/f_Foo.py", "service_inheritance/f_Foo.py"},
+		{"python/package_prefix/ttypes.py", "service_inheritance/ttypes.py"},
+		{"python/package_prefix/constants.py", "service_inheritance/constants.py"},
 	}
 
 	copyAllFiles(t, files)
@@ -134,7 +134,7 @@ func TestPythonPackagePrefix(t *testing.T) {
 
 func TestPythonExtendServiceSameFile(t *testing.T) {
 	options := compiler.Options{
-		File:  "idl/service_extension_same_file.frugal",
+		File:  idl("service_extension_same_file.frugal"),
 		Gen:   "py:asyncio",
 		Out:   outputDir,
 		Delim: delim,
@@ -144,8 +144,8 @@ func TestPythonExtendServiceSameFile(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python.asyncio/service_extension_same_file/f_BasePinger.py", filepath.Join(outputDir, "service_extension_same_file", "python", "f_BasePinger.py")},
-		{"_expected/python.asyncio/service_extension_same_file/f_Pinger.py", filepath.Join(outputDir, "service_extension_same_file", "python", "f_Pinger.py")},
+		{"python.asyncio/service_extension_same_file/f_BasePinger.py", "service_extension_same_file/python/f_BasePinger.py"},
+		{"python.asyncio/service_extension_same_file/f_Pinger.py", "service_extension_same_file/python/f_Pinger.py"},
 	}
 
 	copyAllFiles(t, files)
@@ -153,7 +153,7 @@ func TestPythonExtendServiceSameFile(t *testing.T) {
 }
 
 func TestPythonAbsoluteOutputPath(t *testing.T) {
-	absoluteOutputDir, err := filepath.Abs(filepath.Join(outputDir, "absolute_path"))
+	absoluteOutputDir, err := filepath.Abs("testdata/out/absolute_path")
 	if err != nil {
 		t.Fatal("unexpected error", err)
 	}
@@ -170,17 +170,17 @@ func TestPythonAbsoluteOutputPath(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/python/variety/__init__.py", filepath.Join(absoluteOutputDir, "variety", "python", "__init__.py")},
-		{"_expected/python/variety/constants.py", filepath.Join(absoluteOutputDir, "variety", "python", "constants.py")},
-		{"_expected/python/variety/ttypes.py", filepath.Join(absoluteOutputDir, "variety", "python", "ttypes.py")},
-		{"_expected/python/variety/f_Events_publisher.py", filepath.Join(absoluteOutputDir, "variety", "python", "f_Events_publisher.py")},
-		{"_expected/python/variety/f_Events_subscriber.py", filepath.Join(absoluteOutputDir, "variety", "python", "f_Events_subscriber.py")},
-		{"_expected/python/variety/f_Foo.py", filepath.Join(absoluteOutputDir, "variety", "python", "f_Foo.py")},
+		{"python/variety/__init__.py", absoluteOutputDir + "/variety/python/__init__.py"},
+		{"python/variety/constants.py", absoluteOutputDir + "/variety/python/constants.py"},
+		{"python/variety/ttypes.py", absoluteOutputDir + "/variety/python/ttypes.py"},
+		{"python/variety/f_Events_publisher.py", absoluteOutputDir + "/variety/python/f_Events_publisher.py"},
+		{"python/variety/f_Events_subscriber.py", absoluteOutputDir + "/variety/python/f_Events_subscriber.py"},
+		{"python/variety/f_Foo.py", absoluteOutputDir + "/variety/python/f_Foo.py"},
 
-		{"_expected/python/actual_base/__init__.py", filepath.Join(absoluteOutputDir, "actual_base", "python", "__init__.py")},
-		{"_expected/python/actual_base/constants.py", filepath.Join(absoluteOutputDir, "actual_base", "python", "constants.py")},
-		{"_expected/python/actual_base/ttypes.py", filepath.Join(absoluteOutputDir, "actual_base", "python", "ttypes.py")},
-		{"_expected/python/actual_base/f_BaseFoo.py", filepath.Join(absoluteOutputDir, "actual_base", "python", "f_BaseFoo.py")},
+		{"python/actual_base/__init__.py", absoluteOutputDir + "/actual_base/python/__init__.py"},
+		{"python/actual_base/constants.py", absoluteOutputDir + "/actual_base/python/constants.py"},
+		{"python/actual_base/ttypes.py", absoluteOutputDir + "/actual_base/python/ttypes.py"},
+		{"python/actual_base/f_BaseFoo.py", absoluteOutputDir + "/actual_base/python/f_BaseFoo.py"},
 	}
 
 	copyAllFiles(t, files)

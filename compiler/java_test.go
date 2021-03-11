@@ -14,7 +14,6 @@
 package compiler_test
 
 import (
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -40,7 +39,7 @@ func TestValidJavaWithAsync(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/variety_async/FFoo.java", filepath.Join(outputDir, "async", "variety", "java", "FFoo.java")},
+		{"java/variety_async/FFoo.java", "async/variety/java/FFoo.java"},
 	}
 
 	copyAllFiles(t, files)
@@ -67,27 +66,27 @@ func TestValidJavaFrugalCompiler(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/variety/AwesomeException.java", filepath.Join(outputDir, "variety", "java", "AwesomeException.java")},
-		{"_expected/java/variety/Event.java", filepath.Join(outputDir, "variety", "java", "Event.java")},
-		{"_expected/java/variety/EventWrapper.java", filepath.Join(outputDir, "variety", "java", "EventWrapper.java")},
-		{"_expected/java/variety/ItsAnEnum.java", filepath.Join(outputDir, "variety", "java", "ItsAnEnum.java")},
-		{"_expected/java/variety/TestBase.java", filepath.Join(outputDir, "variety", "java", "TestBase.java")},
-		{"_expected/java/variety/TestingDefaults.java", filepath.Join(outputDir, "variety", "java", "TestingDefaults.java")},
-		{"_expected/java/variety/TestingUnions.java", filepath.Join(outputDir, "variety", "java", "TestingUnions.java")},
-		{"_expected/java/variety/HealthCondition.java", filepath.Join(outputDir, "variety", "java", "HealthCondition.java")},
-		{"_expected/java/variety/varietyConstants.java", filepath.Join(outputDir, "variety", "java", "varietyConstants.java")},
-		{"_expected/java/variety/TestLowercase.java", filepath.Join(outputDir, "variety", "java", "TestLowercase.java")},
-		{"_expected/java/variety/FooArgs.java", filepath.Join(outputDir, "variety", "java", "FooArgs.java")},
-		{"_expected/java/variety/EventsPublisher.java", filepath.Join(outputDir, "variety", "java", "EventsPublisher.java")},
-		{"_expected/java/variety/EventsSubscriber.java", filepath.Join(outputDir, "variety", "java", "EventsSubscriber.java")},
-		{"_expected/java/variety/FFoo.java", filepath.Join(outputDir, "variety", "java", "FFoo.java")},
+		{"java/variety/AwesomeException.java", "variety/java/AwesomeException.java"},
+		{"java/variety/Event.java", "variety/java/Event.java"},
+		{"java/variety/EventWrapper.java", "variety/java/EventWrapper.java"},
+		{"java/variety/ItsAnEnum.java", "variety/java/ItsAnEnum.java"},
+		{"java/variety/TestBase.java", "variety/java/TestBase.java"},
+		{"java/variety/TestingDefaults.java", "variety/java/TestingDefaults.java"},
+		{"java/variety/TestingUnions.java", "variety/java/TestingUnions.java"},
+		{"java/variety/HealthCondition.java", "variety/java/HealthCondition.java"},
+		{"java/variety/varietyConstants.java", "variety/java/varietyConstants.java"},
+		{"java/variety/TestLowercase.java", "variety/java/TestLowercase.java"},
+		{"java/variety/FooArgs.java", "variety/java/FooArgs.java"},
+		{"java/variety/EventsPublisher.java", "variety/java/EventsPublisher.java"},
+		{"java/variety/EventsSubscriber.java", "variety/java/EventsSubscriber.java"},
+		{"java/variety/FFoo.java", "variety/java/FFoo.java"},
 
-		{"_expected/java/actual_base/api_exception.java", filepath.Join(outputDir, "actual_base", "java", "api_exception.java")},
-		{"_expected/java/actual_base/baseConstants.java", filepath.Join(outputDir, "actual_base", "java", "baseConstants.java")},
-		{"_expected/java/actual_base/thing.java", filepath.Join(outputDir, "actual_base", "java", "thing.java")},
-		{"_expected/java/actual_base/base_health_condition.java", filepath.Join(outputDir, "actual_base", "java", "base_health_condition.java")},
-		{"_expected/java/actual_base/FBaseFoo.java", filepath.Join(outputDir, "actual_base", "java", "FBaseFoo.java")},
-		{"_expected/java/actual_base/nested_thing.java", filepath.Join(outputDir, "actual_base", "java", "nested_thing.java")},
+		{"java/actual_base/api_exception.java", "actual_base/java/api_exception.java"},
+		{"java/actual_base/baseConstants.java", "actual_base/java/baseConstants.java"},
+		{"java/actual_base/thing.java", "actual_base/java/thing.java"},
+		{"java/actual_base/base_health_condition.java", "actual_base/java/base_health_condition.java"},
+		{"java/actual_base/FBaseFoo.java", "actual_base/java/FBaseFoo.java"},
+		{"java/actual_base/nested_thing.java", "actual_base/java/nested_thing.java"},
 	}
 
 	copyAllFiles(t, files)
@@ -114,8 +113,8 @@ func TestValidJavaBoxedPrimitives(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/boxed_primitives/FFoo.java", filepath.Join(outputDir, "boxed_primitives", "variety", "java", "FFoo.java")},
-		{"_expected/java/boxed_primitives/TestingDefaults.java", filepath.Join(outputDir, "boxed_primitives", "variety", "java", "TestingDefaults.java")},
+		{"java/boxed_primitives/FFoo.java", "boxed_primitives/variety/java/FFoo.java"},
+		{"java/boxed_primitives/TestingDefaults.java", "boxed_primitives/variety/java/TestingDefaults.java"},
 	}
 
 	copyAllFiles(t, files)
@@ -143,20 +142,20 @@ func TestValidJavaVendor(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/valid_vendor/FMyService.java", filepath.Join(outputDir, "valid_vendor", "include_vendor", "java", "FMyService.java")},
-		{"_expected/java/valid_vendor/MyScopePublisher.java", filepath.Join(outputDir, "valid_vendor", "include_vendor", "java", "MyScopePublisher.java")},
-		{"_expected/java/valid_vendor/MyScopeSubscriber.java", filepath.Join(outputDir, "valid_vendor", "include_vendor", "java", "MyScopeSubscriber.java")},
-		{"_expected/java/valid_vendor/VendoredReferences.java", filepath.Join(outputDir, "valid_vendor", "include_vendor", "java", "VendoredReferences.java")},
-		{"_expected/java/valid_vendor/InvalidData.java", filepath.Join(outputDir, "valid_vendor", "InvalidData.java")},
+		{"java/valid_vendor/FMyService.java", "valid_vendor/include_vendor/java/FMyService.java"},
+		{"java/valid_vendor/MyScopePublisher.java", "valid_vendor/include_vendor/java/MyScopePublisher.java"},
+		{"java/valid_vendor/MyScopeSubscriber.java", "valid_vendor/include_vendor/java/MyScopeSubscriber.java"},
+		{"java/valid_vendor/VendoredReferences.java", "valid_vendor/include_vendor/java/VendoredReferences.java"},
+		{"java/valid_vendor/InvalidData.java", "valid_vendor/InvalidData.java"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
 
 	filesNotToGenerate := []string{
-		filepath.Join(filepath.Join(outputDir, "valid_vendor", "vendor_namespace", "java", "Item.java")),
-		filepath.Join(filepath.Join(outputDir, "valid_vendor", "vendor_namespace", "java", "vendor_namespaceConstants.java")),
-		filepath.Join(filepath.Join(outputDir, "valid_vendor", "vendor_namespace", "java", "MyEnum.java")),
-		filepath.Join(filepath.Join(outputDir, "valid_vendor", "vendor_namespace", "java", "FVendoredBase.java")),
+		"valid_vendor/vendor_namespace/java/Item.java",
+		"valid_vendor/vendor_namespace/java/vendor_namespaceConstants.java",
+		"valid_vendor/vendor_namespace/java/MyEnum.java",
+		"valid_vendor/vendor_namespace/java/FVendoredBase.java",
 	}
 
 	assertFilesNotExist(t, filesNotToGenerate)
@@ -182,15 +181,15 @@ func TestValidJavaVendorButNotUseVendor(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/vendored_but_no_use_vendor/FMyService.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "include_vendor", "java", "FMyService.java")},
-		{"_expected/java/vendored_but_no_use_vendor/MyScopePublisher.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "include_vendor", "java", "MyScopePublisher.java")},
-		{"_expected/java/vendored_but_no_use_vendor/MyScopeSubscriber.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "include_vendor", "java", "MyScopeSubscriber.java")},
-		{"_expected/java/vendored_but_no_use_vendor/VendoredReferences.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "include_vendor", "java", "VendoredReferences.java")},
-		{"_expected/java/vendored_but_no_use_vendor/InvalidData.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "InvalidData.java")},
-		{"_expected/java/vendored_but_no_use_vendor/Item.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "vendor_namespace", "java", "Item.java")},
-		{"_expected/java/vendored_but_no_use_vendor/vendor_namespaceConstants.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "vendor_namespace", "java", "vendor_namespaceConstants.java")},
-		{"_expected/java/vendored_but_no_use_vendor/MyEnum.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "vendor_namespace", "java", "MyEnum.java")},
-		{"_expected/java/vendored_but_no_use_vendor/FVendoredBase.java", filepath.Join(outputDir, "vendored_but_no_use_vendor", "vendor_namespace", "java", "FVendoredBase.java")},
+		{"java/vendored_but_no_use_vendor/FMyService.java", "vendored_but_no_use_vendor/include_vendor/java/FMyService.java"},
+		{"java/vendored_but_no_use_vendor/MyScopePublisher.java", "vendored_but_no_use_vendor/include_vendor/java/MyScopePublisher.java"},
+		{"java/vendored_but_no_use_vendor/MyScopeSubscriber.java", "vendored_but_no_use_vendor/include_vendor/java/MyScopeSubscriber.java"},
+		{"java/vendored_but_no_use_vendor/VendoredReferences.java", "vendored_but_no_use_vendor/include_vendor/java/VendoredReferences.java"},
+		{"java/vendored_but_no_use_vendor/InvalidData.java", "vendored_but_no_use_vendor/InvalidData.java"},
+		{"java/vendored_but_no_use_vendor/Item.java", "vendored_but_no_use_vendor/vendor_namespace/java/Item.java"},
+		{"java/vendored_but_no_use_vendor/vendor_namespaceConstants.java", "vendored_but_no_use_vendor/vendor_namespace/java/vendor_namespaceConstants.java"},
+		{"java/vendored_but_no_use_vendor/MyEnum.java", "vendored_but_no_use_vendor/vendor_namespace/java/MyEnum.java"},
+		{"java/vendored_but_no_use_vendor/FVendoredBase.java", "vendored_but_no_use_vendor/vendor_namespace/java/FVendoredBase.java"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -215,20 +214,20 @@ func TestValidJavaVendorNoPathUsesDefinedNamespace(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/valid_vendor_no_path/FMyService.java", filepath.Join(outputDir, "valid_vendor_no_path", "include_vendor_no_path", "java", "FMyService.java")},
-		{"_expected/java/valid_vendor_no_path/MyScopePublisher.java", filepath.Join(outputDir, "valid_vendor_no_path", "include_vendor_no_path", "java", "MyScopePublisher.java")},
-		{"_expected/java/valid_vendor_no_path/MyScopeSubscriber.java", filepath.Join(outputDir, "valid_vendor_no_path", "include_vendor_no_path", "java", "MyScopeSubscriber.java")},
-		{"_expected/java/valid_vendor_no_path/VendoredReferences.java", filepath.Join(outputDir, "valid_vendor_no_path", "include_vendor_no_path", "java", "VendoredReferences.java")},
-		{"_expected/java/valid_vendor_no_path/InvalidData.java", filepath.Join(outputDir, "valid_vendor_no_path", "InvalidData.java")},
+		{"java/valid_vendor_no_path/FMyService.java", "valid_vendor_no_path/include_vendor_no_path/java/FMyService.java"},
+		{"java/valid_vendor_no_path/MyScopePublisher.java", "valid_vendor_no_path/include_vendor_no_path/java/MyScopePublisher.java"},
+		{"java/valid_vendor_no_path/MyScopeSubscriber.java", "valid_vendor_no_path/include_vendor_no_path/java/MyScopeSubscriber.java"},
+		{"java/valid_vendor_no_path/VendoredReferences.java", "valid_vendor_no_path/include_vendor_no_path/java/VendoredReferences.java"},
+		{"java/valid_vendor_no_path/InvalidData.java", "valid_vendor_no_path/InvalidData.java"},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
 
 	filesNotToGenerate := []string{
-		filepath.Join(outputDir, "valid_vendor_no_path", "vendor_namespace", "java", "Item.java"),
-		filepath.Join(outputDir, "valid_vendor_no_path", "vendor_namespace", "java", "vendor_namespaceConstants.java"),
-		filepath.Join(outputDir, "valid_vendor_no_path", "vendor_namespace", "java", "MyEnum.java"),
-		filepath.Join(outputDir, "valid_vendor_no_path", "vendor_namespace", "java", "FVendoredBase.java"),
+		"valid_vendor_no_path/vendor_namespace/java/Item.java",
+		"valid_vendor_no_path/vendor_namespace/java/vendor_namespaceConstants.java",
+		"valid_vendor_no_path/vendor_namespace/java/MyEnum.java",
+		"valid_vendor_no_path/vendor_namespace/java/FVendoredBase.java",
 	}
 
 	assertFilesNotExist(t, filesNotToGenerate)
@@ -252,7 +251,7 @@ func TestValidJavaSuppressDeprecatedLogging(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/java/deprecated_logging/FFoo.java", filepath.Join(outputDir, "deprecated_logging", "variety", "java", "FFoo.java")},
+		{"java/deprecated_logging/FFoo.java", "deprecated_logging/variety/java/FFoo.java"},
 	}
 
 	copyAllFiles(t, files)

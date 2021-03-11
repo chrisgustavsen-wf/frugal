@@ -14,7 +14,6 @@
 package compiler_test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/Workiva/frugal/compiler"
@@ -33,10 +32,10 @@ func TestHTML(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/html/style.css", filepath.Join(outputDir, "style.css")},
-		{"_expected/html/index.html", filepath.Join(outputDir, "index.html")},
-		{"_expected/html/base.html", filepath.Join(outputDir, "base.html")},
-		{"_expected/html/variety.html", filepath.Join(outputDir, "variety.html")},
+		{"html/style.css", "style.css"},
+		{"html/index.html", "index.html"},
+		{"html/base.html", "base.html"},
+		{"html/variety.html", "variety.html"},
 	}
 
 	copyAllFiles(t, files)
@@ -56,9 +55,9 @@ func TestHTMLStandalone(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"_expected/html/standalone/index.html", filepath.Join(outputDir, "index.html")},
-		{"_expected/html/standalone/base.html", filepath.Join(outputDir, "base.html")},
-		{"_expected/html/standalone/variety.html", filepath.Join(outputDir, "variety.html")},
+		{"html/standalone/index.html", "index.html"},
+		{"html/standalone/base.html", "base.html"},
+		{"html/standalone/variety.html", "variety.html"},
 	}
 
 	copyAllFiles(t, files)
