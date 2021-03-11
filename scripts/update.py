@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import argparse
-import os
 import re
 import subprocess
 from xml.etree import ElementTree
@@ -12,7 +11,6 @@ from yaml import dump, safe_load
 _PYTHON_VERSION_FILE = "lib/python/frugal/version.py"
 _POM = "pom"
 _POM_XML = "{0}/pom.xml"
-_WORKIVA = "com.workiva"
 _NS = {_POM: "http://maven.apache.org/POM/4.0.0"}
 
 
@@ -90,12 +88,11 @@ class Java(LanguageBase):
 
         # Update example pom
         self._update_maven_version("examples/java", version)
-        self._update_maven_dep("examples/java", _WORKIVA, "frugal", version)
+        self._update_maven_dep("examples/java", version)
 
         # Update integration tests
-        self._update_maven_dep(
-            "test/integration/java/frugal-integration-test", _WORKIVA, "frugal", version
-        )
+        integration = "test/integration/java/frugal-integration-test"
+        self._update_maven_dep(integration, version)
 
     def _update_maven_version(self, where, version):
         """Update the project version in the current directory's pom.xml."""
@@ -105,14 +102,14 @@ class Java(LanguageBase):
         ver.text = version
         tree.write(pwd, default_namespace=_NS[_POM])
 
-    def _update_maven_dep(self, where, group, artifact, version):
+    def _update_maven_dep(self, where, version):
         """Update a maven dependency in the current directory's pom.xml."""
         pwd = _POM_XML.format(where)
         tree = ElementTree.parse(pwd)
         for dep in tree.getroot().find("{0}:dependencies".format(_POM), _NS):
             g = dep.find("{0}:groupId".format(_POM), _NS)
             a = dep.find("{0}:artifactId".format(_POM), _NS)
-            if g.text == group and a.text == artifact:
+            if g.text == "com.workiva" and a.text == "frugal":
                 dep.find("{0}:version".format(_POM), _NS).text = version
         tree.write(pwd, default_namespace=_NS[_POM])
 
@@ -144,7 +141,7 @@ def main(args):
 def update_frugal_version(version):
     """Update the frugal version."""
     # TODO: Implement dry run
-    print(f"Updating frugal to version {version} for {', '.join(LANGUAGES.keys())}")
+    print(f"Updating frugal to {version} for {', '.join(LANGUAGES.keys())}")
     update_compiler(version)
     install_frugal()
     for lang in LANGUAGES.values():
