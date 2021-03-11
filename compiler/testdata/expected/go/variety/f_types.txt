@@ -10,11 +10,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Workiva/frugal/test/_out/ValidTypes"
-	"github.com/Workiva/frugal/test/_out/actual_base/golang"
-	"github.com/Workiva/frugal/test/_out/intermediate_include"
-	"github.com/Workiva/frugal/test/_out/subdir_include"
-	"github.com/Workiva/frugal/test/_out/validStructs"
+	"github.com/Workiva/frugal/compiler/testdata/out/ValidTypes"
+	"github.com/Workiva/frugal/compiler/testdata/out/actual_base/golang"
+	"github.com/Workiva/frugal/compiler/testdata/out/intermediate_include"
+	"github.com/Workiva/frugal/compiler/testdata/out/subdir_include"
+	"github.com/Workiva/frugal/compiler/testdata/out/validStructs"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 

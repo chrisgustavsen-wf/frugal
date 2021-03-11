@@ -8,11 +8,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Workiva/frugal/compiler/testdata/out/async/ValidTypes"
+	"github.com/Workiva/frugal/compiler/testdata/out/async/actual_base/golang"
+	"github.com/Workiva/frugal/compiler/testdata/out/async/subdir_include"
+	"github.com/Workiva/frugal/compiler/testdata/out/async/validStructs"
 	frugal "github.com/Workiva/frugal/lib/go"
-	"github.com/Workiva/frugal/test/_out/async/ValidTypes"
-	"github.com/Workiva/frugal/test/_out/async/actual_base/golang"
-	"github.com/Workiva/frugal/test/_out/async/subdir_include"
-	"github.com/Workiva/frugal/test/_out/async/validStructs"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/sirupsen/logrus"
 )

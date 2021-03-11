@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Workiva/frugal/compiler/testdata/out/ValidTypes"
+	"github.com/Workiva/frugal/compiler/testdata/out/actual_base/golang"
+	"github.com/Workiva/frugal/compiler/testdata/out/subdir_include"
+	"github.com/Workiva/frugal/compiler/testdata/out/validStructs"
 	frugal "github.com/Workiva/frugal/lib/go"
-	"github.com/Workiva/frugal/test/_out/ValidTypes"
-	"github.com/Workiva/frugal/test/_out/actual_base/golang"
-	"github.com/Workiva/frugal/test/_out/subdir_include"
-	"github.com/Workiva/frugal/test/_out/validStructs"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 
