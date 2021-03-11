@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package test
+package compiler_test
 
 import (
 	"path/filepath"

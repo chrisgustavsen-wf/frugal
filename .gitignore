@@ -1,6 +1,6 @@
 test/out
-test/_out
 test/idl/constants.thrift
+compiler/testdata/out
 target/
 *.iml
 .idea
@@ -41,7 +41,7 @@ Library/
 # Go lib specific
 lib/go/go.sum
 examples/go/go.sum
-test/go.sum
+test/integration/go.sum
 
 # GopherJS lib specific
 lib/gopherjs/vendor

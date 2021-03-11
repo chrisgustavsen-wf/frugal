@@ -11,29 +11,40 @@
  * limitations under the License.
  */
 
-package test
+package compiler_test
 
 import (
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/Workiva/frugal/compiler"
-	"github.com/stretchr/testify/assert"
+	"github.com/Workiva/frugal/compiler/globals"
 )
 
-const circularFile = "idl/circular_1.frugal"
+func TestValidJsonFrugalCompiler(t *testing.T) {
+	defer globals.Reset()
+	nowBefore := globals.Now
+	defer func() {
+		globals.Now = nowBefore
+	}()
+	globals.Now = time.Date(2015, 11, 24, 0, 0, 0, 0, time.UTC)
 
-func TestCircularIncludes(t *testing.T) {
 	options := compiler.Options{
-		File:   circularFile,
-		Gen:    "go",
-		Out:    "out",
-		Delim:  ".",
-		DryRun: true,
+		File:    frugalGenFile,
+		Gen:     "json:indent",
+		Out:     outputDir,
+		Delim:   delim,
+		Recurse: true,
 	}
-	err := compiler.Compile(options)
-	assert.Error(t, err)
-	assert.Equal(
-		t,
-		"Include circular_2.frugal: Include circular_3.frugal: Include circular_1.frugal: Circular include: [circular_1 circular_2 circular_3 circular_1]",
-		err.Error())
+	if err := compiler.Compile(options); err != nil {
+		t.Fatal("Unexpected error", err)
+	}
+
+	files := []FileComparisonPair{
+		{"_expected/frugal.json", filepath.Join(outputDir, "frugal.json")},
+	}
+
+	copyAllFiles(t, files)
+	compareAllFiles(t, files)
 }
