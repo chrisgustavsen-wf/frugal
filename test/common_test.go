@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	outputDir               = "out"
+	outputDir               = "_out"
 	delim                   = "."
 	validFile               = "idl/valid.frugal"
 	invalidFile             = "idl/invalid.frugal"

@@ -33,10 +33,10 @@ func TestHTML(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/html/style.css", filepath.Join(outputDir, "style.css")},
-		{"expected/html/index.html", filepath.Join(outputDir, "index.html")},
-		{"expected/html/base.html", filepath.Join(outputDir, "base.html")},
-		{"expected/html/variety.html", filepath.Join(outputDir, "variety.html")},
+		{"_expected/html/style.css", filepath.Join(outputDir, "style.css")},
+		{"_expected/html/index.html", filepath.Join(outputDir, "index.html")},
+		{"_expected/html/base.html", filepath.Join(outputDir, "base.html")},
+		{"_expected/html/variety.html", filepath.Join(outputDir, "variety.html")},
 	}
 
 	copyAllFiles(t, files)
@@ -56,9 +56,9 @@ func TestHTMLStandalone(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/html/standalone/index.html", filepath.Join(outputDir, "index.html")},
-		{"expected/html/standalone/base.html", filepath.Join(outputDir, "base.html")},
-		{"expected/html/standalone/variety.html", filepath.Join(outputDir, "variety.html")},
+		{"_expected/html/standalone/index.html", filepath.Join(outputDir, "index.html")},
+		{"_expected/html/standalone/base.html", filepath.Join(outputDir, "base.html")},
+		{"_expected/html/standalone/variety.html", filepath.Join(outputDir, "variety.html")},
 	}
 
 	copyAllFiles(t, files)

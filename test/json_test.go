@@ -42,7 +42,7 @@ func TestValidJsonFrugalCompiler(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/frugal.json", filepath.Join(outputDir, "frugal.json")},
+		{"_expected/frugal.json", filepath.Join(outputDir, "frugal.json")},
 	}
 
 	copyAllFiles(t, files)

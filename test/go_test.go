@@ -23,7 +23,7 @@ import (
 func TestValidGoWithAsync(t *testing.T) {
 	options := compiler.Options{
 		File:  frugalGenFile,
-		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/out/async/,async",
+		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/_out/async/,async",
 		Out:   outputDir + "/async",
 		Delim: delim,
 	}
@@ -32,7 +32,7 @@ func TestValidGoWithAsync(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/variety_async/f_foo_service.txt", filepath.Join(outputDir, "async", "variety", "f_foo_service.go")},
+		{"_expected/go/variety_async/f_foo_service.txt", filepath.Join(outputDir, "async", "variety", "f_foo_service.go")},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -41,7 +41,7 @@ func TestValidGoWithAsync(t *testing.T) {
 func TestValidGoFrugalCompiler(t *testing.T) {
 	options := compiler.Options{
 		File:    frugalGenFile,
-		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/out/",
+		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/_out/",
 		Out:     outputDir,
 		Delim:   delim,
 		Recurse: true,
@@ -51,12 +51,12 @@ func TestValidGoFrugalCompiler(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/actual_base/f_types.txt", filepath.Join(outputDir, "actual_base", "golang", "f_types.go")},
-		{"expected/go/actual_base/f_basefoo_service.txt", filepath.Join(outputDir, "actual_base", "golang", "f_basefoo_service.go")},
+		{"_expected/go/actual_base/f_types.txt", filepath.Join(outputDir, "actual_base", "golang", "f_types.go")},
+		{"_expected/go/actual_base/f_basefoo_service.txt", filepath.Join(outputDir, "actual_base", "golang", "f_basefoo_service.go")},
 
-		{"expected/go/variety/f_types.txt", filepath.Join(outputDir, "variety", "f_types.go")},
-		{"expected/go/variety/f_foo_service.txt", filepath.Join(outputDir, "variety", "f_foo_service.go")},
-		{"expected/go/variety/f_events_scope.txt", filepath.Join(outputDir, "variety", "f_events_scope.go")},
+		{"_expected/go/variety/f_types.txt", filepath.Join(outputDir, "variety", "f_types.go")},
+		{"_expected/go/variety/f_foo_service.txt", filepath.Join(outputDir, "variety", "f_foo_service.go")},
+		{"_expected/go/variety/f_events_scope.txt", filepath.Join(outputDir, "variety", "f_events_scope.go")},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -67,7 +67,7 @@ func TestValidGoFrugalCompiler(t *testing.T) {
 func TestValidGoVendor(t *testing.T) {
 	options := compiler.Options{
 		File:  includeVendor,
-		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/out/,use_vendor",
+		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/_out/,use_vendor",
 		Out:   outputDir,
 		Delim: delim,
 	}
@@ -76,9 +76,9 @@ func TestValidGoVendor(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/vendor/f_myscope_scope.txt", filepath.Join(outputDir, "include_vendor", "f_myscope_scope.go")},
-		{"expected/go/vendor/f_myservice_service.txt", filepath.Join(outputDir, "include_vendor", "f_myservice_service.go")},
-		{"expected/go/vendor/f_types.txt", filepath.Join(outputDir, "include_vendor", "f_types.go")},
+		{"_expected/go/vendor/f_myscope_scope.txt", filepath.Join(outputDir, "include_vendor", "f_myscope_scope.go")},
+		{"_expected/go/vendor/f_myservice_service.txt", filepath.Join(outputDir, "include_vendor", "f_myservice_service.go")},
+		{"_expected/go/vendor/f_types.txt", filepath.Join(outputDir, "include_vendor", "f_types.go")},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -89,7 +89,7 @@ func TestValidGoVendor(t *testing.T) {
 func TestValidGoVendorPathNotSpecified(t *testing.T) {
 	options := compiler.Options{
 		File:  includeVendorNoPath,
-		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/out/,use_vendor",
+		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/_out/,use_vendor",
 		Out:   outputDir,
 		Delim: delim,
 	}
@@ -103,7 +103,7 @@ func TestValidGoVendorPathNotSpecified(t *testing.T) {
 func TestValidGoVendorNamespaceTargetGenerate(t *testing.T) {
 	options := compiler.Options{
 		File:  vendorNamespace,
-		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/out/,use_vendor",
+		Gen:   "go:package_prefix=github.com/Workiva/frugal/test/_out/,use_vendor",
 		Out:   outputDir,
 		Delim: delim,
 	}
@@ -112,8 +112,8 @@ func TestValidGoVendorNamespaceTargetGenerate(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/vendor_namespace/f_types.txt", filepath.Join(outputDir, "vendor_namespace", "f_types.go")},
-		{"expected/go/vendor_namespace/f_vendoredbase_service.txt", filepath.Join(outputDir, "vendor_namespace", "f_vendoredbase_service.go")},
+		{"_expected/go/vendor_namespace/f_types.txt", filepath.Join(outputDir, "vendor_namespace", "f_types.go")},
+		{"_expected/go/vendor_namespace/f_vendoredbase_service.txt", filepath.Join(outputDir, "vendor_namespace", "f_vendoredbase_service.go")},
 	}
 	copyAllFiles(t, files)
 	compareAllFiles(t, files)
@@ -123,8 +123,8 @@ func TestValidGoVendorNamespaceTargetGenerate(t *testing.T) {
 func TestIncludeOrdering(t *testing.T) {
 	options := compiler.Options{
 		File:    "idl/ordering/main.frugal",
-		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/out/ordering",
-		Out:     "out/ordering",
+		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/_out/ordering",
+		Out:     filepath.Join(outputDir, "ordering"),
 		Delim:   delim,
 		Recurse: true,
 	}
@@ -133,11 +133,11 @@ func TestIncludeOrdering(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/ordering/one/f_types.go", filepath.Join(outputDir, "ordering", "one", "f_types.go")},
-		{"expected/go/ordering/two/f_types.go", filepath.Join(outputDir, "ordering", "two", "f_types.go")},
-		{"expected/go/ordering/three/f_types.go", filepath.Join(outputDir, "ordering", "three", "f_types.go")},
-		{"expected/go/ordering/four/f_types.go", filepath.Join(outputDir, "ordering", "four", "f_types.go")},
-		{"expected/go/ordering/five/f_types.go", filepath.Join(outputDir, "ordering", "five", "f_types.go")},
+		{"_expected/go/ordering/one/f_types.go", filepath.Join(outputDir, "ordering", "one", "f_types.go")},
+		{"_expected/go/ordering/two/f_types.go", filepath.Join(outputDir, "ordering", "two", "f_types.go")},
+		{"_expected/go/ordering/three/f_types.go", filepath.Join(outputDir, "ordering", "three", "f_types.go")},
+		{"_expected/go/ordering/four/f_types.go", filepath.Join(outputDir, "ordering", "four", "f_types.go")},
+		{"_expected/go/ordering/five/f_types.go", filepath.Join(outputDir, "ordering", "five", "f_types.go")},
 	}
 
 	copyAllFiles(t, files)
@@ -148,7 +148,7 @@ func TestIncludeOrdering(t *testing.T) {
 func TestSlim(t *testing.T) {
 	options := compiler.Options{
 		File:    frugalGenFile,
-		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/out/,slim",
+		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/_out/,slim",
 		Out:     outputDir,
 		Delim:   delim,
 		Recurse: true,
@@ -158,9 +158,9 @@ func TestSlim(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/slim/f_types.go", filepath.Join(outputDir, "variety", "f_types.go")},
-		{"expected/go/slim/f_foo_service.go", filepath.Join(outputDir, "variety", "f_foo_service.go")},
-		{"expected/go/slim/f_events_scope.go", filepath.Join(outputDir, "variety", "f_events_scope.go")},
+		{"_expected/go/slim/f_types.go", filepath.Join(outputDir, "variety", "f_types.go")},
+		{"_expected/go/slim/f_foo_service.go", filepath.Join(outputDir, "variety", "f_foo_service.go")},
+		{"_expected/go/slim/f_events_scope.go", filepath.Join(outputDir, "variety", "f_events_scope.go")},
 	}
 
 	copyAllFiles(t, files)
@@ -171,7 +171,7 @@ func TestSlim(t *testing.T) {
 func TestSuppressedDeprecatedLogging(t *testing.T) {
 	options := compiler.Options{
 		File:    frugalGenFile,
-		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/out/,suppress_deprecated_logging",
+		Gen:     "go:package_prefix=github.com/Workiva/frugal/test/_out/,suppress_deprecated_logging",
 		Out:     outputDir,
 		Delim:   delim,
 		Recurse: true,
@@ -181,7 +181,7 @@ func TestSuppressedDeprecatedLogging(t *testing.T) {
 	}
 
 	files := []FileComparisonPair{
-		{"expected/go/deprecated_logging/f_foo_service.go", filepath.Join(outputDir, "variety", "f_foo_service.go")},
+		{"_expected/go/deprecated_logging/f_foo_service.go", filepath.Join(outputDir, "variety", "f_foo_service.go")},
 	}
 
 	copyAllFiles(t, files)

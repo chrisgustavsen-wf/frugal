@@ -9,14 +9,14 @@ clean:
 unit: clean unit-cli unit-go unit-java unit-py2 unit-py3
 
 unit-cli:
-	go test ./test -race
+	cd test && go test -race
 
 # update the expected generated files; for those times when you change the generation
 unit-cli-copy:
-	go test ./test -copy-files
+	cd test && go test -copy-files
 
 unit-go:
-	cd lib/go && GO111MODULE=on go mod vendor && go test -v -race 
+	cd lib/go && GO111MODULE=on go mod vendor && go test -v -race
 
 unit-java:
 	mvn -f lib/java/pom.xml clean verify

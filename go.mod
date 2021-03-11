@@ -3,13 +3,8 @@ module github.com/Workiva/frugal
 go 1.15
 
 require (
-	github.com/Workiva/frugal/lib/go v0.0.0-20210120174923-290564696faf
-	github.com/apache/thrift/lib/go/thrift v0.0.0-20210120171102-e27e82c46ba4 // indirect
-	github.com/go-stomp/stomp v2.1.2+incompatible
-	github.com/nats-io/nats.go v1.10.0
-	github.com/rs/cors v1.7.0
-	github.com/sirupsen/logrus v1.7.0
-	github.com/stretchr/testify v1.7.0
+	github.com/sirupsen/logrus v1.8.0
+	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/urfave/cli v1.19.1
 	golang.org/x/tools v0.0.0-20161215003254-dd796641777b
 	gopkg.in/yaml.v2 v2.0.0-20160928153709-a5b47d31c556
