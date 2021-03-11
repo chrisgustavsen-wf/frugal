@@ -27,11 +27,7 @@ func TestValidDartFrugalCompiler(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"dart/variety/f_awesome_exception.dart", "variety/lib/src/f_awesome_exception.dart"},
 		{"dart/variety/f_event.dart", "variety/lib/src/f_event.dart"},
 		{"dart/variety/f_event_wrapper.dart", "variety/lib/src/f_event_wrapper.dart"},
@@ -55,8 +51,7 @@ func TestValidDartFrugalCompiler(t *testing.T) {
 		{"dart/actual_base/f_nested_thing.dart", "actual_base_dart/lib/src/f_nested_thing.dart"},
 		{"dart/actual_base/actual_base_dart.dart", "actual_base_dart/lib/actual_base_dart.dart"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidDartUseNullForUnset(t *testing.T) {
@@ -67,11 +62,7 @@ func TestValidDartUseNullForUnset(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"dart.nullunset/variety/f_awesome_exception.dart", "nullunset/variety/lib/src/f_awesome_exception.dart"},
 		{"dart.nullunset/variety/f_event.dart", "nullunset/variety/lib/src/f_event.dart"},
 		{"dart.nullunset/variety/f_event_wrapper.dart", "nullunset/variety/lib/src/f_event_wrapper.dart"},
@@ -95,8 +86,7 @@ func TestValidDartUseNullForUnset(t *testing.T) {
 		{"dart.nullunset/actual_base/f_nested_thing.dart", "nullunset/actual_base_dart/lib/src/f_nested_thing.dart"},
 		{"dart.nullunset/actual_base/actual_base_dart.dart", "nullunset/actual_base_dart/lib/actual_base_dart.dart"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidDartEnums(t *testing.T) {
@@ -107,16 +97,11 @@ func TestValidDartEnums(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"dart/enum/f_testing_enums.dart", "enum_dart/lib/src/f_testing_enums.dart"},
 		{"dart/enum/enum_dart.dart", "enum_dart/lib/enum_dart.dart"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures correct import references are used when -use-vendor is set and the
@@ -128,20 +113,14 @@ func TestValidDartVendor(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"dart/include_vendor/f_my_scope_scope.dart", "include_vendor/lib/src/f_my_scope_scope.dart"},
 		{"dart/include_vendor/f_my_service_service.dart", "include_vendor/lib/src/f_my_service_service.dart"},
 		{"dart/include_vendor/f_vendored_references.dart", "include_vendor/lib/src/f_vendored_references.dart"},
 		{"dart/include_vendor/include_vendor.dart", "include_vendor/lib/include_vendor.dart"},
 		{"dart/include_vendor/pubspec.yaml", "include_vendor/pubspec.yaml"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures an error is returned when -use-vendor is set and the vendored
@@ -167,17 +146,12 @@ func TestValidDartVendorNamespaceTargetGenerate(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"dart/vendor_namespace/vendor_namespace.dart", "vendor_namespace/lib/vendor_namespace.dart"},
 		{"dart/vendor_namespace/f_item.dart", "vendor_namespace/lib/src/f_item.dart"},
 		{"dart/vendor_namespace/f_vendored_base_service.dart", "vendor_namespace/lib/src/f_vendored_base_service.dart"},
 		{"dart/vendor_namespace/f_vendor_namespace_constants.dart", "vendor_namespace/lib/src/f_vendor_namespace_constants.dart"},
 		{"dart/vendor_namespace/f_my_enum.dart", "vendor_namespace/lib/src/f_my_enum.dart"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }

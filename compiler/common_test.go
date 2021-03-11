@@ -19,6 +19,8 @@ import (
 	"io"
 	"os"
 	"testing"
+
+	"github.com/Workiva/frugal/compiler"
 )
 
 const (
@@ -39,9 +41,25 @@ func idl(name string) string { return "testdata/idl/" + name }
 func exp(name string) string { return "testdata/expected/" + name }
 func gen(name string) string { return "testdata/out/" + name }
 
-type FileComparisonPair struct {
+type Comparison struct {
 	ExpectedPath  string
 	GeneratedPath string
+}
+
+type ComparisonList []Comparison
+
+func (pairs ComparisonList) Run(t *testing.T, options compiler.Options) {
+	if err := compiler.Compile(options); err != nil {
+		t.Fatal("Unexpected error", err)
+	}
+	for i, pair := range pairs {
+		if pair.GeneratedPath[0] != '/' {
+			pairs[i].GeneratedPath = gen(pair.GeneratedPath)
+		}
+		pairs[i].ExpectedPath = exp(pair.ExpectedPath)
+	}
+	copyAllFiles(t, pairs)
+	compareAllFiles(t, pairs)
 }
 
 func compareFiles(t *testing.T, expectedPath, generatedPath string) {
@@ -75,17 +93,13 @@ func compareFiles(t *testing.T, expectedPath, generatedPath string) {
 	}
 }
 
-func compareAllFiles(t *testing.T, pairs []FileComparisonPair) {
+func compareAllFiles(t *testing.T, pairs []Comparison) {
 	for _, pair := range pairs {
-		out := pair.GeneratedPath
-		if out[0] != '/' {
-			out = gen(out)
-		}
-		compareFiles(t, exp(pair.ExpectedPath), out)
+		compareFiles(t, pair.ExpectedPath, pair.GeneratedPath)
 	}
 }
 
-func copyAllFiles(t *testing.T, pairs []FileComparisonPair) {
+func copyAllFiles(t *testing.T, pairs []Comparison) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
@@ -100,19 +114,15 @@ func copyAllFiles(t *testing.T, pairs []FileComparisonPair) {
 	}
 }
 
-func copyFilePair(pair FileComparisonPair) error {
+func copyFilePair(pair Comparison) error {
 	// TODO automatically create a missing expected file?
-	out := pair.GeneratedPath
-	if out[0] != '/' {
-		out = gen(out)
-	}
-	generatedFile, err := os.Open(out)
+	generatedFile, err := os.Open(pair.GeneratedPath)
 	if err != nil {
 		return err
 	}
 	defer generatedFile.Close()
 
-	expectedFile, err := os.Create(exp(pair.ExpectedPath))
+	expectedFile, err := os.Create(pair.ExpectedPath)
 	if err != nil {
 		return err
 	}

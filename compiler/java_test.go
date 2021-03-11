@@ -34,16 +34,10 @@ func TestValidJavaWithAsync(t *testing.T) {
 		Out:   outputDir + "/async",
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/variety_async/FFoo.java", "async/variety/java/FFoo.java"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidJavaFrugalCompiler(t *testing.T) {
@@ -61,11 +55,7 @@ func TestValidJavaFrugalCompiler(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/variety/AwesomeException.java", "variety/java/AwesomeException.java"},
 		{"java/variety/Event.java", "variety/java/Event.java"},
 		{"java/variety/EventWrapper.java", "variety/java/EventWrapper.java"},
@@ -88,9 +78,7 @@ func TestValidJavaFrugalCompiler(t *testing.T) {
 		{"java/actual_base/FBaseFoo.java", "actual_base/java/FBaseFoo.java"},
 		{"java/actual_base/nested_thing.java", "actual_base/java/nested_thing.java"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidJavaBoxedPrimitives(t *testing.T) {
@@ -108,17 +96,11 @@ func TestValidJavaBoxedPrimitives(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/boxed_primitives/FFoo.java", "boxed_primitives/variety/java/FFoo.java"},
 		{"java/boxed_primitives/TestingDefaults.java", "boxed_primitives/variety/java/TestingDefaults.java"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures correct import references are used when -use-vendor is set and the
@@ -137,19 +119,14 @@ func TestValidJavaVendor(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/valid_vendor/FMyService.java", "valid_vendor/include_vendor/java/FMyService.java"},
 		{"java/valid_vendor/MyScopePublisher.java", "valid_vendor/include_vendor/java/MyScopePublisher.java"},
 		{"java/valid_vendor/MyScopeSubscriber.java", "valid_vendor/include_vendor/java/MyScopeSubscriber.java"},
 		{"java/valid_vendor/VendoredReferences.java", "valid_vendor/include_vendor/java/VendoredReferences.java"},
 		{"java/valid_vendor/InvalidData.java", "valid_vendor/InvalidData.java"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 
 	filesNotToGenerate := []string{
 		"valid_vendor/vendor_namespace/java/Item.java",
@@ -176,11 +153,7 @@ func TestValidJavaVendorButNotUseVendor(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/vendored_but_no_use_vendor/FMyService.java", "vendored_but_no_use_vendor/include_vendor/java/FMyService.java"},
 		{"java/vendored_but_no_use_vendor/MyScopePublisher.java", "vendored_but_no_use_vendor/include_vendor/java/MyScopePublisher.java"},
 		{"java/vendored_but_no_use_vendor/MyScopeSubscriber.java", "vendored_but_no_use_vendor/include_vendor/java/MyScopeSubscriber.java"},
@@ -191,8 +164,7 @@ func TestValidJavaVendorButNotUseVendor(t *testing.T) {
 		{"java/vendored_but_no_use_vendor/MyEnum.java", "vendored_but_no_use_vendor/vendor_namespace/java/MyEnum.java"},
 		{"java/vendored_but_no_use_vendor/FVendoredBase.java", "vendored_but_no_use_vendor/vendor_namespace/java/FVendoredBase.java"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidJavaVendorNoPathUsesDefinedNamespace(t *testing.T) {
@@ -209,19 +181,14 @@ func TestValidJavaVendorNoPathUsesDefinedNamespace(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/valid_vendor_no_path/FMyService.java", "valid_vendor_no_path/include_vendor_no_path/java/FMyService.java"},
 		{"java/valid_vendor_no_path/MyScopePublisher.java", "valid_vendor_no_path/include_vendor_no_path/java/MyScopePublisher.java"},
 		{"java/valid_vendor_no_path/MyScopeSubscriber.java", "valid_vendor_no_path/include_vendor_no_path/java/MyScopeSubscriber.java"},
 		{"java/valid_vendor_no_path/VendoredReferences.java", "valid_vendor_no_path/include_vendor_no_path/java/VendoredReferences.java"},
 		{"java/valid_vendor_no_path/InvalidData.java", "valid_vendor_no_path/InvalidData.java"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 
 	filesNotToGenerate := []string{
 		"valid_vendor_no_path/vendor_namespace/java/Item.java",
@@ -246,14 +213,8 @@ func TestValidJavaSuppressDeprecatedLogging(t *testing.T) {
 		Out:   outputDir + "/deprecated_logging",
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"java/deprecated_logging/FFoo.java", "deprecated_logging/variety/java/FFoo.java"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }

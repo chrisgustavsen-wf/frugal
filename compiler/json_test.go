@@ -36,14 +36,8 @@ func TestValidJsonFrugalCompiler(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"frugal.json", "frugal.json"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }

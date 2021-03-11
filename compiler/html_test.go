@@ -27,19 +27,13 @@ func TestHTML(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"html/style.css", "style.css"},
 		{"html/index.html", "index.html"},
 		{"html/base.html", "base.html"},
 		{"html/variety.html", "variety.html"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestHTMLStandalone(t *testing.T) {
@@ -50,16 +44,10 @@ func TestHTMLStandalone(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"html/standalone/index.html", "index.html"},
 		{"html/standalone/base.html", "base.html"},
 		{"html/standalone/variety.html", "variety.html"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }

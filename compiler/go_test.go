@@ -26,15 +26,10 @@ func TestValidGoWithAsync(t *testing.T) {
 		Out:   outputDir + "/async",
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/variety_async/f_foo_service.txt", "async/variety/f_foo_service.go"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 func TestValidGoFrugalCompiler(t *testing.T) {
@@ -45,11 +40,7 @@ func TestValidGoFrugalCompiler(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/actual_base/f_types.txt", "actual_base/golang/f_types.go"},
 		{"go/actual_base/f_basefoo_service.txt", "actual_base/golang/f_basefoo_service.go"},
 
@@ -57,8 +48,7 @@ func TestValidGoFrugalCompiler(t *testing.T) {
 		{"go/variety/f_foo_service.txt", "variety/f_foo_service.go"},
 		{"go/variety/f_events_scope.txt", "variety/f_events_scope.go"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures correct import references are used when -use-vendor is set and the
@@ -70,17 +60,12 @@ func TestValidGoVendor(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/vendor/f_myscope_scope.txt", "include_vendor/f_myscope_scope.go"},
 		{"go/vendor/f_myservice_service.txt", "include_vendor/f_myservice_service.go"},
 		{"go/vendor/f_types.txt", "include_vendor/f_types.go"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures an error is returned when -use-vendor is set and the vendored
@@ -106,16 +91,11 @@ func TestValidGoVendorNamespaceTargetGenerate(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/vendor_namespace/f_types.txt", "vendor_namespace/f_types.go"},
 		{"go/vendor_namespace/f_vendoredbase_service.txt", "vendor_namespace/f_vendoredbase_service.go"},
 	}
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures includes are generated in the same order
@@ -127,20 +107,14 @@ func TestIncludeOrdering(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/ordering/one/f_types.go", "ordering/one/f_types.go"},
 		{"go/ordering/two/f_types.go", "ordering/two/f_types.go"},
 		{"go/ordering/three/f_types.go", "ordering/three/f_types.go"},
 		{"go/ordering/four/f_types.go", "ordering/four/f_types.go"},
 		{"go/ordering/five/f_types.go", "ordering/five/f_types.go"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures slim generated files are correct.
@@ -152,18 +126,12 @@ func TestSlim(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/slim/f_types.go", "variety/f_types.go"},
 		{"go/slim/f_foo_service.go", "variety/f_foo_service.go"},
 		{"go/slim/f_events_scope.go", "variety/f_events_scope.go"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
 
 // Ensures deprecated logging can be suppressed
@@ -175,14 +143,8 @@ func TestSuppressedDeprecatedLogging(t *testing.T) {
 		Delim:   delim,
 		Recurse: true,
 	}
-	if err := compiler.Compile(options); err != nil {
-		t.Fatal("Unexpected error", err)
-	}
-
-	files := []FileComparisonPair{
+	suite := ComparisonList{
 		{"go/deprecated_logging/f_foo_service.go", "variety/f_foo_service.go"},
 	}
-
-	copyAllFiles(t, files)
-	compareAllFiles(t, files)
+	suite.Run(t, options)
 }
