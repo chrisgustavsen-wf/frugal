@@ -16,115 +16,32 @@ package compiler_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/Workiva/frugal/compiler"
 )
 
 func TestInvalid(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("invalid.frugalz"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
+	suite := [][2]string{
+		{"invalid.frugal", "parser: syntax error"},
+		{"duplicate_services.frugal", "Services foo and Foo conflict"},
+		{"duplicate_scopes.frugal", "Scopes foo and Foo conflict"},
+		{"duplicate_methods.frugal", "Methods Ping and ping conflict"},
+		{"duplicate_operations.frugal", "Operations boo and Boo conflict"},
+		{"duplicate_arg_ids.frugal", "Duplicate field"},
+		{"duplicate_field_ids.frugal", "Duplicate field"},
+		{"bad_namespace.frugal", "annotation not compatible with * namespace"},
+		{"bad_op_type.frugal", "Invalid operation type invalid.type for test.test"},
 	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateServices(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_services.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateScopes(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_scopes.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateMethods(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_methods.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateOperations(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_operations.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateMethodArgIds(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_arg_ids.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-func TestDuplicateStructFieldIds(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("duplicate_field_ids.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if compiler.Compile(options) == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-// Ensures an error is returned when a "*" namespace has a vendor annotation.
-func TestWildcardNamespaceWithVendorAnnotation(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("bad_namespace.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if err := compiler.Compile(options); err == nil {
-		t.Fatal("Expected error")
-	}
-}
-
-// Ensures an error is returned when a scope operation has an invalid type.
-func TestInvalidScopeOperationType(t *testing.T) {
-	options := compiler.Options{
-		File:  idl("ad_op_type.frugal"),
-		Gen:   "go",
-		Out:   outputDir,
-		Delim: delim,
-	}
-	if err := compiler.Compile(options); err == nil {
-		t.Fatal("Expected error")
+	for _, test := range suite {
+		options := compiler.Options{
+			File:  idl(test[0]),
+			Gen:   "go",
+			Out:   outputDir,
+			Delim: delim,
+		}
+		err := compiler.Compile(options)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), test[1])
 	}
 }
