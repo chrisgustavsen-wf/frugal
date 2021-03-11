@@ -6,10 +6,6 @@ class Go(LanguageBase):
     Go implementation of LanguageBase.
     """
 
-    def update_frugal(self, version, root):
-        # No change necessary
-        pass
-
-    def update_expected_tests(self, root):
+    def update_frugal(self, version):
         # No change necessary
         pass

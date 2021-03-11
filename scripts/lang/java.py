@@ -4,10 +4,10 @@ from xml.etree import ElementTree
 from lang.base import LanguageBase
 
 
-_POM = 'pom'
-_POM_XML = 'pom.xml'
-_WORKIVA = 'com.workiva'
-_NS = {_POM: 'http://maven.apache.org/POM/4.0.0'}
+_POM = "pom"
+_POM_XML = "{0}/pom.xml"
+_WORKIVA = "com.workiva"
+_NS = {_POM: "http://maven.apache.org/POM/4.0.0"}
 
 
 class Java(LanguageBase):
@@ -16,38 +16,35 @@ class Java(LanguageBase):
     pom.xml's.
     """
 
-    def update_frugal(self, version, root):
+    def update_frugal(self, version):
         """Update the java version."""
         # Update library pom
-        os.chdir('{0}/lib/java'.format(root))
-        self._update_maven_version(version)
+        self._update_maven_version("lib/java", version)
 
         # Update example pom
-        os.chdir('{0}/examples/java'.format(root))
-        self._update_maven_version(version)
-        self._update_maven_dep(_WORKIVA, 'frugal', version)
+        self._update_maven_version("examples/java", version)
+        self._update_maven_dep("examples/java", _WORKIVA, "frugal", version)
 
         # Update integration tests
-        path = '{0}/test/integration/java/frugal-integration-test'.format(root)
-        os.chdir(path)
-        self._update_maven_dep(_WORKIVA, 'frugal', version)
+        self._update_maven_dep(
+            "test/integration/java/frugal-integration-test", _WORKIVA, "frugal", version
+        )
 
-    def _update_maven_version(self, version):
+    def _update_maven_version(self, where, version):
         """Update the project version in the current directory's pom.xml."""
-        tree = ElementTree.parse(_POM_XML)
-        ver = tree.getroot().find('{0}:version'.format(_POM), _NS)
+        pwd = _POM_XML.format(where)
+        tree = ElementTree.parse(pwd)
+        ver = tree.getroot().find("{0}:version".format(_POM), _NS)
         ver.text = version
-        tree.write(_POM_XML, default_namespace=_NS[_POM])
+        tree.write(pwd, default_namespace=_NS[_POM])
 
-    def _update_maven_dep(self, group, artifact, version):
+    def _update_maven_dep(self, where, group, artifact, version):
         """Update a maven dependency in the current directory's pom.xml."""
-        tree = ElementTree.parse(_POM_XML)
-        for dep in tree.getroot().find('{0}:dependencies'.format(_POM), _NS):
-            g = dep.find('{0}:groupId'.format(_POM), _NS)
-            a = dep.find('{0}:artifactId'.format(_POM), _NS)
+        pwd = _POM_XML.format(where)
+        tree = ElementTree.parse(pwd)
+        for dep in tree.getroot().find("{0}:dependencies".format(_POM), _NS):
+            g = dep.find("{0}:groupId".format(_POM), _NS)
+            a = dep.find("{0}:artifactId".format(_POM), _NS)
             if g.text == group and a.text == artifact:
-                dep.find('{0}:version'.format(_POM), _NS).text = version
-        tree.write(_POM_XML, default_namespace=_NS[_POM])
-
-    def update_expected_tests(self, root):
-        pass
+                dep.find("{0}:version".format(_POM), _NS).text = version
+        tree.write(pwd, default_namespace=_NS[_POM])
