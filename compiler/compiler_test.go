@@ -150,9 +150,9 @@ func TestValidDartVendorPathNotSpecified(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err == nil {
-		t.Fatal("Expected error")
-	}
+	err := compiler.Compile(options)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "does not specify vendor path for dart namespace")
 }
 
 // Ensures the target IDL is generated when -use-vendor is set and it has a
@@ -232,9 +232,9 @@ func TestValidGoVendorPathNotSpecified(t *testing.T) {
 		Out:   outputDir,
 		Delim: delim,
 	}
-	if err := compiler.Compile(options); err == nil {
-		t.Fatal("Expected error")
-	}
+	err := compiler.Compile(options)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "does not specify vendor path for go namespace")
 }
 
 // Ensures the target IDL is generated when -use-vendor is set and it has a
