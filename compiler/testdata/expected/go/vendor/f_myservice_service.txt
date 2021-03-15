@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Workiva/frugal/compiler/testdata/out/excepts"
 	frugal "github.com/Workiva/frugal/lib/go"
-	"github.com/Workiva/frugal/test/out/excepts"
 	"github.com/Workiva/some/vendored/place/vendor_namespace"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/sirupsen/logrus"

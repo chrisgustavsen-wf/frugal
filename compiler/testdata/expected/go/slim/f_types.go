@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Workiva/frugal/compiler/testdata/out/actual_base/golang"
 	frugal "github.com/Workiva/frugal/lib/go"
-	"github.com/Workiva/frugal/test/out/actual_base/golang"
 	"github.com/apache/thrift/lib/go/thrift"
 )
 

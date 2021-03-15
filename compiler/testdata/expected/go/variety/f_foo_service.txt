@@ -8,11 +8,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Workiva/frugal/compiler/testdata/out/ValidTypes"
+	"github.com/Workiva/frugal/compiler/testdata/out/actual_base/golang"
+	"github.com/Workiva/frugal/compiler/testdata/out/subdir_include"
+	"github.com/Workiva/frugal/compiler/testdata/out/validStructs"
 	frugal "github.com/Workiva/frugal/lib/go"
-	"github.com/Workiva/frugal/test/out/ValidTypes"
-	"github.com/Workiva/frugal/test/out/actual_base/golang"
-	"github.com/Workiva/frugal/test/out/subdir_include"
-	"github.com/Workiva/frugal/test/out/validStructs"
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/sirupsen/logrus"
 )
@@ -78,6 +78,7 @@ func NewFFooClient(provider *frugal.FServiceProvider, middleware ...frugal.Servi
 // Ping the server.
 // Deprecated: don't use this; use "something else"
 func (f *FFooClient) Ping(fctx frugal.FContext) (err error) {
+	logrus.Warn("Call to deprecated function 'Foo.Ping'")
 	ret := f.methods["ping"].Invoke([]interface{}{fctx})
 	if len(ret) != 1 {
 		panic(fmt.Sprintf("Middleware returned %d arguments, expected 1", len(ret)))
@@ -432,6 +433,7 @@ type fooFPing struct {
 }
 
 func (p *fooFPing) Process(fctx frugal.FContext, iprot, oprot *frugal.FProtocol) error {
+	logrus.Warn("Deprecated function 'Foo.Ping' was called by a client")
 	ctx, cancelFn := frugal.ToContext(fctx)
 	defer cancelFn()
 

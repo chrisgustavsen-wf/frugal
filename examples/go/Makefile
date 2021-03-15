@@ -2,11 +2,15 @@
 .PHONY: all
 all: install
 
-# Installs dependencies and symlink the local frugal into the
-# vendor folder so local changes to frugal can be easily tested
-.PHONY: install
 install:
-	rm -rf vendor && \
-		glide install && \
-		rm -rf vendor/github.com/Workiva/frugal/lib/go && \
-		ln -s ${GOPATH}/src/github.com/Workiva/frugal/lib/go vendor/github.com/Workiva/frugal/lib/go
+	cd ../.. && go install .
+	mkdir -p build
+	frugal -gen go ../idl/music.frugal
+	go build -v -o build/bin-httpClient ./httpClient
+	go build -v -o build/bin-httpServer ./httpServer
+	go build -v -o build/bin-natsClient ./natsClient
+	go build -v -o build/bin-natsPublisher ./natsPublisher
+	go build -v -o build/bin-natsServer ./natsServer
+	go build -v -o build/bin-natsSubscriber ./natsSubscriber
+	go build -v -o build/bin-stompPublisher ./stompPublisher
+	go build -v -o build/bin-stompSubscriber ./stompSubscriber

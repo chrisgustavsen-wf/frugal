@@ -11,22 +11,19 @@
  * limitations under the License.
  */
 
-package test
+package compiler_test
 
 import (
 	"fmt"
 	"strings"
 	"testing"
 
-	"github.com/Workiva/frugal/compiler/parser"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/Workiva/frugal/compiler/parser"
 )
 
-const (
-	testFileThrift = "idl/breaking_changes/test.thrift"
-	testWarning    = "idl/breaking_changes/warning.thrift"
-	scopeFile      = "idl/breaking_changes/scope.frugal"
-)
+var testFileThrift = idl("breaking_changes/test.thrift")
 
 type MockValidationLogger struct {
 	errors   []string
@@ -47,7 +44,8 @@ func (m *MockValidationLogger) ErrorsLogged() bool {
 
 func TestPassingAudit(t *testing.T) {
 	auditor := parser.NewAuditorWithLogger(&MockValidationLogger{})
-	if err := auditor.Audit(validFile, validFile); err != nil {
+	var valid = idl("valid.frugal")
+	if err := auditor.Audit(valid, valid); err != nil {
 		t.Fatal("unexpected error", err)
 	}
 }
@@ -90,7 +88,7 @@ func TestBreakingChanges(t *testing.T) {
 	}
 	for i := 0; i < 33; i++ {
 
-		badFile := fmt.Sprintf("idl/breaking_changes/break%d.thrift", i+1)
+		badFile := idl(fmt.Sprintf("breaking_changes/break%d.thrift", i+1))
 		logger := &MockValidationLogger{}
 		auditor := parser.NewAuditorWithLogger(logger)
 		err := auditor.Audit(testFileThrift, badFile)
@@ -108,7 +106,7 @@ func TestBreakingChanges(t *testing.T) {
 
 func TestWarningChanges(t *testing.T) {
 	auditor := parser.NewAuditorWithLogger(&MockValidationLogger{})
-	err := auditor.Audit(testFileThrift, testWarning)
+	err := auditor.Audit(testFileThrift, idl("breaking_changes/warning.thrift"))
 	if err != nil {
 		t.Fatalf("\nExpected no errors, but got: %s", err.Error())
 	}
@@ -125,10 +123,10 @@ func TestScopeBreakingChanges(t *testing.T) {
 		"scope Foo: operation Foo: types not equal: 'Thing' -> 'i32'",
 	}
 	for i := 0; i < 7; i++ {
-		badFile := fmt.Sprintf("idl/breaking_changes/scope%d.frugal", i+1)
+		badFile := idl(fmt.Sprintf("breaking_changes/scope%d.frugal", i+1))
 		logger := &MockValidationLogger{}
 		auditor := parser.NewAuditorWithLogger(logger)
-		err := auditor.Audit(scopeFile, badFile)
+		err := auditor.Audit(idl("breaking_changes/scope.frugal"), badFile)
 		if err != nil {
 			if logger.errors[0] != expected[i] {
 				t.Fatalf("checking %s\nExpected: %s\nBut got : %s\n", badFile, expected[i], logger.errors[0])

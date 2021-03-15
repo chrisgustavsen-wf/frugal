@@ -1,4 +1,4 @@
-module github.com/Workiva/frugal/test/integration/go
+module github.com/Workiva/frugal/test/integration
 
 go 1.15
 
@@ -10,4 +10,4 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 )
 
-replace github.com/Workiva/frugal/lib/go v0.0.0 => ../../../lib/go
+replace github.com/Workiva/frugal/lib/go v0.0.0 => ../../lib/go

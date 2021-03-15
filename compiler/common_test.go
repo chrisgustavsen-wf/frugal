@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package test
+package compiler_test
 
 import (
 	"bufio"
@@ -19,32 +19,48 @@ import (
 	"io"
 	"os"
 	"testing"
+
+	"github.com/Workiva/frugal/compiler"
 )
 
 const (
-	outputDir               = "out"
-	delim                   = "."
-	validFile               = "idl/valid.frugal"
-	invalidFile             = "idl/invalid.frugal"
-	duplicateServices       = "idl/duplicate_services.frugal"
-	duplicateScopes         = "idl/duplicate_scopes.frugal"
-	duplicateMethods        = "idl/duplicate_methods.frugal"
-	duplicateOperations     = "idl/duplicate_operations.frugal"
-	duplicateMethodArgIds   = "idl/duplicate_arg_ids.frugal"
-	duplicateStructFieldIds = "idl/duplicate_field_ids.frugal"
-	frugalGenFile           = "idl/variety.frugal"
-	badNamespace            = "idl/bad_namespace.frugal"
-	badOpType               = "idl/bad_op_type.frugal"
-	includeVendor           = "idl/include_vendor.frugal"
-	includeVendorNoPath     = "idl/include_vendor_no_path.frugal"
-	vendorNamespace         = "idl/vendor_namespace.frugal"
+	outputDir = "testdata/out"
+	delim     = "."
 )
 
-var copyFilesPtr = flag.Bool("copy-files", false, "")
+var (
+	frugalGenFile       = idl("variety.frugal")
+	includeVendor       = idl("include_vendor.frugal")
+	includeVendorNoPath = idl("include_vendor_no_path.frugal")
+	vendorNamespace     = idl("vendor_namespace.frugal")
 
-type FileComparisonPair struct {
+	// Flag that can be passed to `go test` to update the gold files
+	copyFilesPtr = flag.Bool("copy-files", false, "")
+)
+
+func idl(name string) string { return "testdata/idl/" + name }
+func exp(name string) string { return "testdata/expected/" + name }
+func gen(name string) string { return outputDir + "/" + name }
+
+type Comparison struct {
 	ExpectedPath  string
 	GeneratedPath string
+}
+
+type ComparisonList []Comparison
+
+func (pairs ComparisonList) Run(t *testing.T, options compiler.Options) {
+	if err := compiler.Compile(options); err != nil {
+		t.Fatal("Unexpected error", err)
+	}
+	for i, pair := range pairs {
+		if pair.GeneratedPath[0] != '/' { // don't modify absolute paths
+			pairs[i].GeneratedPath = gen(pair.GeneratedPath)
+		}
+		pairs[i].ExpectedPath = exp(pair.ExpectedPath)
+	}
+	copyAllFiles(t, pairs)
+	compareAllFiles(t, pairs)
 }
 
 func compareFiles(t *testing.T, expectedPath, generatedPath string) {
@@ -78,13 +94,13 @@ func compareFiles(t *testing.T, expectedPath, generatedPath string) {
 	}
 }
 
-func compareAllFiles(t *testing.T, pairs []FileComparisonPair) {
+func compareAllFiles(t *testing.T, pairs []Comparison) {
 	for _, pair := range pairs {
 		compareFiles(t, pair.ExpectedPath, pair.GeneratedPath)
 	}
 }
 
-func copyAllFiles(t *testing.T, pairs []FileComparisonPair) {
+func copyAllFiles(t *testing.T, pairs []Comparison) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
@@ -99,9 +115,8 @@ func copyAllFiles(t *testing.T, pairs []FileComparisonPair) {
 	}
 }
 
-func copyFilePair(pair FileComparisonPair) error {
+func copyFilePair(pair Comparison) error {
 	// TODO automatically create a missing expected file?
-
 	generatedFile, err := os.Open(pair.GeneratedPath)
 	if err != nil {
 		return err
