@@ -6,8 +6,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Go: "
   - package-ecosystem: "gomod"
@@ -16,8 +15,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Tool: "
   - package-ecosystem: "maven"
@@ -26,8 +24,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Java: "
   - package-ecosystem: "maven"
@@ -36,8 +33,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Examples(java): "
   - package-ecosystem: "gomod"
@@ -46,8 +42,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Examples(go): "
   - package-ecosystem: "maven"
@@ -56,8 +51,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Tests(java): "
   - package-ecosystem: "gomod"
@@ -66,8 +60,7 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Tests(go): "
   - package-ecosystem: "pip"
@@ -76,7 +69,6 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "natewoods-wf"
+      - "Workiva/service-platform"
     commit-message:
       prefix: "Python: "
