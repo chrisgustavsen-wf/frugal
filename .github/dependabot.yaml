@@ -7,21 +7,19 @@ updates:
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
       prefix: "Go: "
   - package-ecosystem: "gomod"
-    directory: "/lib/gopherjs"
+    directory: "/"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
-      prefix: "Go: "
+      prefix: "Tool: "
   - package-ecosystem: "maven"
     directory: "/lib/java"
     schedule:
@@ -29,7 +27,6 @@ updates:
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
       prefix: "Java: "
@@ -40,10 +37,19 @@ updates:
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
-      prefix: "Examples: "
+      prefix: "Examples(java): "
+  - package-ecosystem: "gomod"
+    directory: "/examples/go"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "natewoods-wf"
+    commit-message:
+      prefix: "Examples(go): "
   - package-ecosystem: "maven"
     directory: "/test/integration/java/frugal-integration-test"
     schedule:
@@ -51,10 +57,19 @@ updates:
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
-      prefix: "Tests: "
+      prefix: "Tests(java): "
+  - package-ecosystem: "gomod"
+    directory: "/test/integration"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    reviewers:
+      - "charliekump-wf"
+      - "natewoods-wf"
+    commit-message:
+      prefix: "Tests(go): "
   - package-ecosystem: "pip"
     directory: "/lib/python"
     schedule:
@@ -62,7 +77,6 @@ updates:
     target-branch: "develop"
     reviewers:
       - "charliekump-wf"
-      - "erikpetersen-wf"
       - "natewoods-wf"
     commit-message:
       prefix: "Python: "
