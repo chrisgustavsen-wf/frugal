@@ -2,7 +2,6 @@
 TODO
 
 ### Acceptance Criteria:
-- [ ] At least one InfRe Squad 2 member has reviewed and +1'd
 - [ ] Code has been tested and results documented
 - [ ] Unit tests have been updated
 - [ ] Updates to documentation if necessary
@@ -19,4 +18,4 @@ TODO
 TODO
 
 #### Reviewers:
-@Workiva/product2
+@Workiva/service-platform
