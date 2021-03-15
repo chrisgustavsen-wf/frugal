@@ -8,7 +8,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Go: "
+      prefix: "go-lib: "
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
@@ -17,7 +17,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Tool: "
+      prefix: "go-tool: "
   - package-ecosystem: "maven"
     directory: "/lib/java"
     schedule:
@@ -26,7 +26,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Java: "
+      prefix: "java-lib: "
   - package-ecosystem: "maven"
     directory: "/examples/java"
     schedule:
@@ -35,7 +35,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Examples(java): "
+      prefix: "java-exam: "
   - package-ecosystem: "gomod"
     directory: "/examples/go"
     schedule:
@@ -44,7 +44,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Examples(go): "
+      prefix: "go-exam: "
   - package-ecosystem: "maven"
     directory: "/test/integration/java/frugal-integration-test"
     schedule:
@@ -53,7 +53,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Tests(java): "
+      prefix: "java-test: "
   - package-ecosystem: "gomod"
     directory: "/test/integration"
     schedule:
@@ -62,7 +62,7 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Tests(go): "
+      prefix: "go-test: "
   - package-ecosystem: "pip"
     directory: "/lib/python"
     schedule:
@@ -71,4 +71,4 @@ updates:
     reviewers:
       - "Workiva/service-platform"
     commit-message:
-      prefix: "Python: "
+      prefix: "py-lib: "
