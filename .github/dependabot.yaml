@@ -6,69 +6,69 @@ updates:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Go: "
+      prefix: "go-lib: "
   - package-ecosystem: "gomod"
-    directory: "/lib/gopherjs"
+    directory: "/"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Go: "
+      prefix: "go-tool: "
   - package-ecosystem: "maven"
     directory: "/lib/java"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Java: "
+      prefix: "java-lib: "
   - package-ecosystem: "maven"
     directory: "/examples/java"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Examples: "
+      prefix: "java-exam: "
+  - package-ecosystem: "gomod"
+    directory: "/examples/go"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    reviewers:
+      - "Workiva/service-platform"
+    commit-message:
+      prefix: "go-exam: "
   - package-ecosystem: "maven"
     directory: "/test/integration/java/frugal-integration-test"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Tests: "
+      prefix: "java-test: "
+  - package-ecosystem: "gomod"
+    directory: "/test/integration"
+    schedule:
+      interval: "weekly"
+    target-branch: "develop"
+    reviewers:
+      - "Workiva/service-platform"
+    commit-message:
+      prefix: "go-test: "
   - package-ecosystem: "pip"
     directory: "/lib/python"
     schedule:
       interval: "weekly"
     target-branch: "develop"
     reviewers:
-      - "charliekump-wf"
-      - "erikpetersen-wf"
-      - "natewoods-wf"
-      - "yuanmwang-wf"
+      - "Workiva/service-platform"
     commit-message:
-      prefix: "Python: "
+      prefix: "py-lib: "

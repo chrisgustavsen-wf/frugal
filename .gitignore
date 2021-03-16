@@ -1,5 +1,6 @@
 test/out
 test/idl/constants.thrift
+compiler/testdata/out
 target/
 *.iml
 .idea
@@ -38,11 +39,9 @@ lib/python/dist
 Library/
 
 # Go lib specific
-lib/go/vendor
-lib/go/glide.lock
 lib/go/go.sum
-examples/go/vendor
-examples/go/glide.lock
+examples/go/go.sum
+test/integration/go.sum
 
 # GopherJS lib specific
 lib/gopherjs/vendor
